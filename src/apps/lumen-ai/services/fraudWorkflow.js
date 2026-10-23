@@ -3,6 +3,7 @@
 
 import { trustStorage } from './trustStorage';
 import { financeStorage } from './financeStorage';
+import { aiStorage } from './aiStorage';
 
 class FraudWorkflowService {
   constructor() {
@@ -31,6 +32,11 @@ class FraudWorkflowService {
   // 1. Trigger Fraud Simulation (called by SimulatorPanel)
   simulateFraud({ amount = 4850, merchant = 'Unknown Global POS • Dublin' } = {}) {
     const activeLevel = trustStorage.getAutonomyLevel(); // 'l1' or 'l3'
+
+    // If simulating under L1, ensure the credit card is active (not left frozen from earlier tests)
+    if (activeLevel === 'l1') {
+      financeStorage.unfreezeCard('card-lumen-brand');
+    }
 
     // Deduct & Record in Finance Storage
     const { card, txn, last4 } = financeStorage.injectFraudTransaction({ amount, merchant });
@@ -62,7 +68,7 @@ class FraudWorkflowService {
         title: 'Suspicious Transaction Detected',
         body: `A transaction of ₹${amount.toLocaleString('en-IN')} has been detected on your card ending with ${last4}. Have you done this transaction?`,
         color: '#ef4444',
-        duration: 3000,
+        duration: 5000,
         actions: [
           {
             label: 'Yes',
@@ -108,6 +114,9 @@ class FraudWorkflowService {
   // L1 WORKFLOW (Guided Assistance)
   // ==========================================
   startL1Workflow(incident) {
+    // Explicitly guarantee the credit card is active and not frozen
+    financeStorage.unfreezeCard(incident?.cardId || 'card-lumen-brand');
+
     const updated = {
       ...incident,
       status: 'l1_steps'
@@ -127,7 +136,7 @@ class FraudWorkflowService {
         title: 'Credit Card Protection',
         body: 'Want to freeze and replace the credit card? Click here to know how to freeze and apply for replacement of credit card',
         color: '#3b82f6',
-        duration: 3000,
+        duration: 5000,
         onClickCard: () => this.executeL1NavigateToAsk(),
         actions: [
           {
@@ -145,10 +154,8 @@ class FraudWorkflowService {
     const incident = trustStorage.getFraudIncident();
     trustStorage.clearFraudIncident();
 
-    // Navigate to Ask screen of Lumen AI
-    if (this.appNavigator) {
-      this.appNavigator('lumen_ai', 'ask');
-    }
+    // Ensure the card remains active and is NEVER left in a frozen state for L1
+    financeStorage.unfreezeCard(incident?.cardId || 'card-lumen-brand');
 
     // Direct reply coming from agent (no prior user prompt)
     const amount = incident?.amount || 4850;
@@ -169,8 +176,23 @@ Here are the required steps to safeguard your funds:
 
 Feel free to ask me anything about filing a dispute or monitoring your bank balance!`;
 
-    if (this.askDirectMessenger) {
-      this.askDirectMessenger(detailedMessage);
+    // Append directly to aiStorage as single source of truth (triggers lumen_ai_messages_updated)
+    aiStorage.appendMessage({
+      id: `msg-fraud-${last4}-${Date.now()}`,
+      role: 'assistant',
+      text: detailedMessage,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+
+    // Navigate to Ask screen of Lumen AI
+    if (this.appNavigator) {
+      this.appNavigator('lumen_ai', 'ask');
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('lumen_switch_tab', { detail: { tab: 'ask' } })
+      );
     }
   }
 
@@ -197,7 +219,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
         title: 'Emergency Card Action',
         body: 'Want to freeze the credit card to prevent further charges?',
         color: '#ef4444',
-        duration: 3000,
+        duration: 5000,
         actions: [
           {
             label: 'Freeze Now',
@@ -234,7 +256,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
         title: 'Security Protocol Activated',
         body: 'Initiated freezing the credit card in the background...',
         color: '#0284c7',
-        duration: 3000
+        duration: 5000
       });
     }
 
@@ -264,7 +286,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           title: 'Card Freezed Successfully',
           body: 'The card has been freezed successfully. Want to apply for replacement of this credit card?',
           color: '#10b981',
-          duration: 3000,
+          duration: 5000,
           actions: [
             {
               label: 'Replace Card',
@@ -302,7 +324,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
         title: 'Replacement Request Filed',
         body: 'Applied for new credit card. Generating fresh digital credentials...',
         color: '#6366f1',
-        duration: 3000
+        duration: 5000
       });
     }
 
@@ -333,7 +355,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           title: 'New Credit Card Issued',
           body: 'New credit card is here! Fresh CVV and 16-digit credentials ready to view.',
           color: '#10b981',
-          duration: 3000,
+          duration: 5000,
           onClickCard: () => this.executeL3ViewNewCard(),
           actions: [
             {
@@ -354,14 +376,22 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
 
     // Navigate to Glance and trigger Digital Card Modal
     if (this.appNavigator) {
-      this.appNavigator('lumen_ai', 'glance');
+      this.appNavigator('lumen_ai', 'glance', { openDigitalCard: true });
     }
 
     if (this.glanceCardOpener) {
-      // Small timeout to allow tab render if app just launched
+      this.glanceCardOpener();
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('lumen_switch_tab', {
+          detail: { tab: 'glance', openDigitalCard: true }
+        })
+      );
       setTimeout(() => {
-        this.glanceCardOpener();
-      }, 150);
+        window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
+      }, 250);
     }
   }
 

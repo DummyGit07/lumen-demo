@@ -204,7 +204,7 @@ export default function App() {
     }
 
     // Auto dismiss heads-up banner from mobile screen after 3 seconds (notification remains in tray)
-    const timeoutMs = newNotif.duration || 3000;
+    const timeoutMs = newNotif.duration || 5000;
     setTimeout(() => {
       setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
     }, timeoutMs);
@@ -215,18 +215,22 @@ export default function App() {
     fraudWorkflow.init({
       triggerNotification,
       dismissNotification,
-      navigateApp: (appId, tab) => {
+      navigateApp: (appId, tab, extra = {}) => {
         handleLaunchApp(appId);
         if (tab) {
+          setAppScreen(appId, tab);
+          if (extra.openDigitalCard) {
+            setAppScreen('lumen_ai_open_card', true);
+          }
           setTimeout(() => {
             window.dispatchEvent(
-              new CustomEvent('lumen_switch_tab', { detail: { tab } })
+              new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
             );
-          }, 120);
+          }, 80);
         }
       }
     });
-  }, [activeAppId]);
+  }, []);
 
   // Keyboard Navigation Listeners
   useEffect(() => {
@@ -436,7 +440,13 @@ export default function App() {
                       )}
 
                       {activeAppId === 'lumen_ai' && (
-                        <LumenAiApp />
+                        <LumenAiApp
+                          initialTab={internalAppScreens.lumen_ai || 'glance'}
+                          activeTabProp={internalAppScreens.lumen_ai}
+                          onTabChange={(t) => setAppScreen('lumen_ai', t)}
+                          autoOpenDigitalCard={Boolean(internalAppScreens.lumen_ai_open_card)}
+                          onClearAutoOpenCard={() => setAppScreen('lumen_ai_open_card', false)}
+                        />
                       )}
 
                       {activeAppId === 'gmail' && (

@@ -12,8 +12,29 @@ import ChatInput from './components/ChatInput';
 import ActScreen from './components/ActScreen';
 import TrustScreen from './components/TrustScreen';
 
-export default function LumenAiApp({ initialTab = 'glance' }) {
-  const [activeTab, setActiveTab] = useState(initialTab); // 'glance' | 'ask' | 'act' | 'trust'
+export default function LumenAiApp({
+  initialTab = 'glance',
+  activeTabProp,
+  onTabChange,
+  autoOpenDigitalCard = false,
+  onClearAutoOpenCard
+}) {
+  const [activeTab, setActiveTab] = useState(activeTabProp || initialTab); // 'glance' | 'ask' | 'act' | 'trust'
+  const [autoOpenCard, setAutoOpenCard] = useState(Boolean(autoOpenDigitalCard));
+
+  // Sync if parent passes activeTabProp
+  useEffect(() => {
+    if (activeTabProp && activeTabProp !== activeTab) {
+      setActiveTab(activeTabProp);
+    }
+  }, [activeTabProp]);
+
+  // Sync if parent passes autoOpenDigitalCard
+  useEffect(() => {
+    if (autoOpenDigitalCard) {
+      setAutoOpenCard(true);
+    }
+  }, [autoOpenDigitalCard]);
 
   // Financial Dashboard State
   const finance = useLumenFinance();
@@ -21,32 +42,41 @@ export default function LumenAiApp({ initialTab = 'glance' }) {
   // AI Assistant Chat State (for 'ask' tab)
   const { messages, isThinking, sendMessage, addDirectAssistantMessage, clearChat } = useLumenAi();
 
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    if (onTabChange) onTabChange(tab);
+  };
+
   // Register chat messenger & card opener with fraudWorkflow
   useEffect(() => {
     fraudWorkflow.setChatMessenger(addDirectAssistantMessage);
     fraudWorkflow.setGlanceCardOpener(() => {
       setActiveTab('glance');
+      setAutoOpenCard(true);
+      if (onTabChange) onTabChange('glance');
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
       }, 100);
     });
-  }, [addDirectAssistantMessage]);
+  }, [addDirectAssistantMessage, onTabChange]);
 
   // Listen to tab switch events from external workflows
   useEffect(() => {
     const handleSwitch = (e) => {
       if (e.detail?.tab) {
         setActiveTab(e.detail.tab);
-        if (e.detail?.openDigitalCard) {
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
-          }, 100);
-        }
+        if (onTabChange) onTabChange(e.detail.tab);
+      }
+      if (e.detail?.openDigitalCard) {
+        setAutoOpenCard(true);
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
+        }, 100);
       }
     };
     window.addEventListener('lumen_switch_tab', handleSwitch);
     return () => window.removeEventListener('lumen_switch_tab', handleSwitch);
-  }, []);
+  }, [onTabChange]);
 
   return (
     <div className="lumen-app-root">
@@ -64,7 +94,12 @@ export default function LumenAiApp({ initialTab = 'glance' }) {
             >
               <GlanceScreen
                 finance={finance}
-                onNavigateTab={(tab) => setActiveTab(tab)}
+                onNavigateTab={handleTabSwitch}
+                autoOpenDigitalCard={autoOpenCard}
+                onResetAutoOpen={() => {
+                  setAutoOpenCard(false);
+                  if (onClearAutoOpenCard) onClearAutoOpenCard();
+                }}
               />
             </motion.div>
           )}
@@ -130,7 +165,7 @@ export default function LumenAiApp({ initialTab = 'glance' }) {
               transition={{ duration: 0.18 }}
             >
               <ActScreen
-                onNavigateTab={(tab) => setActiveTab(tab)}
+                onNavigateTab={handleTabSwitch}
               />
             </motion.div>
           )}
@@ -145,7 +180,7 @@ export default function LumenAiApp({ initialTab = 'glance' }) {
               transition={{ duration: 0.18 }}
             >
               <TrustScreen
-                onNavigateTab={(tab) => setActiveTab(tab)}
+                onNavigateTab={handleTabSwitch}
               />
             </motion.div>
           )}
@@ -153,7 +188,7 @@ export default function LumenAiApp({ initialTab = 'glance' }) {
       </div>
 
       {/* 4-Tab Bottom Navigation Bar (Glance, Ask, Act, Trust) */}
-      <LumenBottomNav activeTab={activeTab} onSelectTab={setActiveTab} />
+      <LumenBottomNav activeTab={activeTab} onSelectTab={handleTabSwitch} />
     </div>
   );
 }

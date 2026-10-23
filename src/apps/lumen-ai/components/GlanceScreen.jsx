@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CreditCard,
@@ -19,7 +19,9 @@ import { detectCardBrand } from '../services/financeStorage';
 
 export default function GlanceScreen({
   finance,
-  onNavigateTab
+  onNavigateTab,
+  autoOpenDigitalCard = false,
+  onResetAutoOpen
 }) {
   const {
     banks,
@@ -34,10 +36,18 @@ export default function GlanceScreen({
 
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(false);
-  const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(false);
+  const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(Boolean(autoOpenDigitalCard));
+
+  // Sync when autoOpenDigitalCard prop becomes true
+  useEffect(() => {
+    if (autoOpenDigitalCard) {
+      setIsDigitalCardOpen(true);
+      if (onResetAutoOpen) onResetAutoOpen();
+    }
+  }, [autoOpenDigitalCard, onResetAutoOpen]);
 
   // Auto open digital card modal when triggered externally (e.g., View New Card)
-  React.useEffect(() => {
+  useEffect(() => {
     const handleOpen = () => {
       setIsDigitalCardOpen(true);
     };

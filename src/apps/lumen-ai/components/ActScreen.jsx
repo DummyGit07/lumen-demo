@@ -120,7 +120,10 @@ export default function ActScreen({ onNavigateTab }) {
 
                 <button
                   className="incident-action-btn primary"
-                  onClick={() => fraudWorkflow.executeL1NavigateToAsk()}
+                  onClick={() => {
+                    fraudWorkflow.executeL1NavigateToAsk();
+                    if (onNavigateTab) onNavigateTab('ask');
+                  }}
                 >
                   <span>View Steps</span>
                   <ArrowRight size={15} />
@@ -285,7 +288,10 @@ export default function ActScreen({ onNavigateTab }) {
 
                 <button
                   className="incident-action-btn success"
-                  onClick={() => fraudWorkflow.executeL3ViewNewCard()}
+                  onClick={() => {
+                    fraudWorkflow.executeL3ViewNewCard();
+                    if (onNavigateTab) onNavigateTab('glance');
+                  }}
                 >
                   <CreditCard size={15} />
                   <span>View New Card</span>

@@ -5,10 +5,19 @@ export function useLumenAi() {
   const [messages, setMessages] = useState(() => aiStorage.loadMessages());
   const [isThinking, setIsThinking] = useState(false);
 
-  // Sync to local storage whenever messages update
+  // Sync to local storage whenever messages update from internal chat actions
   useEffect(() => {
     aiStorage.saveMessages(messages);
   }, [messages]);
+
+  // Sync when messages are updated externally (e.g. from fraudWorkflow)
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      setMessages(aiStorage.loadMessages());
+    };
+    window.addEventListener('lumen_ai_messages_updated', handleStorageUpdate);
+    return () => window.removeEventListener('lumen_ai_messages_updated', handleStorageUpdate);
+  }, []);
 
   const sendMessage = useCallback((promptText) => {
     if (!promptText.trim() || isThinking) return;
@@ -53,13 +62,12 @@ export function useLumenAi() {
   }, [isThinking]);
 
   const addDirectAssistantMessage = useCallback((text) => {
-    const aiMessage = {
+    aiStorage.appendMessage({
       id: `msg-${Date.now()}`,
       role: 'assistant',
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setMessages((prev) => [...prev, aiMessage]);
+    });
   }, []);
 
   const clearChat = useCallback(() => {
