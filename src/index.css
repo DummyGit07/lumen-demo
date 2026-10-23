@@ -2120,3 +2120,1112 @@ html, body, #root {
   font-weight: 600;
 }
 
+/* ========================================================
+   LUMEN AI - FINANCIAL DASHBOARD & MULTI-SCREEN STYLES
+   ======================================================== */
+.lumen-app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #090b11;
+  color: #f8fafc;
+  overflow: hidden;
+  position: relative;
+}
+
+.lumen-screen-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.lumen-tab-pane {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lumen-ask-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Glance Scroll Container */
+/* Glance Scroll Container - Scroller hidden to utilize full screen while retaining smooth scroll */
+.lumen-glance-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.95rem 1rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.lumen-glance-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Top Bar */
+.glance-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.15rem 0 0.25rem;
+}
+
+.glance-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.glance-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.glance-greeting {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.glance-status {
+  font-size: 0.68rem;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.glance-reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 0.35rem 0.65rem;
+  border-radius: 14px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.glance-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* Metrics Overview */
+.glance-metrics-strip {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 0.95rem 1.1rem;
+}
+
+.metric-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 3px 0 2px;
+  letter-spacing: -0.02em;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.metric-sub {
+  font-size: 0.62rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.metric-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 1rem;
+}
+
+/* Section Header */
+.glance-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-top: 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.view-all-txns-btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.view-all-txns-btn:hover {
+  background: rgba(99, 102, 241, 0.22);
+  color: #fff;
+}
+
+/* Primary Focus: Lumen Credit Card */
+.lumen-credit-card-canvas {
+  width: 100%;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #171529 0%, #231c3c 45%, #361f56 100%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  padding: 1.15rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.lumen-credit-card-canvas::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.card-brand-classified {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-bank-name {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card-brand-pipe {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 300;
+}
+
+.card-brand-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #c084fc;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(192, 132, 252, 0.15);
+  padding: 1px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+}
+
+.card-contactless {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Masked Starting Digits and Inline Total Outstanding Row */
+.card-masked-and-outstanding-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.card-masked-digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.08em;
+}
+
+.card-outstanding-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.card-outstanding-label {
+  font-size: 0.62rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.card-outstanding-amount {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #f87171;
+  white-space: nowrap;
+}
+
+/* Chip & Full Number Display */
+.card-chip-and-number-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.emv-chip {
+  width: 32px;
+  height: 23px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.35);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.emv-chip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.card-full-number-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+  white-space: nowrap;
+}
+
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.meta-label {
+  font-size: 0.54rem;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.meta-value {
+  font-size: 0.74rem;
+  color: #fff;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.card-outstanding-bar {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.55rem 0.75rem;
+}
+
+.outstanding-flex {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.outstanding-meter-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.outstanding-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+/* Quick Actions (UPI Widgets) */
+.glance-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.glance-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.8rem 0.4rem;
+  cursor: pointer;
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.glance-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.glance-action-btn.primary {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(168, 85, 247, 0.28));
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.action-icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Connected Banks List */
+.glance-banks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.bank-account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  transition: all 0.15s;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+.bank-account-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.bank-card-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bank-logo-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+.bank-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.bank-ac-num {
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+}
+
+.bank-ac-type {
+  font-size: 0.62rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.bank-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.bank-balance {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.bank-balance.debit {
+  color: #f87171;
+}
+
+.bank-pay-link {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: #818cf8;
+  font-size: 0.66rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 3px;
+}
+
+
+
+.card-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.card-status-pill.active {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.card-status-pill.active .status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.card-status-pill.freezed {
+  background: rgba(56, 189, 248, 0.16);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.card-status-pill.freezed .status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+.credit-card-view-link {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  color: #c084fc;
+  font-size: 0.66rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 3px;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.credit-card-view-link:hover {
+  color: #e9d5ff;
+}
+
+/* Transactions Container */
+.glance-txn-container {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 0.85rem 1rem;
+}
+
+.glance-txn-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 1.5rem 0.5rem;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.glance-txn-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.glance-txn-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glance-txn-item:last-child {
+  border-bottom: none;
+}
+
+.txn-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.txn-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.txn-recipient {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1px;
+}
+
+.txn-meta {
+  font-size: 0.64rem;
+  color: #94a3b8;
+  display: flex;
+  gap: 6px;
+}
+
+.txn-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.txn-amount-wrap {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.txn-amount-wrap.debit {
+  color: #f87171;
+}
+
+.txn-note {
+  font-size: 0.62rem;
+  color: #64748b;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* ========================================================
+   LUMEN BOTTOM NAVIGATION (GLANCE, ASK, ACT, TRUST)
+   ======================================================== */
+.lumen-bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #0d1017;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.55rem 0.65rem 0.65rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.lumen-nav-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  position: relative;
+  border-radius: 10px;
+  transition: color 0.15s ease;
+}
+
+.lumen-nav-item.active {
+  color: #818cf8;
+  font-weight: 700;
+}
+
+.lumen-nav-indicator {
+  position: absolute;
+  inset: 0;
+  background: rgba(99, 102, 241, 0.18);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 8px;
+}
+
+.lumen-nav-label {
+  position: relative;
+  z-index: 2;
+}
+
+/* ========================================================
+   PAY MODAL / BOTTOM SHEET
+   ======================================================== */
+.lumen-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.lumen-pay-sheet {
+  background: #111420;
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.85rem 1rem 1.25rem;
+  max-height: 88%;
+  overflow-y: auto;
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.lumen-pay-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 auto 0.75rem;
+}
+
+.lumen-pay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.lumen-upi-badge {
+  background: #10b981;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.lumen-presets-scroll {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.lumen-presets-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.lumen-preset-pill {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 0.35rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.lumen-preset-pill:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #fff;
+}
+
+.lumen-pay-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.lumen-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lumen-input-group label {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.lumen-text-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.55rem 0.75rem;
+  color: #fff;
+  font-size: 0.78rem;
+  outline: none;
+}
+
+.lumen-text-input:focus {
+  border-color: #6366f1;
+}
+
+.lumen-amount-input-wrap {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.35rem 0.75rem;
+}
+
+.lumen-inr-symbol {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #818cf8;
+  margin-right: 6px;
+}
+
+.lumen-amount-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  width: 100%;
+}
+
+.lumen-method-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lumen-method-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.5rem 0.65rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.lumen-method-item.selected {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: #6366f1;
+}
+
+.lumen-method-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lumen-method-item.selected .lumen-method-radio {
+  border-color: #6366f1;
+}
+
+.lumen-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6366f1;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.15s;
+}
+
+.lumen-method-item.selected .lumen-radio-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.lumen-method-name {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lumen-method-sub {
+  font-size: 0.62rem;
+  color: #94a3b8;
+}
+
+.lumen-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+}
+
+.lumen-primary-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  border: none;
+  padding: 0.65rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  transition: all 0.15s;
+  margin-top: 0.35rem;
+}
+
+.lumen-primary-action-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Payment Success State */
+.lumen-success-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+}
+
+.lumen-success-icon-wrap {
+  margin-bottom: 0.4rem;
+}
+
+.lumen-success-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.lumen-success-amount {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #10b981;
+  margin: 0.25rem 0;
+}
+
+.lumen-success-recipient {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.lumen-success-details-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lumen-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+/* Dummy Screen (Act / Trust) */
+.lumen-dummy-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.dummy-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.85rem;
+}
+
+.dummy-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.dummy-subtitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #818cf8;
+  margin-bottom: 0.65rem;
+}
+
+.dummy-desc {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  max-width: 260px;
+  margin-bottom: 1rem;
+}
+
+.dummy-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(236, 72, 153, 0.12);
+  color: #f472b6;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  margin-bottom: 1.25rem;
+}
+
+.dummy-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.dummy-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 0.5rem 1.1rem;
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dummy-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+
