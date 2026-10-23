@@ -25,6 +25,7 @@ import {
 import StatusBar from './components/StatusBar';
 import BottomNavBar from './components/BottomNavBar';
 import NotificationBanner from './components/NotificationBanner';
+import NotificationShade from './components/NotificationShade';
 import HomeScreen from './components/HomeScreen';
 import RecentsScreen from './components/RecentsScreen';
 
@@ -95,6 +96,10 @@ export default function App() {
     setInternalAppScreens((prev) => ({ ...prev, [appId]: screen }));
   };
 
+  const [apps, setApps] = useState(INITIAL_APPS);
+  const [isNotificationShadeOpen, setIsNotificationShadeOpen] = useState(false);
+  const [notificationList, setNotificationList] = useState([]); // Completely empty by default, dynamic like a real phone!
+
   // Launch / Open an App
   const handleLaunchApp = (appId) => {
     playHapticSound('click');
@@ -103,11 +108,21 @@ export default function App() {
     if (!runningApps.includes(appId)) {
       setRunningApps((prev) => [...prev, appId]);
     }
+    // Clear unread notification badge when opening the app, just like a real phone
+    setApps((prev) =>
+      prev.map((a) => (a.id === appId ? { ...a, badge: null } : a))
+    );
   };
 
   // Bottom 1: BACK BUTTON (◁)
   const handleBack = () => {
     playHapticSound('click');
+
+    // If Notification Shade is open -> slide it back up
+    if (isNotificationShadeOpen) {
+      setIsNotificationShadeOpen(false);
+      return;
+    }
 
     if (mode === 'recents') {
       setMode('home');
@@ -143,6 +158,9 @@ export default function App() {
   // Bottom 2: HOME BUTTON (○)
   const handleHome = () => {
     playHapticSound('click');
+    if (isNotificationShadeOpen) {
+      setIsNotificationShadeOpen(false);
+    }
     setMode('home');
     // App stays preserved in runningApps!
   };
@@ -150,6 +168,9 @@ export default function App() {
   // Bottom 3: RECENTS BUTTON (□)
   const handleRecents = () => {
     playHapticSound('click');
+    if (isNotificationShadeOpen) {
+      setIsNotificationShadeOpen(false);
+    }
     if (mode === 'recents') {
       setMode('home');
     } else {
@@ -174,7 +195,7 @@ export default function App() {
     setMode('home');
   };
 
-  // Trigger simulated push notification
+  // Trigger dynamic push notification
   const triggerNotification = (notifTemplate) => {
     playHapticSound('chime');
     const newNotif = {
@@ -182,8 +203,19 @@ export default function App() {
       id: `notif-${Date.now()}`
     };
     setActiveNotification(newNotif);
+    // Push to notification screen tray
+    setNotificationList((prev) => [newNotif, ...prev]);
 
-    // Auto dismiss after 4.5 seconds
+    // Dynamically update unread badge on the app icon if user is not currently inside that app
+    if (activeAppId !== newNotif.appId) {
+      setApps((prevApps) =>
+        prevApps.map((a) =>
+          a.id === newNotif.appId ? { ...a, badge: (a.badge || 0) + 1 } : a
+        )
+      );
+    }
+
+    // Auto dismiss banner after 4.5 seconds
     setTimeout(() => {
       setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
     }, 4500);
@@ -279,6 +311,44 @@ export default function App() {
                     handleLaunchApp('music');
                   }
                 }}
+                onSlideDown={() => {
+                  playHapticSound('click');
+                  setIsNotificationShadeOpen(true);
+                }}
+              />
+
+              {/* Slide-Down Notification Screen (Shade) */}
+              <NotificationShade
+                isOpen={isNotificationShadeOpen}
+                onClose={() => {
+                  playHapticSound('click');
+                  setIsNotificationShadeOpen(false);
+                }}
+                notifications={notificationList}
+                onClearAll={() => {
+                  playHapticSound('click');
+                  setNotificationList([]);
+                  setApps((prev) => prev.map((a) => ({ ...a, badge: null })));
+                }}
+                onDismissOne={(id) => {
+                  playHapticSound('click');
+                  const targetItem = notificationList.find((n) => n.id === id);
+                  setNotificationList((prev) => prev.filter((n) => n.id !== id));
+                  if (targetItem?.appId) {
+                    setApps((prev) =>
+                      prev.map((a) => {
+                        if (a.id === targetItem.appId && a.badge) {
+                          const nextBadge = a.badge - 1;
+                          return { ...a, badge: nextBadge > 0 ? nextBadge : null };
+                        }
+                        return a;
+                      })
+                    );
+                  }
+                }}
+                onOpenApp={handleLaunchApp}
+                wifi={wifi}
+                setWifi={setWifi}
               />
 
               {/* Drop-down Notification Banner */}
@@ -294,7 +364,7 @@ export default function App() {
                   {mode === 'home' && (
                     <HomeScreen
                       key="home-screen"
-                      apps={INITIAL_APPS}
+                      apps={apps}
                       onLaunchApp={handleLaunchApp}
                     />
                   )}
@@ -303,7 +373,7 @@ export default function App() {
                     <RecentsScreen
                       key="recents-screen"
                       runningApps={runningApps}
-                      allApps={INITIAL_APPS}
+                      allApps={apps}
                       onSelectApp={(appId) => {
                         playHapticSound('click');
                         setActiveAppId(appId);
@@ -335,6 +405,7 @@ export default function App() {
                         <SmsApp
                           internalScreen={internalAppScreens.sms || 'list'}
                           setInternalScreen={(s) => setAppScreen('sms', s)}
+                          onNewMessageNotification={triggerNotification}
                         />
                       )}
 
@@ -406,6 +477,36 @@ export default function App() {
                       style={{ overflow: 'hidden' }}
                     >
                       <div className="sub-sim-body">
+                        {/* Slide Down Screen Action Button */}
+                        <button
+                          className="panel-button active"
+                          onClick={() => {
+                            playHapticSound('click');
+                            setIsNotificationShadeOpen(!isNotificationShadeOpen);
+                          }}
+                          style={{
+                            width: '100%',
+                            marginBottom: '0.45rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '0.55rem 0.75rem',
+                            fontSize: '0.74rem'
+                          }}
+                        >
+                          <span>{isNotificationShadeOpen ? 'Slide Up Notification Screen' : 'Slide Down Notification Screen'}</span>
+                          <ChevronDown
+                            size={14}
+                            style={{
+                              transform: isNotificationShadeOpen ? 'rotate(180deg)' : 'none',
+                              transition: 'transform 0.2s'
+                            }}
+                          />
+                        </button>
+
+                        <div style={{ fontSize: '0.68rem', color: '#94a3b8', margin: '2px 0 4px' }}>
+                          Send Test Toasts:
+                        </div>
                         <div className="notification-sender-box">
                           {SAMPLE_NOTIFICATIONS.map((item) => (
                             <div

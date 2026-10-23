@@ -39,7 +39,7 @@ export const INITIAL_APPS = [
     name: 'Messages',
     icon: 'MessageSquare',
     color: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-    badge: 1,
+    badge: null,
     inDock: true
   },
   {

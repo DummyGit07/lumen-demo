@@ -37,7 +37,7 @@ const INITIAL_THREADS = [
   }
 ];
 
-export default function SmsApp({ internalScreen, setInternalScreen }) {
+export default function SmsApp({ internalScreen, setInternalScreen, onNewMessageNotification }) {
   const [threads, setThreads] = useState(INITIAL_THREADS);
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [inputText, setInputText] = useState('');
@@ -73,23 +73,24 @@ export default function SmsApp({ internalScreen, setInternalScreen }) {
       })
     );
 
-    const sent = inputText;
+    const targetThread = activeThread;
     setInputText('');
 
-    // Simulate response
+    // Simulate response dynamically
     setTimeout(() => {
+      const replyMsg = 'Sounds good to me!';
       setThreads((prev) =>
         prev.map((t) => {
           if (t.id === activeThreadId) {
             return {
               ...t,
-              lastMessage: 'Sounds good to me!',
+              lastMessage: replyMsg,
               time: 'Just now',
               messages: [
                 ...t.messages,
                 {
                   id: Date.now() + 1,
-                  text: 'Sounds good to me!',
+                  text: replyMsg,
                   sender: 'them',
                   time: 'Just now'
                 }
@@ -99,6 +100,18 @@ export default function SmsApp({ internalScreen, setInternalScreen }) {
           return t;
         })
       );
+
+      if (onNewMessageNotification && targetThread) {
+        onNewMessageNotification({
+          appId: 'sms',
+          appName: 'Messages',
+          title: targetThread.sender,
+          body: replyMsg,
+          time: 'Just now',
+          icon: 'MessageSquare',
+          color: '#3b82f6'
+        });
+      }
     }, 1200);
   };
 

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wifi, Signal, Battery, Music, Bell } from 'lucide-react';
+import { Wifi, Signal, Battery, Music, Bell, ChevronDown } from 'lucide-react';
 
 export default function StatusBar({ 
   battery = 94, 
   wifi = true, 
   isPlayingMusic = false, 
   activeNotification = null,
-  onDynamicIslandClick 
+  onDynamicIslandClick,
+  onSlideDown
 }) {
   const [timeStr, setTimeStr] = useState('');
 
@@ -26,17 +27,35 @@ export default function StatusBar({
   const isExpanded = Boolean(activeNotification || isPlayingMusic);
 
   return (
-    <div className="phone-status-bar">
+    <motion.div 
+      className="phone-status-bar"
+      onClick={onSlideDown}
+      title="Click or drag down to open Notification Screen"
+      drag="y"
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={{ top: 0, bottom: 0.5 }}
+      onDragEnd={(e, info) => {
+        if (info.offset.y > 15 || info.velocity.y > 150) {
+          onSlideDown();
+        }
+      }}
+      style={{ cursor: 'pointer' }}
+    >
       {/* Left: Clock */}
       <div className="status-left-time">
         <span>{timeStr || '09:41'}</span>
       </div>
 
       {/* Center: Dynamic Island */}
-      <div className="dynamic-island-container">
+      <div 
+        className="dynamic-island-container"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDynamicIslandClick();
+        }}
+      >
         <motion.div
           className="dynamic-island"
-          onClick={onDynamicIslandClick}
           layout
           initial={{ width: 88, height: 26 }}
           animate={{
@@ -94,6 +113,9 @@ export default function StatusBar({
           <Battery size={15} strokeWidth={2.2} />
         </div>
       </div>
-    </div>
+
+      {/* Subtle indicator bar hinting pull down */}
+      <div className="status-bar-pull-indicator" />
+    </motion.div>
   );
 }
