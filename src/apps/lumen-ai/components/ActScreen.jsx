@@ -17,7 +17,6 @@ import { fraudWorkflow } from '../services/fraudWorkflow';
 
 export default function ActScreen({ onNavigateTab }) {
   const [incident, setIncident] = useState(() => trustStorage.getFraudIncident());
-  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     const unsub = trustStorage.subscribe((event, data) => {
@@ -27,17 +26,6 @@ export default function ActScreen({ onNavigateTab }) {
     });
     return unsub;
   }, []);
-
-  // 5-second countdown timer when in freezing or replacing progress
-  useEffect(() => {
-    if (incident?.status === 'l3_freezing' || incident?.status === 'l3_replacing') {
-      setCountdown(5);
-      const interval = setInterval(() => {
-        setCountdown((prev) => (prev > 1 ? prev - 1 : 1));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [incident?.status]);
 
   const hasValidIncident =
     incident &&
@@ -177,19 +165,18 @@ export default function ActScreen({ onNavigateTab }) {
                   Issuing emergency block command to domestic and international card networks for •••• {incident.cardLast4}...
                 </p>
 
-                {/* Progress bar (5 seconds) */}
+                {/* Progress bar (10 seconds) */}
                 <div className="incident-progress-box">
                   <div className="incident-progress-track">
                     <motion.div
                       className="incident-progress-fill freeze-fill"
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
-                      transition={{ duration: 5, ease: 'linear' }}
+                      transition={{ duration: 10, ease: 'linear' }}
                     />
                   </div>
                   <div className="progress-meta-row">
                     <span className="progress-status-text">Network handshake active</span>
-                    <span className="progress-timer-text">{countdown}s remaining</span>
                   </div>
                 </div>
               </div>
@@ -239,19 +226,18 @@ export default function ActScreen({ onNavigateTab }) {
                   Generating verified 16-digit credit card number, fresh dynamic CVV, and updating security vault...
                 </p>
 
-                {/* Progress bar (5 seconds) */}
+                {/* Progress bar (10 seconds) */}
                 <div className="incident-progress-box">
                   <div className="incident-progress-track">
                     <motion.div
                       className="incident-progress-fill replace-fill"
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
-                      transition={{ duration: 5, ease: 'linear' }}
+                      transition={{ duration: 10, ease: 'linear' }}
                     />
                   </div>
                   <div className="progress-meta-row">
                     <span className="progress-status-text">RBI tokenization & key sync</span>
-                    <span className="progress-timer-text">{countdown}s remaining</span>
                   </div>
                 </div>
               </div>

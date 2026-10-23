@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   financeStorage,
   DEFAULT_BANKS,
-  DEFAULT_CARDS
+  DEFAULT_CARDS,
+  DEFAULT_TRANSACTIONS
 } from '../services/financeStorage';
 
 export function useLumenFinance() {
@@ -10,7 +11,7 @@ export function useLumenFinance() {
   const [cards, setCards] = useState(() => financeStorage.loadCards());
   const [transactions, setTransactions] = useState(() => financeStorage.loadTransactions());
 
-  // Listen to external updates (fraud simulation, card replacement, freezing)
+  // Listen to external updates (fraud simulation, card replacement, freezing, reset)
   useEffect(() => {
     const handleUpdate = () => {
       setBanks(financeStorage.loadBanks());
@@ -21,19 +22,6 @@ export function useLumenFinance() {
     window.addEventListener('lumen_finance_updated', handleUpdate);
     return () => window.removeEventListener('lumen_finance_updated', handleUpdate);
   }, []);
-
-  // Save to persistent storage whenever state changes
-  useEffect(() => {
-    financeStorage.saveBanks(banks);
-  }, [banks]);
-
-  useEffect(() => {
-    financeStorage.saveCards(cards);
-  }, [cards]);
-
-  useEffect(() => {
-    financeStorage.saveTransactions(transactions);
-  }, [transactions]);
 
   // Dynamically calculate total liquid bank balance
   const totalBankBalance = useMemo(() => {
@@ -46,7 +34,7 @@ export function useLumenFinance() {
   }, [cards]);
 
   // Execute payment transaction from connected Bank or Credit Card
-  const executePayment = ({
+  const executePayment = useCallback(({
     recipient,
     upiId = '',
     amount,
@@ -58,8 +46,12 @@ export function useLumenFinance() {
       return { success: false, error: 'Please enter a valid recipient and amount' };
     }
 
+    const currentBanks = financeStorage.loadBanks();
+    const currentCards = financeStorage.loadCards();
+    const currentTxns = financeStorage.loadTransactions();
+
     // 1. Check if paying from a Bank Account
-    const targetBank = banks.find((b) => b.id === paymentMethodId);
+    const targetBank = currentBanks.find((b) => b.id === paymentMethodId);
     if (targetBank) {
       if (targetBank.balance < numAmount) {
         return {
@@ -69,7 +61,7 @@ export function useLumenFinance() {
       }
 
       // Deduct balance from the bank
-      const updatedBanks = banks.map((b) =>
+      const updatedBanks = currentBanks.map((b) =>
         b.id === paymentMethodId
           ? { ...b, balance: b.balance - numAmount }
           : b
@@ -89,13 +81,20 @@ export function useLumenFinance() {
         formattedTime: 'Just now'
       };
 
+      const updatedTxns = [newTxn, ...currentTxns];
+
+      // Save atomically to storage
+      financeStorage.saveBanks(updatedBanks, false);
+      financeStorage.saveTransactions(updatedTxns, false);
+      financeStorage.notifyUpdate();
+
       setBanks(updatedBanks);
-      setTransactions((prev) => [newTxn, ...prev]);
+      setTransactions(updatedTxns);
       return { success: true, txn: newTxn };
     }
 
     // 2. Check if paying from a Credit Card
-    const targetCard = cards.find((c) => c.id === paymentMethodId);
+    const targetCard = currentCards.find((c) => c.id === paymentMethodId);
     if (targetCard) {
       if (targetCard.status === 'freezed') {
         return {
@@ -113,9 +112,9 @@ export function useLumenFinance() {
       }
 
       // Increase outstanding amount on the credit card
-      const updatedCards = cards.map((c) =>
+      const updatedCards = currentCards.map((c) =>
         c.id === paymentMethodId
-          ? { ...c, outstanding: c.outstanding + numAmount }
+          ? { ...c, outstanding: (Number(c.outstanding) || 0) + numAmount }
           : c
       );
 
@@ -133,31 +132,39 @@ export function useLumenFinance() {
         formattedTime: 'Just now'
       };
 
+      const updatedTxns = [newTxn, ...currentTxns];
+
+      // Save atomically to storage
+      financeStorage.saveCards(updatedCards, false);
+      financeStorage.saveTransactions(updatedTxns, false);
+      financeStorage.notifyUpdate();
+
       setCards(updatedCards);
-      setTransactions((prev) => [newTxn, ...prev]);
+      setTransactions(updatedTxns);
       return { success: true, txn: newTxn };
     }
 
     return { success: false, error: 'Please select a valid payment method' };
-  };
+  }, []);
 
   // Toggle Card Freeze/Active Status
-  const toggleCardStatus = (cardId) => {
-    setCards((prev) =>
-      prev.map((c) =>
-        c.id === cardId
-          ? { ...c, status: c.status === 'freezed' ? 'active' : 'freezed' }
-          : c
-      )
+  const toggleCardStatus = useCallback((cardId) => {
+    const currentCards = financeStorage.loadCards();
+    const updated = currentCards.map((c) =>
+      c.id === cardId
+        ? { ...c, status: c.status === 'freezed' ? 'active' : 'freezed' }
+        : c
     );
-  };
+    financeStorage.saveCards(updated, true);
+    setCards(updated);
+  }, []);
 
-  const resetToDefault = () => {
+  const resetToDefault = useCallback(() => {
     financeStorage.resetAll();
     setBanks(DEFAULT_BANKS);
     setCards(DEFAULT_CARDS);
-    setTransactions([]);
-  };
+    setTransactions(DEFAULT_TRANSACTIONS);
+  }, []);
 
   return {
     banks,

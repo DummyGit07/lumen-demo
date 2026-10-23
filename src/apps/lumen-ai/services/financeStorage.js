@@ -29,12 +29,13 @@ export function detectCardBrand(cardNumber) {
     return 'Amex';
   }
 
-  // 4. Discover: 6011, 644–649, 65, or 622126–622925, Length 16 to 19
-  if (len >= 16 && len <= 19) {
+  // 4. Discover: 6011, 622126–622925, 644–649, 65, Length 16
+  if (len === 16) {
     const prefix2 = parseInt(clean.slice(0, 2), 10);
     const prefix3 = parseInt(clean.slice(0, 3), 10);
     const prefix4 = parseInt(clean.slice(0, 4), 10);
     const prefix6 = parseInt(clean.slice(0, 6), 10);
+
     if (
       prefix4 === 6011 ||
       prefix2 === 65 ||
@@ -45,7 +46,7 @@ export function detectCardBrand(cardNumber) {
     }
   }
 
-  // 5. Diners Club: 300–305, 36, 38, Length 14
+  // 5. Diners Club: 36, 38, or 300–305, Length 14
   if (len === 14) {
     const prefix2 = parseInt(clean.slice(0, 2), 10);
     const prefix3 = parseInt(clean.slice(0, 3), 10);
@@ -112,7 +113,42 @@ export const DEFAULT_CARDS = [
   }
 ];
 
+export const DEFAULT_TRANSACTIONS = [
+  {
+    id: 'txn-seed-1',
+    recipient: 'Starbucks Coffee',
+    upiId: 'starbucks@hdfcbank',
+    amount: 380,
+    type: 'debit',
+    sourceType: 'bank',
+    sourceName: 'Lumen Bank',
+    sourceId: 'bank-lumen',
+    note: 'Espresso & Croissant',
+    timestamp: new Date(Date.now() - 3600000 * 3).toISOString(),
+    formattedTime: '3 hrs ago'
+  },
+  {
+    id: 'txn-seed-2',
+    recipient: 'Apple Subscriptions',
+    upiId: 'apple@icici',
+    amount: 799,
+    type: 'debit',
+    sourceType: 'card',
+    sourceName: 'Lumen Credit Card',
+    sourceId: 'card-lumen-brand',
+    note: 'iCloud+ 2TB Family',
+    timestamp: new Date(Date.now() - 3600000 * 18).toISOString(),
+    formattedTime: 'Yesterday'
+  }
+];
+
 export const financeStorage = {
+  notifyUpdate: () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
+    }
+  },
+
   loadBanks: () => {
     try {
       const data = localStorage.getItem(STORAGE_KEY_BANKS);
@@ -122,9 +158,12 @@ export const financeStorage = {
     }
   },
 
-  saveBanks: (banks) => {
+  saveBanks: (banks, notify = true) => {
     try {
       localStorage.setItem(STORAGE_KEY_BANKS, JSON.stringify(banks));
+      if (notify) {
+        financeStorage.notifyUpdate();
+      }
     } catch (e) {
       console.warn('Failed to save bank accounts:', e);
     }
@@ -151,11 +190,11 @@ export const financeStorage = {
     }
   },
 
-  saveCards: (cards) => {
+  saveCards: (cards, notify = true) => {
     try {
       localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
+      if (notify) {
+        financeStorage.notifyUpdate();
       }
     } catch (e) {
       console.warn('Failed to save credit cards:', e);
@@ -165,17 +204,19 @@ export const financeStorage = {
   loadTransactions: () => {
     try {
       const data = localStorage.getItem(STORAGE_KEY_TXNS);
-      return data ? JSON.parse(data) : [];
+      if (!data) return DEFAULT_TRANSACTIONS;
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : DEFAULT_TRANSACTIONS;
     } catch {
-      return [];
+      return DEFAULT_TRANSACTIONS;
     }
   },
 
-  saveTransactions: (txns) => {
+  saveTransactions: (txns, notify = true) => {
     try {
       localStorage.setItem(STORAGE_KEY_TXNS, JSON.stringify(txns));
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
+      if (notify) {
+        financeStorage.notifyUpdate();
       }
     } catch (e) {
       console.warn('Failed to save transactions:', e);
@@ -190,7 +231,7 @@ export const financeStorage = {
         ? { ...c, status: 'freezed' }
         : c
     );
-    financeStorage.saveCards(updated);
+    financeStorage.saveCards(updated, true);
     return updated;
   },
 
@@ -202,7 +243,7 @@ export const financeStorage = {
         ? { ...c, status: 'active' }
         : c
     );
-    financeStorage.saveCards(updated);
+    financeStorage.saveCards(updated, true);
     return updated;
   },
 
@@ -237,7 +278,7 @@ export const financeStorage = {
     };
 
     const updatedCards = cards.map((c) => (c.id === target.id ? updatedCard : c));
-    financeStorage.saveCards(updatedCards);
+    financeStorage.saveCards(updatedCards, true);
     return updatedCard;
   },
 
@@ -256,7 +297,6 @@ export const financeStorage = {
         ? { ...c, outstanding: (Number(c.outstanding) || 0) + amount }
         : c
     );
-    financeStorage.saveCards(updatedCards);
 
     // Add suspicious debit transaction
     const txns = financeStorage.loadTransactions();
@@ -275,7 +315,12 @@ export const financeStorage = {
       isFlagged: true
     };
 
-    financeStorage.saveTransactions([fraudTxn, ...txns]);
+    const updatedTxns = [fraudTxn, ...txns];
+
+    // Atomic write: Save both without intermediate events, then fire one single update notification
+    financeStorage.saveCards(updatedCards, false);
+    financeStorage.saveTransactions(updatedTxns, false);
+    financeStorage.notifyUpdate();
 
     return {
       card: targetCard,
@@ -289,9 +334,7 @@ export const financeStorage = {
       localStorage.removeItem(STORAGE_KEY_BANKS);
       localStorage.removeItem(STORAGE_KEY_CARDS);
       localStorage.removeItem(STORAGE_KEY_TXNS);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
-      }
+      financeStorage.notifyUpdate();
     } catch {
       // ignore
     }

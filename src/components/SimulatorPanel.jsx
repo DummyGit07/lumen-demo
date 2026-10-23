@@ -173,7 +173,7 @@ export default function SimulatorPanel({
                     )}
 
                     {/* Reset Button */}
-                    {/* <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+                    <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
                       <button
                         className="panel-button"
                         onClick={handleResetFinance}
@@ -191,7 +191,7 @@ export default function SimulatorPanel({
                         <RotateCcw size={11} />
                         <span>Reset Cards & Incidents</span>
                       </button>
-                    </div> */}
+                    </div>
                   </div>
                 </motion.div>
               )}

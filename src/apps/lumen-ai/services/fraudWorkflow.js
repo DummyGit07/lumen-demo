@@ -260,7 +260,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
       });
     }
 
-    // Simulate background process completion after 5.0 seconds
+    // Simulate background process completion after 10.0 seconds
     setTimeout(() => {
       this.dismissActiveNotification();
 
@@ -296,7 +296,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           ]
         });
       }
-    }, 5000);
+    }, 10000);
   }
 
   // L3 Step 2: Replacing Card
@@ -328,7 +328,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
       });
     }
 
-    // Simulate background replacement generation after 5.0 seconds
+    // Simulate background replacement generation after 10.0 seconds
     setTimeout(() => {
       this.dismissActiveNotification();
 
@@ -366,7 +366,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           ]
         });
       }
-    }, 5000);
+    }, 10000);
   }
 
   // L3 Step 3: View New Card
