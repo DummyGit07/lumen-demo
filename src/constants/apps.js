@@ -57,38 +57,66 @@ export const INITIAL_APPS = [
     color: 'linear-gradient(135deg, #ec4899, #db2777)',
     badge: null,
     inDock: true
+  },
+  {
+    id: 'gmail',
+    name: 'Gmail',
+    isGmail: true,
+    icon: 'Mail',
+    color: '#ffffff',
+    badge: null,
+    inDock: false
+  },
+  {
+    id: 'lumen_ai',
+    name: 'Lumen AI',
+    isLetterLogo: true,
+    letter: 'L',
+    color: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    badge: null,
+    inDock: false
   }
 ];
 
 export const SAMPLE_NOTIFICATIONS = [
   {
     id: 'notif-1',
+    appId: 'gmail',
+    appName: 'Gmail',
+    title: 'Elena Vance',
+    body: 'Product Prototype Roadmap - Final Review document attached',
+    time: 'Just now',
+    icon: 'Mail',
+    color: '#ea4335'
+  },
+  {
+    id: 'notif-2',
+    appId: 'lumen_ai',
+    appName: 'Lumen AI',
+    title: 'Lumen Assistant',
+    body: 'Your summary for today is ready. Tap to view insights.',
+    time: 'Just now',
+    icon: 'L',
+    color: '#6366f1'
+  },
+  {
+    id: 'notif-3',
     appId: 'phone',
     appName: 'Phone',
     title: 'Missed Call',
     body: 'Missed call from Alex Morgan (+1 555-0199)',
-    time: 'Just now',
+    time: '2m ago',
     icon: 'Phone',
     color: '#22c55e'
   },
   {
-    id: 'notif-2',
+    id: 'notif-4',
     appId: 'sms',
     appName: 'Messages',
     title: 'Alex Morgan',
     body: 'Are we still meeting up this evening?',
-    time: '2m ago',
+    time: '5m ago',
     icon: 'MessageSquare',
     color: '#3b82f6'
-  },
-  {
-    id: 'notif-3',
-    appId: 'music',
-    appName: 'Music',
-    title: 'Now Playing',
-    body: 'Midnight Horizon • Aether & Cyberia',
-    time: 'Streaming',
-    icon: 'Music2',
-    color: '#ec4899'
   }
 ];

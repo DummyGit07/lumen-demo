@@ -103,9 +103,25 @@ export default function RecentsScreen({
                     <div className="recents-card-header">
                       <div
                         className="recents-card-icon"
-                        style={{ background: app.color }}
+                        style={{ 
+                          background: app.color,
+                          color: '#fff',
+                          fontWeight: 800,
+                          fontSize: '0.75rem'
+                        }}
                       >
-                        <IconComp size={14} />
+                        {appId === 'lumen_ai' ? (
+                          <span>L</span>
+                        ) : appId === 'gmail' ? (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                            <path d="M2 6.5V17.5C2 18.3284 2.67157 19 3.5 19H6.5V10.5L2 7.125V6.5Z" fill="#4285F4"/>
+                            <path d="M17.5 19H20.5C21.3284 19 22 18.3284 22 17.5V6.5L17.5 9.875V19Z" fill="#34A853"/>
+                            <path d="M17.5 9.875L12 14L6.5 9.875V19H17.5V9.875Z" fill="#EA4335"/>
+                            <path d="M17.5 5H6.5C5.67157 5 5 5.67157 5 6.5V7.125L12 12.375L19 7.125V6.5C19 5.67157 18.3284 5 17.5 5Z" fill="#FBBC04"/>
+                          </svg>
+                        ) : (
+                          <IconComp size={14} />
+                        )}
                       </div>
                       <span className="recents-card-name">{app.name}</span>
                       <button

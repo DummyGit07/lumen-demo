@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, MessageSquare, Image, Music2, CloudSun, Sparkles } from 'lucide-react';
+import { Phone, MessageSquare, Image, Music2, CloudSun, Sparkles, Mail } from 'lucide-react';
 
 const ICON_MAP = {
   phone: Phone,
@@ -8,6 +8,30 @@ const ICON_MAP = {
   gallery: Image,
   music: Music2,
 };
+
+function renderAppIconContent(app, size = 26) {
+  if (app.id === 'lumen_ai') {
+    return (
+      <span style={{ fontSize: size * 0.95, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+        L
+      </span>
+    );
+  }
+
+  if (app.id === 'gmail') {
+    return (
+      <svg width={size + 2} height={size + 2} viewBox="0 0 24 24" fill="none">
+        <path d="M2 6.5V17.5C2 18.3284 2.67157 19 3.5 19H6.5V10.5L2 7.125V6.5Z" fill="#4285F4"/>
+        <path d="M17.5 19H20.5C21.3284 19 22 18.3284 22 17.5V6.5L17.5 9.875V19Z" fill="#34A853"/>
+        <path d="M17.5 9.875L12 14L6.5 9.875V19H17.5V9.875Z" fill="#EA4335"/>
+        <path d="M17.5 5H6.5C5.67157 5 5 5.67157 5 6.5V7.125L12 12.375L19 7.125V6.5C19 5.67157 18.3284 5 17.5 5Z" fill="#FBBC04"/>
+      </svg>
+    );
+  }
+
+  const IconComp = ICON_MAP[app.id] || Sparkles;
+  return <IconComp size={size} strokeWidth={2.2} />;
+}
 
 export default function HomeScreen({ apps, onLaunchApp }) {
   const [time, setTime] = useState('');
@@ -23,6 +47,8 @@ export default function HomeScreen({ apps, onLaunchApp }) {
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const dockApps = apps.filter((a) => a.inDock);
 
   return (
     <motion.div
@@ -44,47 +70,56 @@ export default function HomeScreen({ apps, onLaunchApp }) {
         </div>
       </div>
 
-      {/* Main App Grid (The 4 core apps) */}
-      <div className="app-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginTop: '1rem' }}>
-        {apps.map((app) => {
-          const IconComp = ICON_MAP[app.id] || Sparkles;
-          return (
-            <motion.div
-              key={app.id}
-              className="app-icon-item"
-              whileTap={{ scale: 0.88 }}
-              whileHover={{ scale: 1.05 }}
-              onClick={() => onLaunchApp(app.id)}
+      {/* Main App Grid */}
+      <div className="app-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginTop: '0.75rem', gap: '1rem 0.6rem' }}>
+        {apps.map((app) => (
+          <motion.div
+            key={app.id}
+            className="app-icon-item"
+            whileTap={{ scale: 0.88 }}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => onLaunchApp(app.id)}
+          >
+            <div 
+              className="app-icon-box" 
+              style={{ 
+                background: app.color,
+                boxShadow: app.id === 'gmail' ? '0 4px 12px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.08)' : undefined
+              }}
             >
-              <div className="app-icon-box" style={{ background: app.color }}>
-                <IconComp size={26} strokeWidth={2.2} />
-                {app.badge && <span className="app-badge-unread">{app.badge}</span>}
-              </div>
-              <span className="app-label">{app.name}</span>
-            </motion.div>
-          );
-        })}
+              {renderAppIconContent(app, 24)}
+              {app.badge && <span className="app-badge-unread">{app.badge}</span>}
+            </div>
+            <span className="app-label">{app.name}</span>
+          </motion.div>
+        ))}
       </div>
 
       {/* Bottom Quick Launch Dock */}
       <div className="home-dock" style={{ marginTop: 'auto' }}>
-        {apps.map((app) => {
-          const IconComp = ICON_MAP[app.id] || Sparkles;
-          return (
-            <motion.div
-              key={app.id}
-              className="app-icon-item"
-              whileTap={{ scale: 0.88 }}
-              whileHover={{ scale: 1.08 }}
-              onClick={() => onLaunchApp(app.id)}
+        {dockApps.map((app) => (
+          <motion.div
+            key={app.id}
+            className="app-icon-item"
+            whileTap={{ scale: 0.88 }}
+            whileHover={{ scale: 1.08 }}
+            onClick={() => onLaunchApp(app.id)}
+          >
+            <div 
+              className="app-icon-box" 
+              style={{ 
+                background: app.color, 
+                width: 46, 
+                height: 46, 
+                borderRadius: 13,
+                boxShadow: app.id === 'gmail' ? '0 3px 10px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.08)' : undefined
+              }}
             >
-              <div className="app-icon-box" style={{ background: app.color, width: 50, height: 50, borderRadius: 14 }}>
-                <IconComp size={22} strokeWidth={2.2} />
-                {app.badge && <span className="app-badge-unread">{app.badge}</span>}
-              </div>
-            </motion.div>
-          );
-        })}
+              {renderAppIconContent(app, 20)}
+              {app.badge && <span className="app-badge-unread">{app.badge}</span>}
+            </div>
+          </motion.div>
+        ))}
       </div>
     </motion.div>
   );
