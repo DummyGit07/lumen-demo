@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Zap,
   ShieldAlert,
   ShieldCheck,
   CreditCard,
@@ -11,14 +10,14 @@ import {
   Sparkles,
   RefreshCw,
   CheckCircle2,
-  ExternalLink,
-  ChevronRight
+  Cpu
 } from 'lucide-react';
 import { trustStorage } from '../services/trustStorage';
 import { fraudWorkflow } from '../services/fraudWorkflow';
 
 export default function ActScreen({ onNavigateTab }) {
   const [incident, setIncident] = useState(() => trustStorage.getFraudIncident());
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     const unsub = trustStorage.subscribe((event, data) => {
@@ -29,30 +28,77 @@ export default function ActScreen({ onNavigateTab }) {
     return unsub;
   }, []);
 
+  // 5-second countdown timer when in freezing or replacing progress
+  useEffect(() => {
+    if (incident?.status === 'l3_freezing' || incident?.status === 'l3_replacing') {
+      setCountdown(5);
+      const interval = setInterval(() => {
+        setCountdown((prev) => (prev > 1 ? prev - 1 : 1));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [incident?.status]);
+
+  const hasValidIncident =
+    incident &&
+    [
+      'awaiting_confirmation',
+      'l1_steps',
+      'l3_freeze_prompt',
+      'l3_freezing',
+      'l3_freeze_done',
+      'l3_replacing',
+      'l3_replaced'
+    ].includes(incident.status);
+
   return (
     <div className="lumen-act-scroll">
-      {/* 1. Header Overview */}
-      <div className="act-hero-bar">
-        <div className="act-hero-icon-box">
-          <Zap size={26} color="#ec4899" />
-        </div>
-        <div>
-          <div className="act-hero-title">Lumen Act</div>
-          <div className="act-hero-subtitle">Autonomous AI Routines & Protection</div>
-        </div>
-      </div>
-
-      {/* 2. Active Incident Action Card (Rendered dynamically if an incident exists) */}
       <AnimatePresence mode="wait">
-        {incident && incident.status !== 'resolved' && (
+        {/* Case 1: Active Incident Action Card */}
+        {hasValidIncident ? (
           <motion.div
             key={incident.status}
             className="act-incident-card"
-            initial={{ opacity: 0, scale: 0.96, y: -10 }}
+            initial={{ opacity: 0, scale: 0.95, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -10 }}
-            transition={{ duration: 0.22 }}
+            exit={{ opacity: 0, scale: 0.95, y: -6 }}
+            transition={{ duration: 0.2 }}
           >
+            {/* Initial State: Awaiting Confirmation */}
+            {incident.status === 'awaiting_confirmation' && (
+              <div className="incident-content">
+                <div className="incident-header">
+                  <div className="incident-icon-pulse danger">
+                    <ShieldAlert size={20} color="#ef4444" />
+                  </div>
+                  <div className="incident-title-block">
+                    <div className="incident-badge l3-badge">Verification Required</div>
+                    <div className="incident-title">Suspicious Transaction</div>
+                  </div>
+                </div>
+
+                <p className="incident-desc">
+                  A charge of <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> was detected on card <strong>•••• {incident.cardLast4}</strong>. Have you performed this transaction?
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
+                  <button
+                    className="incident-action-btn"
+                    style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#cbd5e1' }}
+                    onClick={() => fraudWorkflow.handleConfirmationResponse(true)}
+                  >
+                    Yes, It Was Me
+                  </button>
+                  <button
+                    className="incident-action-btn danger"
+                    onClick={() => fraudWorkflow.handleConfirmationResponse(false)}
+                  >
+                    No, Not Me
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* L1 State: Steps Guidance */}
             {incident.status === 'l1_steps' && (
               <div className="incident-content">
@@ -68,8 +114,8 @@ export default function ActScreen({ onNavigateTab }) {
 
                 <p className="incident-desc">
                   Detected a transaction of{' '}
-                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> with credit card{' '}
-                  <strong>•••• {incident.cardLast4}</strong>. Know how to freeze the card and apply for a new credit card.
+                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> on credit card{' '}
+                  <strong>•••• {incident.cardLast4}</strong>. Learn how to freeze the card and apply for a new card.
                 </p>
 
                 <button
@@ -91,7 +137,7 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l3-badge">L3 Autonomous Protection</div>
-                    <div className="incident-title">Emergency Freeze Recommended</div>
+                    <div className="incident-title">Emergency Freeze Required</div>
                   </div>
                 </div>
 
@@ -111,7 +157,7 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L3 State 2: Freezing In Progress */}
+            {/* L3 State 2: Freezing In Progress (5 Seconds) */}
             {incident.status === 'l3_freezing' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -125,17 +171,23 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc">
-                  Issuing emergency block commands to domestic and international card networks for •••• {incident.cardLast4}...
+                  Issuing emergency block command to domestic and international card networks for •••• {incident.cardLast4}...
                 </p>
 
-                {/* Animated progress bar */}
-                <div className="incident-progress-track">
-                  <motion.div
-                    className="incident-progress-fill freeze-fill"
-                    initial={{ width: '10%' }}
-                    animate={{ width: '92%' }}
-                    transition={{ duration: 2.3, ease: 'easeInOut' }}
-                  />
+                {/* Progress bar (5 seconds) */}
+                <div className="incident-progress-box">
+                  <div className="incident-progress-track">
+                    <motion.div
+                      className="incident-progress-fill freeze-fill"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 5, ease: 'linear' }}
+                    />
+                  </div>
+                  <div className="progress-meta-row">
+                    <span className="progress-status-text">Network handshake active</span>
+                    <span className="progress-timer-text">{countdown}s remaining</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -154,7 +206,7 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc">
-                  Card <strong>•••• {incident.cardLast4}</strong> is now completely frozen. All payment requests are actively blocked. Would you like to issue a replacement card?
+                  Card <strong>•••• {incident.cardLast4}</strong> is now locked. All further payments are blocked. Would you like to issue a replacement card?
                 </p>
 
                 <button
@@ -167,7 +219,7 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L3 State 4: Replacing In Progress */}
+            {/* L3 State 4: Replacing In Progress (5 Seconds) */}
             {incident.status === 'l3_replacing' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -181,17 +233,23 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc">
-                  Generating verified 16-digit credit card number, fresh dynamic CVV, and updating local security vault...
+                  Generating verified 16-digit credit card number, fresh dynamic CVV, and updating security vault...
                 </p>
 
-                {/* Animated progress bar */}
-                <div className="incident-progress-track">
-                  <motion.div
-                    className="incident-progress-fill replace-fill"
-                    initial={{ width: '12%' }}
-                    animate={{ width: '94%' }}
-                    transition={{ duration: 2.4, ease: 'easeInOut' }}
-                  />
+                {/* Progress bar (5 seconds) */}
+                <div className="incident-progress-box">
+                  <div className="incident-progress-track">
+                    <motion.div
+                      className="incident-progress-fill replace-fill"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 5, ease: 'linear' }}
+                    />
+                  </div>
+                  <div className="progress-meta-row">
+                    <span className="progress-status-text">RBI tokenization & key sync</span>
+                    <span className="progress-timer-text">{countdown}s remaining</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -216,12 +274,12 @@ export default function ActScreen({ onNavigateTab }) {
                   <div className="mini-card-details">
                     <div className="mini-card-name">Lumen Visa Signature</div>
                     <div className="mini-card-num">
-                      •••• {incident.newCard?.last4 || 'Newly Issued'}
+                      •••• {incident.newCard?.last4 || 'Active'}
                     </div>
                   </div>
                 </div>
 
-                <p className="incident-desc" style={{ marginTop: '0.4rem' }}>
+                <p className="incident-desc" style={{ marginTop: '0.25rem' }}>
                   Your new card has been generated and connected to your account. All payments have been reactivated.
                 </p>
 
@@ -235,58 +293,30 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
           </motion.div>
+        ) : (
+          /* Case 2: Clean Empty State (No Active Actions) */
+          <motion.div
+            key="act-empty-state"
+            className="act-empty-state-card"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="act-empty-icon-wrap">
+              <ShieldCheck size={32} color="#10b981" />
+            </div>
+            <div className="act-empty-title">All Systems Protected</div>
+            <p className="act-empty-desc">
+              No active security incidents or background actions. Lumen AI is monitoring your cards and routines in the background.
+            </p>
+            <div className="act-empty-badge">
+              <span className="act-status-dot" />
+              <span>Guardrails Standing By</span>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-
-      {/* 3. Standard Autonomous Routines List */}
-      <div className="act-section-header">
-        <span>ACTIVE ROUTINES & WORKFLOWS</span>
-      </div>
-
-      <div className="act-routine-card">
-        <div className="routine-top">
-          <div className="routine-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)' }}>
-            <Zap size={18} color="#ec4899" />
-          </div>
-          <div className="routine-meta">
-            <div className="routine-name">Smart Bill Autopay</div>
-            <div className="routine-desc">Auto-clears credit card bill 2 days before due date.</div>
-          </div>
-          <div className="routine-toggle active">
-            <div className="toggle-dot" />
-          </div>
-        </div>
-      </div>
-
-      <div className="act-routine-card">
-        <div className="routine-top">
-          <div className="routine-icon-box" style={{ background: 'rgba(16, 185, 129, 0.15)' }}>
-            <ShieldCheck size={18} color="#10b981" />
-          </div>
-          <div className="routine-meta">
-            <div className="routine-name">Fraud Shield Watchdog</div>
-            <div className="routine-desc">Autonomous network monitoring across high-risk merchant categories.</div>
-          </div>
-          <div className="routine-toggle active">
-            <div className="toggle-dot" />
-          </div>
-        </div>
-      </div>
-
-      <div className="act-routine-card">
-        <div className="routine-top">
-          <div className="routine-icon-box" style={{ background: 'rgba(99, 102, 241, 0.15)' }}>
-            <Sparkles size={18} color="#818cf8" />
-          </div>
-          <div className="routine-meta">
-            <div className="routine-name">Round-Up Micro Investments</div>
-            <div className="routine-desc">Invests spare change from UPI spends into digital gold.</div>
-          </div>
-          <div className="routine-toggle">
-            <div className="toggle-dot" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

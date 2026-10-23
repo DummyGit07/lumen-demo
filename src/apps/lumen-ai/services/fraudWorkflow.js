@@ -62,7 +62,7 @@ class FraudWorkflowService {
         title: 'Suspicious Transaction Detected',
         body: `A transaction of ₹${amount.toLocaleString('en-IN')} has been detected on your card ending with ${last4}. Have you done this transaction?`,
         color: '#ef4444',
-        persistent: true,
+        duration: 3000,
         actions: [
           {
             label: 'Yes',
@@ -127,7 +127,7 @@ class FraudWorkflowService {
         title: 'Credit Card Protection',
         body: 'Want to freeze and replace the credit card? Click here to know how to freeze and apply for replacement of credit card',
         color: '#3b82f6',
-        persistent: true,
+        duration: 3000,
         onClickCard: () => this.executeL1NavigateToAsk(),
         actions: [
           {
@@ -197,7 +197,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
         title: 'Emergency Card Action',
         body: 'Want to freeze the credit card to prevent further charges?',
         color: '#ef4444',
-        persistent: true,
+        duration: 3000,
         actions: [
           {
             label: 'Freeze Now',
@@ -234,12 +234,11 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
         title: 'Security Protocol Activated',
         body: 'Initiated freezing the credit card in the background...',
         color: '#0284c7',
-        persistent: false,
-        duration: 3500
+        duration: 3000
       });
     }
 
-    // Simulate background process completion after 2.5 seconds
+    // Simulate background process completion after 5.0 seconds
     setTimeout(() => {
       this.dismissActiveNotification();
 
@@ -265,7 +264,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           title: 'Card Freezed Successfully',
           body: 'The card has been freezed successfully. Want to apply for replacement of this credit card?',
           color: '#10b981',
-          persistent: true,
+          duration: 3000,
           actions: [
             {
               label: 'Replace Card',
@@ -275,7 +274,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           ]
         });
       }
-    }, 2500);
+    }, 5000);
   }
 
   // L3 Step 2: Replacing Card
@@ -303,12 +302,11 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
         title: 'Replacement Request Filed',
         body: 'Applied for new credit card. Generating fresh digital credentials...',
         color: '#6366f1',
-        persistent: false,
-        duration: 3500
+        duration: 3000
       });
     }
 
-    // Simulate background replacement generation after 2.6 seconds
+    // Simulate background replacement generation after 5.0 seconds
     setTimeout(() => {
       this.dismissActiveNotification();
 
@@ -335,7 +333,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           title: 'New Credit Card Issued',
           body: 'New credit card is here! Fresh CVV and 16-digit credentials ready to view.',
           color: '#10b981',
-          persistent: true,
+          duration: 3000,
           onClickCard: () => this.executeL3ViewNewCard(),
           actions: [
             {
@@ -346,7 +344,7 @@ Feel free to ask me anything about filing a dispute or monitoring your bank bala
           ]
         });
       }
-    }, 2600);
+    }, 5000);
   }
 
   // L3 Step 3: View New Card

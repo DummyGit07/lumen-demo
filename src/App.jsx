@@ -203,13 +203,11 @@ export default function App() {
       );
     }
 
-    // Auto dismiss banner if not marked persistent
-    if (!newNotif.persistent) {
-      const timeoutMs = newNotif.duration || 4500;
-      setTimeout(() => {
-        setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
-      }, timeoutMs);
-    }
+    // Auto dismiss heads-up banner from mobile screen after 3 seconds (notification remains in tray)
+    const timeoutMs = newNotif.duration || 3000;
+    setTimeout(() => {
+      setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
+    }, timeoutMs);
   };
 
   // Initialize fraudWorkflow service with navigation and notification handlers
