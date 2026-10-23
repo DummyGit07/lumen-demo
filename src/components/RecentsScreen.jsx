@@ -24,6 +24,15 @@ export default function RecentsScreen({
   onRemoveApp,
   onClearAll
 }) {
+  const containerRef = React.useRef(null);
+
+  // Automatically scroll to the very start (the most recent app)
+  React.useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollLeft = 0;
+    }
+  }, [runningApps]);
+
   const getAppMeta = (appId) => {
     return allApps.find((a) => a.id === appId) || {
       id: appId,
@@ -43,7 +52,7 @@ export default function RecentsScreen({
       <div className="recents-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Layers size={18} color="#a5b4fc" />
-          <span className="recents-title">Active Apps</span>
+          <span className="recents-title">Recent Apps</span>
           <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
             ({runningApps.length})
           </span>
@@ -59,15 +68,15 @@ export default function RecentsScreen({
       {runningApps.length === 0 ? (
         <div className="recents-empty">
           <Layers size={36} color="#475569" />
-          <span>No recent apps open</span>
+          <span>No recent apps</span>
           <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
             Tap the Home (○) button to launch an app
           </span>
         </div>
       ) : (
-        <div className="recents-cards-container">
+        <div className="recents-cards-container" ref={containerRef}>
           <AnimatePresence>
-            {runningApps.map((appId) => {
+            {runningApps.map((appId, index) => {
               const app = getAppMeta(appId);
               const IconComp = ICON_MAP[appId] || Layers;
 
@@ -124,6 +133,23 @@ export default function RecentsScreen({
                         )}
                       </div>
                       <span className="recents-card-name">{app.name}</span>
+                      {index === 0 && (
+                        <span
+                          style={{
+                            fontSize: '0.6rem',
+                            fontWeight: 700,
+                            padding: '1px 6px',
+                            borderRadius: '6px',
+                            background: 'rgba(99, 102, 241, 0.22)',
+                            color: '#818cf8',
+                            border: '1px solid rgba(99, 102, 241, 0.35)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em'
+                          }}
+                        >
+                          Recent
+                        </span>
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

@@ -31,6 +31,32 @@
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) rgba(0, 0, 0, 0.2);
+}
+
+/* Custom Sleek Dark Theme Scrollbars (no white default browser scrollers) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.55);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 html, body, #root {
@@ -184,11 +210,21 @@ html, body, #root {
 }
 
 .control-panel::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
+
+.control-panel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 999px;
+}
+
 .control-panel::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.45);
+  border-radius: 999px;
+}
+
+.control-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.75);
 }
 
 .panel-section-title {
@@ -810,9 +846,17 @@ html, body, #root {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.15rem;
   overflow-x: auto;
   padding: 0.75rem 1.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar for authentic mobile feel */
+  -ms-overflow-style: none;
+}
+
+.recents-cards-container::-webkit-scrollbar {
+  display: none;
 }
 
 .recents-card-wrapper {
@@ -820,6 +864,7 @@ html, body, #root {
   width: 200px;
   height: 380px;
   cursor: grab;
+  scroll-snap-align: center;
 }
 
 .recents-card {

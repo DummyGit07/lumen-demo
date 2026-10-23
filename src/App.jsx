@@ -51,7 +51,7 @@ export default function App() {
   // Mobile OS States
   const [mode, setMode] = useState('home'); // 'home' | 'app' | 'recents'
   const [activeAppId, setActiveAppId] = useState(null);
-  const [runningApps, setRunningApps] = useState(['phone', 'music']); // initially phone & music active in memory
+  const [runningApps, setRunningApps] = useState([]); // Zero default active apps on initial startup
   const [internalAppScreens, setInternalAppScreens] = useState({}); // e.g. { phone: 'dialpad', sms: 'list', gallery: 'grid' }
   const [activeNotification, setActiveNotification] = useState(null);
   const [currentWallpaper, setCurrentWallpaper] = useState(WALLPAPERS[0]);
@@ -77,9 +77,8 @@ export default function App() {
     playHapticSound('click');
     setActiveAppId(appId);
     setMode('app');
-    if (!runningApps.includes(appId)) {
-      setRunningApps((prev) => [...prev, appId]);
-    }
+    // Move newly opened app to the very front of runningApps (MRU order)
+    setRunningApps((prev) => [appId, ...prev.filter((id) => id !== appId)]);
     // Clear unread notification badge when opening the app, just like a real phone
     setApps((prev) =>
       prev.map((a) => (a.id === appId ? { ...a, badge: null } : a))
@@ -152,6 +151,10 @@ export default function App() {
     if (mode === 'recents') {
       setMode('home');
     } else {
+      // If currently inside an app, ensure it sits at index 0 (most recent)
+      if (activeAppId) {
+        setRunningApps((prev) => [activeAppId, ...prev.filter((id) => id !== activeAppId)]);
+      }
       setMode('recents');
     }
   };
@@ -355,6 +358,7 @@ export default function App() {
                       onSelectApp={(appId) => {
                         playHapticSound('click');
                         setActiveAppId(appId);
+                        setRunningApps((prev) => [appId, ...prev.filter((id) => id !== appId)]);
                         setMode('app');
                       }}
                       onRemoveApp={handleRemoveApp}
