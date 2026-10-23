@@ -3472,57 +3472,60 @@ html, body, #root {
 .trust-hero-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.2rem 0.1rem;
+}
+
+.trust-hero-left {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  padding: 0.4rem 0.2rem 0.2rem;
 }
 
 .trust-hero-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.1));
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(168, 85, 247, 0.18));
+  border: 1px solid rgba(99, 102, 241, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
 }
 
 .trust-hero-title {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.01em;
 }
 
 .trust-hero-subtitle {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: #94a3b8;
-  font-weight: 500;
+  margin-top: 1px;
 }
 
-.trust-security-status-strip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 99px;
-  padding: 4px 12px;
-  font-size: 0.64rem;
-  color: #34d399;
-  font-weight: 600;
-}
-
-.trust-security-status-strip .status-item {
+.trust-guard-pill {
   display: flex;
   align-items: center;
   gap: 5px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  color: #34d399;
+  font-weight: 700;
 }
 
-.trust-security-status-strip .status-divider {
-  color: rgba(255, 255, 255, 0.2);
+.trust-status-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }
 
 .trust-save-toast {
@@ -3543,35 +3546,230 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.64rem;
+  font-size: 0.63rem;
   font-weight: 800;
   color: #818cf8;
   letter-spacing: 0.08em;
   margin-top: 0.2rem;
 }
 
-.trust-card-container {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.75) 100%);
+/* ============================================================
+   SLEEK HORIZONTAL AUTONOMY SPECTRUM SLIDER
+   ============================================================ */
+.spectrum-card {
+  background: linear-gradient(135deg, rgba(20, 27, 45, 0.85) 0%, rgba(11, 15, 26, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 0.9rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  position: relative;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.spectrum-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.spectrum-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+}
+
+.spectrum-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 99px;
+  border: 1px solid;
+  letter-spacing: normal;
+}
+
+/* Horizontal Track with Sliding Thumb */
+.spectrum-track-container {
+  margin-bottom: 0.8rem;
+}
+
+.spectrum-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 3px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.spectrum-slider-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 9px;
+  border: 1px solid;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spectrum-seg-btn {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  padding: 0.45rem 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.spectrum-seg-btn:hover:not(.disabled) {
+  opacity: 0.9;
+}
+
+.spectrum-seg-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.spectrum-seg-num {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.spectrum-seg-label {
+  font-size: 0.58rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.spectrum-soon-tag {
+  font-size: 0.5rem;
+  font-weight: 800;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  padding: 1px 4px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+}
+
+/* Dynamic Mode Detail Banner */
+.spectrum-detail-banner {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.spectrum-detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.spectrum-detail-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.spectrum-detail-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.spectrum-detail-desc {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Workflow Step Sequence */
+.spectrum-flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.45rem 0.55rem;
+}
+
+.spectrum-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-align: center;
+}
+
+.spectrum-step-icon {
+  font-size: 0.72rem;
+}
+
+.spectrum-arrow {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   CLEAN APPLE-STYLE MODULAR POLICY CARDS
+   ============================================================ */
+.apple-policy-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 0.85rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  position: relative;
+  transition: transform 0.15s ease, border-color 0.2s ease;
 }
 
-.highlighted-trust-card {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.12);
-}
-
-.trust-card-top {
+.apple-policy-header {
   display: flex;
-  gap: 10px;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.trust-card-icon-wrap {
+.apple-policy-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+}
+
+.apple-icon-squircle {
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -3581,174 +3779,186 @@ html, body, #root {
   flex-shrink: 0;
 }
 
-.trust-card-title-group {
-  flex: 1;
-}
-
-.trust-card-title {
-  font-size: 0.84rem;
+.apple-policy-title {
+  font-size: 0.82rem;
   font-weight: 700;
   color: #fff;
+  letter-spacing: -0.01em;
 }
 
-.trust-card-desc {
-  font-size: 0.66rem;
+.apple-policy-desc {
+  font-size: 0.63rem;
   color: #94a3b8;
-  line-height: 1.4;
+  line-height: 1.35;
   margin-top: 2px;
 }
 
-/* Autonomy Tiers Selector */
-.autonomy-levels-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.7rem;
-}
-
-.autonomy-tier-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1.5px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
-  padding: 0.7rem 0.75rem;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.autonomy-tier-card:hover:not(.disabled-tier) {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(30, 41, 59, 0.5);
-}
-
-.autonomy-tier-card.active {
-  border-color: #3b82f6;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
-}
-
-.autonomy-tier-card.active.l3-active {
-  border-color: #10b981;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
-}
-
-.autonomy-tier-card.disabled-tier {
-  opacity: 0.55;
-  cursor: not-allowed;
-  border-style: dashed;
-}
-
-.tier-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 0.35rem;
-}
-
-.tier-badge {
-  font-size: 0.68rem;
+.apple-policy-val-pill {
+  font-size: 0.66rem;
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
-.tier-title-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
+/* Apple Slider Controls */
+.apple-slider-wrap {
+  margin: 0.8rem 0 0.5rem;
+}
+
+.apple-range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+  cursor: pointer;
+}
+
+.apple-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.5);
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.apple-range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Quick Chips */
+.apple-chips-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
+  margin-top: 0.35rem;
 }
 
-.tier-title {
-  font-size: 0.76rem;
+.apple-chip-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  padding: 4px 2px;
+  font-size: 0.62rem;
   font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.apple-chip-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
 
-.tier-tag {
-  font-size: 0.6rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  padding: 1px 6px;
-  border-radius: 4px;
-}
-
-.tier-tag-soon {
-  font-size: 0.58rem;
-  font-weight: 700;
-  background: rgba(245, 158, 11, 0.15);
+.apple-chip-btn.active {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: #f59e0b;
   color: #fbbf24;
-  padding: 1px 6px;
-  border-radius: 4px;
 }
 
-.tier-radio {
-  width: 16px;
-  height: 16px;
+/* Apple iOS Toggle */
+.apple-ios-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.apple-ios-toggle.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.apple-ios-toggle-thumb {
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.apple-ios-toggle.active .apple-ios-toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* Status Line at Bottom of Policy Card */
+.apple-card-status-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.6rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.61rem;
+  font-weight: 600;
+}
+
+.apple-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.trust-info-trigger-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.tier-radio-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.trust-info-trigger-btn:hover,
+.trust-info-trigger-btn.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366f1;
+  color: #fff;
 }
 
-.tier-desc {
-  font-size: 0.65rem;
+.trust-info-popover {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.55rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.trust-info-popover-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #c7d2fe;
+  margin-bottom: 2px;
+}
+
+.trust-info-popover-text {
+  font-size: 0.63rem;
   color: #94a3b8;
   line-height: 1.45;
-  margin: 0;
-}
-
-.tier-desc strong {
-  color: #e2e8f0;
-}
-
-.tier-active-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  margin-top: 0.4rem;
-  padding: 2px 8px;
-  border-radius: 99px;
-  border: 1px solid;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.trust-card-footer-note {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.64rem;
-  color: #94a3b8;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 6px 8px;
-  border-radius: 8px;
-}
-
-.trust-badge-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 0.4rem;
-}
-
-.trust-pill-tag {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: #cbd5e1;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 2px 8px;
-  border-radius: 6px;
 }
 
 /* ============================================================
