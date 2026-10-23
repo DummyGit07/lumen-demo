@@ -15,6 +15,7 @@ import GalleryApp from './components/apps/GalleryApp';
 import MusicApp from './components/apps/MusicApp';
 import LumenAiApp from './apps/lumen-ai/LumenAiApp';
 import GmailApp from './apps/gmail/GmailApp';
+import { fraudWorkflow } from './apps/lumen-ai/services/fraudWorkflow';
 
 import { INITIAL_APPS, WALLPAPERS, SAMPLE_NOTIFICATIONS } from './constants/apps';
 
@@ -176,16 +177,22 @@ export default function App() {
     setMode('home');
   };
 
+  // Dismiss notification helper
+  const dismissNotification = (notifId) => {
+    setActiveNotification((curr) => (curr?.id === notifId ? null : curr));
+    setNotificationList((prev) => prev.filter((n) => n.id !== notifId));
+  };
+
   // Trigger dynamic push notification
   const triggerNotification = (notifTemplate) => {
     playHapticSound('chime');
     const newNotif = {
       ...notifTemplate,
-      id: `notif-${Date.now()}`
+      id: notifTemplate.id || `notif-${Date.now()}`
     };
     setActiveNotification(newNotif);
-    // Push to notification screen tray
-    setNotificationList((prev) => [newNotif, ...prev]);
+    // Push to notification screen tray (prevent duplicate IDs)
+    setNotificationList((prev) => [newNotif, ...prev.filter((n) => n.id !== newNotif.id)]);
 
     // Dynamically update unread badge on the app icon if user is not currently inside that app
     if (activeAppId !== newNotif.appId) {
@@ -196,11 +203,32 @@ export default function App() {
       );
     }
 
-    // Auto dismiss banner after 4.5 seconds
-    setTimeout(() => {
-      setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
-    }, 4500);
+    // Auto dismiss banner if not marked persistent
+    if (!newNotif.persistent) {
+      const timeoutMs = newNotif.duration || 4500;
+      setTimeout(() => {
+        setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
+      }, timeoutMs);
+    }
   };
+
+  // Initialize fraudWorkflow service with navigation and notification handlers
+  useEffect(() => {
+    fraudWorkflow.init({
+      triggerNotification,
+      dismissNotification,
+      navigateApp: (appId, tab) => {
+        handleLaunchApp(appId);
+        if (tab) {
+          setTimeout(() => {
+            window.dispatchEvent(
+              new CustomEvent('lumen_switch_tab', { detail: { tab } })
+            );
+          }, 120);
+        }
+      }
+    });
+  }, [activeAppId]);
 
   // Keyboard Navigation Listeners
   useEffect(() => {
@@ -336,7 +364,11 @@ export default function App() {
               <NotificationBanner
                 notification={activeNotification}
                 onOpenApp={handleLaunchApp}
-                onDismiss={() => setActiveNotification(null)}
+                onDismiss={() => {
+                  if (activeNotification) {
+                    dismissNotification(activeNotification.id);
+                  }
+                }}
               />
 
               {/* Main Viewport for Apps, Home & Recents */}

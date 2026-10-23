@@ -138,12 +138,13 @@ export const financeStorage = {
       return parsed.map((c, i) => ({
         ...DEFAULT_CARDS[i],
         ...c,
-        status: c.status || DEFAULT_CARDS[i]?.status || 'active',
-        cardNumber: DEFAULT_CARDS[i]?.cardNumber || c.cardNumber,
-        cardHolder: DEFAULT_CARDS[i]?.cardHolder || c.cardHolder,
-        cvv: DEFAULT_CARDS[i]?.cvv || c.cvv,
-        expiry: DEFAULT_CARDS[i]?.expiry || c.expiry,
-        last4: DEFAULT_CARDS[i]?.last4 || c.last4
+        status: c.status || 'active',
+        cardNumber: c.cardNumber || DEFAULT_CARDS[i]?.cardNumber,
+        cardHolder: c.cardHolder || DEFAULT_CARDS[i]?.cardHolder,
+        cvv: c.cvv || DEFAULT_CARDS[i]?.cvv,
+        expiry: c.expiry || DEFAULT_CARDS[i]?.expiry,
+        last4: c.last4 || (c.cardNumber ? c.cardNumber.replace(/\s+/g, '').slice(-4) : DEFAULT_CARDS[i]?.last4),
+        maskedNumber: c.maskedNumber || (c.last4 ? `•••• •••• •••• ${c.last4}` : DEFAULT_CARDS[i]?.maskedNumber)
       }));
     } catch {
       return DEFAULT_CARDS;
@@ -153,6 +154,9 @@ export const financeStorage = {
   saveCards: (cards) => {
     try {
       localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
+      }
     } catch (e) {
       console.warn('Failed to save credit cards:', e);
     }
@@ -170,9 +174,114 @@ export const financeStorage = {
   saveTransactions: (txns) => {
     try {
       localStorage.setItem(STORAGE_KEY_TXNS, JSON.stringify(txns));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
+      }
     } catch (e) {
       console.warn('Failed to save transactions:', e);
     }
+  },
+
+  // Helper to freeze a specific card
+  freezeCard: (cardId) => {
+    const cards = financeStorage.loadCards();
+    const updated = cards.map((c) =>
+      c.id === cardId || (!cardId && c.id === 'card-lumen-brand')
+        ? { ...c, status: 'freezed' }
+        : c
+    );
+    financeStorage.saveCards(updated);
+    return updated;
+  },
+
+  // Helper to unfreeze a specific card
+  unfreezeCard: (cardId) => {
+    const cards = financeStorage.loadCards();
+    const updated = cards.map((c) =>
+      c.id === cardId || (!cardId && c.id === 'card-lumen-brand')
+        ? { ...c, status: 'active' }
+        : c
+    );
+    financeStorage.saveCards(updated);
+    return updated;
+  },
+
+  // Helper to generate a new valid random credit card and replace credentials
+  generateAndReplaceCard: (cardId) => {
+    const cards = financeStorage.loadCards();
+    const target = cards.find((c) => c.id === cardId) || cards[0];
+
+    // Generate random Visa 16-digit card number (starts with 4)
+    const randomDigits = Array.from({ length: 15 }, () => Math.floor(Math.random() * 10)).join('');
+    const fullNumber = `4${randomDigits}`;
+    const formattedNumber = `${fullNumber.slice(0, 4)} ${fullNumber.slice(4, 8)} ${fullNumber.slice(8, 12)} ${fullNumber.slice(12, 16)}`;
+    const last4 = fullNumber.slice(-4);
+
+    // Random future expiry (e.g. 3-5 years ahead)
+    const futureYear = (new Date().getFullYear() + 4).toString().slice(-2);
+    const randomMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+    const expiry = `${randomMonth}/${futureYear}`;
+
+    // Random 3 digit CVV
+    const cvv = String(Math.floor(100 + Math.random() * 900));
+
+    const updatedCard = {
+      ...target,
+      cardNumber: formattedNumber,
+      maskedNumber: `•••• •••• •••• ${last4}`,
+      last4,
+      expiry,
+      cvv,
+      status: 'active', // Restores to active!
+      outstanding: Math.max(0, (target.outstanding || 0) - 4850) // remove fraud amount
+    };
+
+    const updatedCards = cards.map((c) => (c.id === target.id ? updatedCard : c));
+    financeStorage.saveCards(updatedCards);
+    return updatedCard;
+  },
+
+  // Helper to inject a simulated fraudulent transaction
+  injectFraudTransaction: ({
+    amount = 4850,
+    merchant = 'Unknown Global POS • Dublin',
+    cardId = 'card-lumen-brand'
+  } = {}) => {
+    const cards = financeStorage.loadCards();
+    const targetCard = cards.find((c) => c.id === cardId) || cards[0];
+
+    // Increase credit card outstanding
+    const updatedCards = cards.map((c) =>
+      c.id === targetCard.id
+        ? { ...c, outstanding: (Number(c.outstanding) || 0) + amount }
+        : c
+    );
+    financeStorage.saveCards(updatedCards);
+
+    // Add suspicious debit transaction
+    const txns = financeStorage.loadTransactions();
+    const fraudTxn = {
+      id: `fraud-${Date.now()}`,
+      recipient: merchant,
+      upiId: 'flagged_merchant@intl-pos',
+      amount,
+      type: 'debit',
+      sourceType: 'card',
+      sourceName: `${targetCard.bankName || 'Lumen'} Card (•••• ${targetCard.last4 || '8411'})`,
+      sourceId: targetCard.id,
+      note: 'FLAGGED: Suspicious Card Transaction',
+      timestamp: new Date().toISOString(),
+      formattedTime: 'Just now',
+      isFlagged: true
+    };
+
+    financeStorage.saveTransactions([fraudTxn, ...txns]);
+
+    return {
+      card: targetCard,
+      txn: fraudTxn,
+      last4: targetCard.last4 || '8411'
+    };
   },
 
   resetAll: () => {
@@ -180,6 +289,9 @@ export const financeStorage = {
       localStorage.removeItem(STORAGE_KEY_BANKS);
       localStorage.removeItem(STORAGE_KEY_CARDS);
       localStorage.removeItem(STORAGE_KEY_TXNS);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('lumen_finance_updated'));
+      }
     } catch {
       // ignore
     }

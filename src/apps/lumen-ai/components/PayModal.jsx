@@ -207,23 +207,41 @@ export default function PayModal({
                 ))}
 
                 {/* 2. Credit Cards */}
-                {cards.map((c) => (
-                  <div
-                    key={c.id}
-                    className={`lumen-method-item ${selectedMethodId === c.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedMethodId(c.id)}
-                  >
-                    <div className="lumen-method-radio">
-                      <div className="lumen-radio-dot" />
-                    </div>
-                    <div className="lumen-method-info">
-                      <div className="lumen-method-name">{c.name} ({c.brand})</div>
-                      <div className="lumen-method-sub" style={{ color: '#f87171' }}>
-                        Outstanding: {c.outstanding > 0 ? `-₹${c.outstanding?.toLocaleString('en-IN')}` : `₹${c.outstanding?.toLocaleString('en-IN')}`} (Limit: ₹{c.creditLimit?.toLocaleString('en-IN')})
+                {cards.map((c) => {
+                  const isFreezed = c.status === 'freezed';
+                  return (
+                    <div
+                      key={c.id}
+                      className={`lumen-method-item ${selectedMethodId === c.id ? 'selected' : ''} ${isFreezed ? 'is-freezed' : ''}`}
+                      onClick={() => {
+                        if (isFreezed) {
+                          setErrorMsg('This credit card is currently freezed and cannot be used for payments.');
+                          return;
+                        }
+                        setSelectedMethodId(c.id);
+                        setErrorMsg('');
+                      }}
+                      style={{ opacity: isFreezed ? 0.6 : 1 }}
+                    >
+                      <div className="lumen-method-radio">
+                        <div className="lumen-radio-dot" />
+                      </div>
+                      <div className="lumen-method-info">
+                        <div className="lumen-method-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>{c.name}</span>
+                          {isFreezed && (
+                            <span style={{ fontSize: '0.62rem', background: 'rgba(239, 68, 68, 0.2)', color: '#f87171', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                              Freezed
+                            </span>
+                          )}
+                        </div>
+                        <div className="lumen-method-sub" style={{ color: isFreezed ? '#94a3b8' : '#f87171' }}>
+                          {isFreezed ? 'Card Locked • Payments Disabled' : `Outstanding: ₹${c.outstanding?.toLocaleString('en-IN')} (Limit: ₹${c.creditLimit?.toLocaleString('en-IN')})`}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

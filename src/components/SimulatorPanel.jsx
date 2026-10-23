@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sliders,
@@ -8,8 +8,14 @@ import {
   Wifi,
   Palette,
   Smartphone,
-  Sparkles
+  Sparkles,
+  ShieldAlert,
+  ShieldCheck,
+  RotateCcw
 } from 'lucide-react';
+import { fraudWorkflow } from '../apps/lumen-ai/services/fraudWorkflow';
+import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
+import { financeStorage } from '../apps/lumen-ai/services/financeStorage';
 
 export default function SimulatorPanel({
   isNotificationShadeOpen,
@@ -29,8 +35,20 @@ export default function SimulatorPanel({
   setPhoneScale,
   playHapticSound
 }) {
-  // Collapsible sub-simulators (minimized by default)
-  const [openSections, setOpenSections] = useState({});
+  // Collapsible sub-simulators (Lumen Fraud open by default)
+  const [openSections, setOpenSections] = useState({ lumen_fraud: true });
+  const [autonomyLevel, setAutonomyLevel] = useState(() => trustStorage.getAutonomyLevel());
+  const [simFeedback, setSimFeedback] = useState('');
+
+  // Keep autonomy level synced with Trust screen settings
+  useEffect(() => {
+    const unsub = trustStorage.subscribe((event, data) => {
+      if (event === 'autonomy_changed') {
+        setAutonomyLevel(data);
+      }
+    });
+    return unsub;
+  }, []);
 
   const toggleSection = (id) => {
     if (playHapticSound) playHapticSound('click');
@@ -38,6 +56,24 @@ export default function SimulatorPanel({
       ...prev,
       [id]: !prev[id]
     }));
+  };
+
+  const handleSimulateFraud = () => {
+    if (playHapticSound) playHapticSound('click');
+    const incident = fraudWorkflow.simulateFraud({
+      amount: 4850,
+      merchant: 'Unknown POS • Global Gateway'
+    });
+    setSimFeedback(`Fraud ₹4,850 simulated on •••• ${incident.cardLast4}!`);
+    setTimeout(() => setSimFeedback(''), 3500);
+  };
+
+  const handleResetFinance = () => {
+    if (playHapticSound) playHapticSound('click');
+    financeStorage.resetAll();
+    trustStorage.clearFraudIncident();
+    setSimFeedback('Card balances & incidents reset!');
+    setTimeout(() => setSimFeedback(''), 2500);
   };
 
   return (
@@ -52,8 +88,115 @@ export default function SimulatorPanel({
           <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Modules</span>
         </div>
 
-        {/* Minimizable Sub-Simulators (Minimized by Default) */}
+        {/* Minimizable Sub-Simulators */}
         <div className="simulator-list">
+          {/* 0. Sub-Simulator: Lumen AI Fraud & Trust Simulation */}
+          <div className={`sub-sim-item ${openSections.lumen_fraud ? 'open' : ''}`} style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+            <div
+              className="sub-sim-header"
+              onClick={() => toggleSection('lumen_fraud')}
+              style={{ background: 'rgba(239, 68, 68, 0.08)' }}
+            >
+              <div className="sub-sim-title-group">
+                <ShieldAlert size={14} color="#ef4444" />
+                <span style={{ color: '#fff', fontWeight: 700 }}>Fraud & Trust Workflow</span>
+              </div>
+              <ChevronDown
+                size={14}
+                className={`sub-sim-chevron ${openSections.lumen_fraud ? 'open' : ''}`}
+              />
+            </div>
+            <AnimatePresence>
+              {openSections.lumen_fraud && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="sub-sim-body" style={{ background: 'rgba(15, 23, 42, 0.4)' }}>
+                    {/* Active Autonomy Indicator */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Trust Autonomy:</span>
+                      <span
+                        className="notif-autonomy-badge"
+                        style={{
+                          background: autonomyLevel === 'l3' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                          color: autonomyLevel === 'l3' ? '#34d399' : '#60a5fa',
+                          border: `1px solid ${autonomyLevel === 'l3' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(59, 130, 246, 0.35)'}`,
+                          padding: '2px 8px'
+                        }}
+                      >
+                        {autonomyLevel.toUpperCase()} {autonomyLevel === 'l3' ? '(Autonomous)' : '(Guided)'}
+                      </span>
+                    </div>
+
+                    {/* Trigger Fraud Button */}
+                    <button
+                      className="panel-button active"
+                      onClick={handleSimulateFraud}
+                      style={{
+                        width: '100%',
+                        background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                        border: 'none',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: '0.74rem',
+                        padding: '0.6rem 0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 4px 14px rgba(239, 68, 68, 0.3)'
+                      }}
+                    >
+                      <ShieldAlert size={14} color="#fff" />
+                      <span>Simulate Fraud Transaction</span>
+                    </button>
+
+                    {simFeedback && (
+                      <div
+                        style={{
+                          marginTop: '6px',
+                          padding: '4px 8px',
+                          background: 'rgba(16, 185, 129, 0.15)',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          borderRadius: '6px',
+                          color: '#34d399',
+                          fontSize: '0.66rem',
+                          textAlign: 'center'
+                        }}
+                      >
+                        {simFeedback}
+                      </div>
+                    )}
+
+                    {/* Reset Button */}
+                    {/* <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+                      <button
+                        className="panel-button"
+                        onClick={handleResetFinance}
+                        style={{
+                          width: '100%',
+                          fontSize: '0.68rem',
+                          padding: '0.35rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px',
+                          color: '#94a3b8'
+                        }}
+                      >
+                        <RotateCcw size={11} />
+                        <span>Reset Cards & Incidents</span>
+                      </button>
+                    </div> */}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           {/* 1. Sub-Simulator: Notifications */}
           <div className={`sub-sim-item ${openSections.notifications ? 'open' : ''}`}>
             <div

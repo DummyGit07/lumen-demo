@@ -36,6 +36,15 @@ export default function GlanceScreen({
   const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(false);
   const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(false);
 
+  // Auto open digital card modal when triggered externally (e.g., View New Card)
+  React.useEffect(() => {
+    const handleOpen = () => {
+      setIsDigitalCardOpen(true);
+    };
+    window.addEventListener('lumen_open_digital_card', handleOpen);
+    return () => window.removeEventListener('lumen_open_digital_card', handleOpen);
+  }, []);
+
   // Primary Focus: Lumen Credit Card
   const primaryCard = cards[0];
 
@@ -236,10 +245,10 @@ export default function GlanceScreen({
 
       {/* 6. Transaction History Widget (Only last 3 + View All button) */}
       <div className="glance-section-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ReceiptText size={16} color="#10b981" />
+        <div className="glance-section-title">
+          <ReceiptText size={16} color="#10b981" style={{ flexShrink: 0 }} />
           <span>Transaction History</span>
-          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+          <span className="glance-section-count">
             ({transactions.length})
           </span>
         </div>
@@ -269,15 +278,29 @@ export default function GlanceScreen({
             {recentTransactions.map((txn) => (
               <div key={txn.id} className="glance-txn-item">
                 <div className="txn-left">
-                  <div className="txn-icon-circle">
-                    <ArrowUpRight size={13} color="#ef4444" />
+                  <div
+                    className="txn-icon-circle"
+                    style={{
+                      background: txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
+                        ? 'rgba(239, 68, 68, 0.22)'
+                        : 'rgba(99, 102, 241, 0.15)'
+                    }}
+                  >
+                    <ArrowUpRight
+                      size={13}
+                      color={txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? '#ef4444' : '#818cf8'}
+                    />
                   </div>
-                  <div>
-                    <div className="txn-recipient">{txn.recipient}</div>
+                  <div className="txn-details">
+                    <div className="txn-recipient" title={txn.recipient}>
+                      {txn.recipient}
+                    </div>
                     <div className="txn-meta">
-                      <span>{txn.sourceName}</span>
-                      <span>•</span>
-                      <span>{txn.formattedTime || 'Today'}</span>
+                      <span className="txn-source" title={txn.sourceName}>
+                        {txn.sourceName}
+                      </span>
+                      <span className="txn-dot">•</span>
+                      <span className="txn-time">{txn.formattedTime || 'Today'}</span>
                     </div>
                   </div>
                 </div>
@@ -289,7 +312,12 @@ export default function GlanceScreen({
                   >
                     -₹{txn.amount?.toLocaleString('en-IN')}
                   </div>
-                  <div className="txn-note">{txn.note || 'Payment'}</div>
+                  <div
+                    className={`txn-note ${txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? 'flagged' : ''}`}
+                    title={txn.note || 'Payment'}
+                  >
+                    {txn.note || 'Payment'}
+                  </div>
                 </div>
               </div>
             ))}

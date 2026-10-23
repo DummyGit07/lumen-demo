@@ -1,19 +1,29 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, MessageSquare, Music2, Image, Bell, X } from 'lucide-react';
+import { Phone, MessageSquare, Music2, Image, Bell, X, ShieldAlert } from 'lucide-react';
 
 const ICON_MAP = {
   Phone,
   MessageSquare,
   Music2,
   Image,
-  Bell
+  Bell,
+  ShieldAlert
 };
 
 export default function NotificationBanner({ notification, onOpenApp, onDismiss }) {
   if (!notification) return null;
 
   const IconComponent = ICON_MAP[notification.icon] || Bell;
+
+  const handleCardClick = () => {
+    if (notification.onClickCard) {
+      notification.onClickCard();
+    } else if (onOpenApp) {
+      onOpenApp(notification.appId);
+    }
+    if (onDismiss) onDismiss();
+  };
 
   return (
     <AnimatePresence>
@@ -28,19 +38,20 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss 
           dragConstraints={{ top: 0, bottom: 0 }}
           dragElastic={0.4}
           onDragEnd={(e, info) => {
-            if (info.offset.y < -30) {
+            if (info.offset.y < -30 && onDismiss) {
               onDismiss();
             }
           }}
-          onClick={() => {
-            onOpenApp(notification.appId);
-            onDismiss();
-          }}
+          onClick={handleCardClick}
+          style={{ cursor: 'pointer' }}
         >
           <div
             className="notif-icon-badge"
-            style={{ 
-              background: notification.appId === 'gmail' ? '#ffffff' : (notification.color || '#6366f1'),
+            style={{
+              background:
+                notification.appId === 'gmail'
+                  ? '#ffffff'
+                  : notification.color || '#6366f1',
               fontWeight: 800,
               fontSize: '1rem',
               color: '#fff'
@@ -63,16 +74,38 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss 
           <div className="notif-text-content">
             <div className="notif-header-line">
               <span className="notif-app-name">{notification.appName}</span>
-              <span className="notif-timestamp">{notification.time}</span>
+              {notification.autonomyBadge && (
+                <span className="notif-autonomy-badge">{notification.autonomyBadge}</span>
+              )}
+              <span className="notif-timestamp">{notification.time || 'Now'}</span>
             </div>
             <div className="notif-title">{notification.title}</div>
             <div className="notif-body">{notification.body}</div>
+
+            {/* Action Buttons */}
+            {Array.isArray(notification.actions) && notification.actions.length > 0 && (
+              <div className="notif-actions-row">
+                {notification.actions.map((act, idx) => (
+                  <button
+                    key={idx}
+                    className={`notif-btn notif-btn-${act.variant || 'default'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (act.onClick) act.onClick();
+                      if (onDismiss) onDismiss();
+                    }}
+                  >
+                    {act.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDismiss();
+              if (onDismiss) onDismiss();
             }}
             style={{
               background: 'transparent',

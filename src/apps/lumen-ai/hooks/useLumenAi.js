@@ -52,6 +52,16 @@ export function useLumenAi() {
     }, 1100);
   }, [isThinking]);
 
+  const addDirectAssistantMessage = useCallback((text) => {
+    const aiMessage = {
+      id: `msg-${Date.now()}`,
+      role: 'assistant',
+      text,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setMessages((prev) => [...prev, aiMessage]);
+  }, []);
+
   const clearChat = useCallback(() => {
     setMessages([]);
     aiStorage.clearMessages();
@@ -61,6 +71,7 @@ export function useLumenAi() {
     messages,
     isThinking,
     sendMessage,
+    addDirectAssistantMessage,
     clearChat
   };
 }

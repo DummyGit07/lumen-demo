@@ -10,6 +10,18 @@ export function useLumenFinance() {
   const [cards, setCards] = useState(() => financeStorage.loadCards());
   const [transactions, setTransactions] = useState(() => financeStorage.loadTransactions());
 
+  // Listen to external updates (fraud simulation, card replacement, freezing)
+  useEffect(() => {
+    const handleUpdate = () => {
+      setBanks(financeStorage.loadBanks());
+      setCards(financeStorage.loadCards());
+      setTransactions(financeStorage.loadTransactions());
+    };
+
+    window.addEventListener('lumen_finance_updated', handleUpdate);
+    return () => window.removeEventListener('lumen_finance_updated', handleUpdate);
+  }, []);
+
   // Save to persistent storage whenever state changes
   useEffect(() => {
     financeStorage.saveBanks(banks);

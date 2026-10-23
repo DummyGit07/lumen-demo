@@ -177,7 +177,12 @@ export default function NotificationShade({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: -100, transition: { duration: 0.15 } }}
                       onClick={() => {
-                        onOpenApp(item.appId);
+                        if (item.onClickCard) {
+                          item.onClickCard();
+                        } else {
+                          onOpenApp(item.appId);
+                        }
+                        onDismissOne(item.id);
                         onClose();
                       }}
                     >
@@ -209,10 +214,32 @@ export default function NotificationShade({
                       <div className="shade-item-content">
                         <div className="shade-item-top">
                           <span className="shade-item-app">{item.appName || 'System'}</span>
+                          {item.autonomyBadge && (
+                            <span className="notif-autonomy-badge">{item.autonomyBadge}</span>
+                          )}
                           <span className="shade-item-time">{item.time || 'Now'}</span>
                         </div>
                         <div className="shade-item-title">{item.title}</div>
                         <div className="shade-item-body">{item.body}</div>
+
+                        {Array.isArray(item.actions) && item.actions.length > 0 && (
+                          <div className="notif-actions-row" style={{ marginTop: '6px' }}>
+                            {item.actions.map((act, idx) => (
+                              <button
+                                key={idx}
+                                className={`notif-btn notif-btn-${act.variant || 'default'}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (act.onClick) act.onClick();
+                                  onDismissOne(item.id);
+                                  onClose();
+                                }}
+                              >
+                                {act.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <button

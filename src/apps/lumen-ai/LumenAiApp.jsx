@@ -1,23 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, Trash2 } from 'lucide-react';
 import { useLumenFinance } from './hooks/useLumenFinance';
 import { useLumenAi } from './hooks/useLumenAi';
+import { fraudWorkflow } from './services/fraudWorkflow';
 
 import GlanceScreen from './components/GlanceScreen';
 import LumenBottomNav from './components/LumenBottomNav';
 import MessageList from './components/MessageList';
 import ChatInput from './components/ChatInput';
-import DummyScreen from './components/DummyScreen';
+import ActScreen from './components/ActScreen';
+import TrustScreen from './components/TrustScreen';
 
-export default function LumenAiApp() {
-  const [activeTab, setActiveTab] = useState('glance'); // 'glance' | 'ask' | 'act' | 'trust'
+export default function LumenAiApp({ initialTab = 'glance' }) {
+  const [activeTab, setActiveTab] = useState(initialTab); // 'glance' | 'ask' | 'act' | 'trust'
 
   // Financial Dashboard State
   const finance = useLumenFinance();
 
   // AI Assistant Chat State (for 'ask' tab)
-  const { messages, isThinking, sendMessage, clearChat } = useLumenAi();
+  const { messages, isThinking, sendMessage, addDirectAssistantMessage, clearChat } = useLumenAi();
+
+  // Register chat messenger & card opener with fraudWorkflow
+  useEffect(() => {
+    fraudWorkflow.setChatMessenger(addDirectAssistantMessage);
+    fraudWorkflow.setGlanceCardOpener(() => {
+      setActiveTab('glance');
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
+      }, 100);
+    });
+  }, [addDirectAssistantMessage]);
+
+  // Listen to tab switch events from external workflows
+  useEffect(() => {
+    const handleSwitch = (e) => {
+      if (e.detail?.tab) {
+        setActiveTab(e.detail.tab);
+        if (e.detail?.openDigitalCard) {
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
+          }, 100);
+        }
+      }
+    };
+    window.addEventListener('lumen_switch_tab', handleSwitch);
+    return () => window.removeEventListener('lumen_switch_tab', handleSwitch);
+  }, []);
 
   return (
     <div className="lumen-app-root">
@@ -91,18 +120,32 @@ export default function LumenAiApp() {
             </motion.div>
           )}
 
-          {(activeTab === 'act' || activeTab === 'trust') && (
+          {activeTab === 'act' && (
             <motion.div
-              key={`tab-${activeTab}`}
+              key="tab-act"
               className="lumen-tab-pane"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
             >
-              <DummyScreen
-                tab={activeTab}
-                onNavigateGlance={() => setActiveTab('glance')}
+              <ActScreen
+                onNavigateTab={(tab) => setActiveTab(tab)}
+              />
+            </motion.div>
+          )}
+
+          {activeTab === 'trust' && (
+            <motion.div
+              key="tab-trust"
+              className="lumen-tab-pane"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              <TrustScreen
+                onNavigateTab={(tab) => setActiveTab(tab)}
               />
             </motion.div>
           )}

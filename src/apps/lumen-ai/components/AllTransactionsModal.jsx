@@ -46,15 +46,25 @@ export default function AllTransactionsModal({
             transactions.map((txn) => (
               <div key={txn.id} className="glance-txn-item" style={{ padding: '0.75rem 0' }}>
                 <div className="txn-left">
-                  <div className="txn-icon-circle">
-                    <ArrowUpRight size={14} color="#ef4444" />
+                  <div
+                    className="txn-icon-circle"
+                    style={{
+                      background: txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
+                        ? 'rgba(239, 68, 68, 0.22)'
+                        : 'rgba(99, 102, 241, 0.15)'
+                    }}
+                  >
+                    <ArrowUpRight
+                      size={14}
+                      color={txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? '#ef4444' : '#818cf8'}
+                    />
                   </div>
-                  <div>
-                    <div className="txn-recipient">{txn.recipient}</div>
+                  <div className="txn-details">
+                    <div className="txn-recipient" title={txn.recipient}>{txn.recipient}</div>
                     <div className="txn-meta">
-                      <span>{txn.sourceName}</span>
-                      <span>•</span>
-                      <span>{txn.formattedTime || 'Today'}</span>
+                      <span className="txn-source" title={txn.sourceName}>{txn.sourceName}</span>
+                      <span className="txn-dot">•</span>
+                      <span className="txn-time">{txn.formattedTime || 'Today'}</span>
                     </div>
                   </div>
                 </div>
@@ -63,7 +73,12 @@ export default function AllTransactionsModal({
                   <div className="txn-amount-wrap debit">
                     -₹{txn.amount?.toLocaleString('en-IN')}
                   </div>
-                  <div className="txn-note">{txn.note || 'Payment'}</div>
+                  <div
+                    className={`txn-note ${txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? 'flagged' : ''}`}
+                    title={txn.note || 'Payment'}
+                  >
+                    {txn.note || 'Payment'}
+                  </div>
                 </div>
               </div>
             ))
