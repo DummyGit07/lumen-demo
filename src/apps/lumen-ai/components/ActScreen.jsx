@@ -28,6 +28,8 @@ export default function ActScreen({ onNavigateTab }) {
     const unsub = trustStorage.subscribe((event, data) => {
       if (event === 'incident_updated') {
         setIncident(data);
+      } else if (event === 'address_updated') {
+        setAddressInput(data);
       }
     });
     return unsub;
@@ -304,13 +306,13 @@ export default function ActScreen({ onNavigateTab }) {
                     <Loader2 size={20} color="#a855f7" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l2-badge">L2 Card Replacement</div>
-                    <div className="incident-title">Generating Replacement Card...</div>
+                    <div className="incident-badge l2-badge">L2 Card Delivery</div>
+                    <div className="incident-title">New Card on the Way</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Setting up your new digital card with fresh security credentials...
+                  Your old card is locked. We are preparing your new physical card for dispatch to <strong>{(incident.deliveryAddress || trustStorage.getUserAddress()).split(',')[0]}</strong> and activating an instant digital card.
                 </p>
 
                 <div className="incident-progress-box">
@@ -323,7 +325,7 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">Creating verified digital card credentials</span>
+                    <span className="progress-status-text">Activating instant digital card • Preparing dispatch</span>
                   </div>
                 </div>
               </div>
@@ -399,7 +401,7 @@ export default function ActScreen({ onNavigateTab }) {
                   onClick={() => fraudWorkflow.executeL3Unified()}
                 >
                   <Lock size={15} />
-                  <span>Lock & Replace</span>
+                  <span>Lock & Replace Card</span>
                 </button>
               </div>
             )}
@@ -447,12 +449,12 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l3-badge">L3 Autonomous • Step 2/2</div>
-                    <div className="incident-title">Generating Your New Card</div>
+                    <div className="incident-title">New Card on the Way</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Card locked. Dispatching your physical replacement card to verified address on file (<strong>{(incident.deliveryAddress || trustStorage.getUserAddress()).split(',')[0]}</strong>). Setting up fresh credentials now...
+                  Compromised card is locked. Dispatching your physical card to verified address on file (<strong>{(incident.deliveryAddress || trustStorage.getUserAddress()).split(',')[0]}</strong>) and activating an instant digital card.
                 </p>
 
                 {/* Progress bar (10 seconds) */}
@@ -466,7 +468,7 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">Step 2 of 2: Setting up fresh digital credentials</span>
+                    <span className="progress-status-text">Step 2 of 2: Activating instant digital card • Preparing dispatch</span>
                   </div>
                 </div>
               </div>

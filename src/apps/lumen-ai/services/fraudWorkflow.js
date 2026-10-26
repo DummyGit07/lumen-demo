@@ -69,15 +69,15 @@ class FraudWorkflowService {
         title: 'Suspicious Transaction Detected',
         body: `A transaction of ₹${amount.toLocaleString('en-IN')} has been detected on your card ending with ${last4}. Have you done this transaction?`,
         color: '#ef4444',
-        duration: 5000,
+        duration: 8000,
         actions: [
           {
-            label: 'Yes',
+            label: 'Yes, It Was Me',
             variant: 'ghost',
             onClick: () => this.handleConfirmationResponse(true)
           },
           {
-            label: 'No',
+            label: 'No, Not Me',
             variant: 'danger',
             onClick: () => this.handleConfirmationResponse(false)
           }
@@ -263,7 +263,7 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         title: 'Securing Your Card...',
         body: 'Temporarily locking your card across all payment networks...',
         color: '#f59e0b',
-        duration: 5000
+        duration: 10000
       });
     }
 
@@ -333,7 +333,7 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
       deliveryAddress: finalAddress
     });
 
-    // Notification: Setting up new card
+    // Notification: Setting up new card (Option B: Action & Delivery Focused)
     const notifId = `notif-l2-applied-${Date.now()}`;
     this.activeNotifId = notifId;
 
@@ -344,10 +344,10 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         appName: 'Lumen',
         icon: 'CreditCard',
         autonomyBadge: 'L2',
-        title: 'Generating Replacement Card...',
-        body: `Card locked. Dispatching fresh card to ${finalAddress.split(',')[0]}...`,
+        title: 'New Card on the Way',
+        body: `Old card secured. Preparing physical card for dispatch to ${finalAddress.split(',')[0]}. Instant digital card ready in moments.`,
         color: '#6366f1',
-        duration: 5000
+        duration: 10000
       });
     }
 
@@ -378,9 +378,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           icon: 'Sparkles',
           autonomyBadge: 'L2',
           title: 'Your New Card is Ready',
-          body: `Virtual card active immediately. Physical card dispatched to ${finalAddress.split(',')[0]}.`,
+          body: `Instant digital card is active immediately. Physical card dispatched to ${finalAddress.split(',')[0]}.`,
           color: '#10b981',
-          duration: 6000,
+          duration: 8000,
           onClickCard: () => this.executeL2ViewNewCard(),
           actions: [
             {
@@ -443,10 +443,10 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         title: 'Suspicious Charge Flagged',
         body: 'We detected an unauthorized charge. We recommend locking your compromised card and instantly issuing a safe replacement card.',
         color: '#10b981',
-        duration: 5000,
+        duration: 8000,
         actions: [
           {
-            label: 'Lock & Replace',
+            label: 'Lock & Replace Card',
             variant: 'danger',
             onClick: () => this.executeL3Unified()
           }
@@ -480,7 +480,7 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         title: 'Securing Your Card...',
         body: 'Locking your compromised card to prevent further charges... Replacement card will follow automatically.',
         color: '#0284c7',
-        duration: 5000
+        duration: 10000
       });
     }
 
@@ -509,10 +509,10 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           appName: 'Lumen',
           icon: 'CreditCard',
           autonomyBadge: 'L3',
-          title: 'Generating Your New Card...',
-          body: `Card locked. Dispatching fresh card to verified address on file (${userAddress.split(',')[0]})...`,
+          title: 'New Card on the Way',
+          body: `Card secured. Dispatching new physical card to verified address on file (${userAddress.split(',')[0]}). Instant digital card ready in moments.`,
           color: '#6366f1',
-          duration: 5000
+          duration: 10000
         });
       }
 
@@ -543,9 +543,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
             icon: 'Sparkles',
             autonomyBadge: 'L3',
             title: 'Your New Card is Ready',
-            body: `Your new card is active immediately. Physical card dispatched to verified address on file (${userAddress.split(',')[0]}).`,
+            body: `Instant digital card is active immediately. Physical card dispatched to verified address on file (${userAddress.split(',')[0]}).`,
             color: '#10b981',
-            duration: 6000,
+            duration: 8000,
             onClickCard: () => this.executeL3ViewNewCard(),
             actions: [
               {

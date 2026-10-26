@@ -17,6 +17,7 @@ import {
   Check,
   X
 } from 'lucide-react';
+import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
 
 const ICON_MAP = {
   Phone,
@@ -44,6 +45,16 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
     setIsEditingAddress(false);
     setAddressInput(notification?.deliveryAddress || '');
   }, [notification?.id, notification?.deliveryAddress]);
+
+  // Two-way real-time sync with trustStorage address updates
+  useEffect(() => {
+    const unsub = trustStorage.subscribe((event, data) => {
+      if (event === 'address_updated') {
+        setAddressInput(data);
+      }
+    });
+    return unsub;
+  }, []);
 
   const IconComponent = ICON_MAP[notification.icon] || Bell;
 
@@ -256,7 +267,6 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
                     onClick={(e) => {
                       e.stopPropagation();
                       if (act.onClick) act.onClick(addressInput.trim() || notification?.deliveryAddress);
-                      if (onDismiss) onDismiss();
                     }}
                   >
                     {act.label}

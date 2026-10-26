@@ -23,6 +23,7 @@ import {
   Sparkles,
   CheckCircle2
 } from 'lucide-react';
+import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
 
 const ICON_MAP = {
   Phone,
@@ -246,8 +247,7 @@ export default function NotificationShade({
                                 className={`notif-btn notif-btn-${act.variant || 'default'}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (act.onClick) act.onClick();
-                                  onDismissOne(item.id);
+                                  if (act.onClick) act.onClick(trustStorage.getUserAddress());
                                   onClose();
                                 }}
                               >
