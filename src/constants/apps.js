@@ -92,11 +92,11 @@ export const SAMPLE_NOTIFICATIONS = [
   {
     id: 'notif-2',
     appId: 'lumen_ai',
-    appName: 'Lumen AI',
-    title: 'Lumen Assistant',
+    appName: 'Lumen',
+    title: 'Daily Financial Summary',
     body: 'Your summary for today is ready. Tap to view insights.',
     time: 'Just now',
-    icon: 'L',
+    icon: 'Sparkles',
     color: '#6366f1'
   }
 ];

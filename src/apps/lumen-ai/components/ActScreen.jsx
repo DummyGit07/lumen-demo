@@ -70,7 +70,7 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc">
-                  A charge of <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> was detected on card <strong>•••• {incident.cardLast4}</strong>. Have you performed this transaction?
+                  A charge of <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> was detected on card <strong>•••• {incident.cardLast4}</strong>. Did you authorize this transaction?
                 </p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
@@ -99,15 +99,15 @@ export default function ActScreen({ onNavigateTab }) {
                     <ShieldAlert size={20} color="#ef4444" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l1-badge">L1 Guided Action</div>
-                    <div className="incident-title">Suspicious Charge Detected</div>
+                    <div className="incident-badge l1-badge">L1 Guided Assistance</div>
+                    <div className="incident-title">Card Protection Steps</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Detected a transaction of{' '}
-                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> on credit card{' '}
-                  <strong>•••• {incident.cardLast4}</strong>. Learn how to freeze the card and apply for a new card.
+                  We flagged an unauthorized charge of{' '}
+                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> on card{' '}
+                  <strong>•••• {incident.cardLast4}</strong>. Follow our guided checklist in Ask to safely lock your card and request a replacement.
                 </p>
 
                 <button
@@ -117,7 +117,7 @@ export default function ActScreen({ onNavigateTab }) {
                     if (onNavigateTab) onNavigateTab('ask');
                   }}
                 >
-                  <span>View Steps</span>
+                  <span>View Guided Steps</span>
                   <ArrowRight size={15} />
                 </button>
               </div>
@@ -127,7 +127,7 @@ export default function ActScreen({ onNavigateTab }) {
                 L2 WORKFLOW STATES (Two-Step Manual Approval)
                 ========================================== */}
 
-            {/* L2 State 1: Freeze Prompt */}
+            {/* L2 State 1: Lock Prompt */}
             {incident.status === 'l2_freeze_prompt' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -136,14 +136,14 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l2-badge">L2 Semi-Autonomous</div>
-                    <div className="incident-title">Emergency Freeze Required</div>
+                    <div className="incident-title">Suspicious Charge Flagged</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Unauthorized charge of{' '}
-                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> flagged on card{' '}
-                  <strong>•••• {incident.cardLast4}</strong> at <em>{incident.merchant || 'International POS'}</em>.
+                  We detected an unauthorized charge of{' '}
+                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> on card{' '}
+                  <strong>•••• {incident.cardLast4}</strong> at <em>{incident.merchant || 'International POS'}</em>. We recommend locking this card immediately to prevent further charges.
                 </p>
 
                 <button
@@ -151,12 +151,12 @@ export default function ActScreen({ onNavigateTab }) {
                   onClick={() => fraudWorkflow.executeL2Freeze()}
                 >
                   <Lock size={15} />
-                  <span>Freeze Now</span>
+                  <span>Lock Card</span>
                 </button>
               </div>
             )}
 
-            {/* L2 State 2: Freezing In Progress */}
+            {/* L2 State 2: Locking In Progress */}
             {incident.status === 'l2_freezing' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -164,13 +164,13 @@ export default function ActScreen({ onNavigateTab }) {
                     <Loader2 size={20} color="#f59e0b" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l2-badge">L2 Background Worker</div>
-                    <div className="incident-title">Freezing Card in Progress...</div>
+                    <div className="incident-badge l2-badge">L2 Security Action</div>
+                    <div className="incident-title">Securing Your Card...</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Issuing emergency block command to domestic and international card networks for •••• {incident.cardLast4}...
+                  Temporarily locking your card across all domestic and international payment networks...
                 </p>
 
                 <div className="incident-progress-box">
@@ -183,13 +183,13 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">Network handshake active</span>
+                    <span className="progress-status-text">Locking card across payment networks</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* L2 State 3: Freeze Completed / Replace Prompt */}
+            {/* L2 State 3: Card Locked / Prompt for Replacement */}
             {incident.status === 'l2_freeze_done' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -198,12 +198,12 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l2-badge">L2 Card Secured</div>
-                    <div className="incident-title">Card Freezed Successfully</div>
+                    <div className="incident-title">Card Successfully Locked</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Card <strong>•••• {incident.cardLast4}</strong> is now locked. All further payments are blocked. Would you like to issue a replacement card?
+                  No further charges can go through on card <strong>•••• {incident.cardLast4}</strong>. Would you like us to generate a new card now?
                 </p>
 
                 <button
@@ -211,7 +211,7 @@ export default function ActScreen({ onNavigateTab }) {
                   onClick={() => fraudWorkflow.executeL2Replace()}
                 >
                   <RefreshCw size={15} />
-                  <span>Apply for New Card</span>
+                  <span>Order Replacement Card</span>
                 </button>
               </div>
             )}
@@ -224,13 +224,13 @@ export default function ActScreen({ onNavigateTab }) {
                     <Loader2 size={20} color="#a855f7" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l2-badge">L2 Digital Provisioning</div>
-                    <div className="incident-title">Replacing Card in Progress...</div>
+                    <div className="incident-badge l2-badge">L2 Card Replacement</div>
+                    <div className="incident-title">Generating Replacement Card...</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Generating verified 16-digit credit card number, fresh dynamic CVV, and updating security vault...
+                  Setting up your new digital card with fresh security credentials...
                 </p>
 
                 <div className="incident-progress-box">
@@ -243,7 +243,7 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">RBI tokenization & key sync</span>
+                    <span className="progress-status-text">Creating verified digital card credentials</span>
                   </div>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge success-badge">Issued & Active</div>
-                    <div className="incident-title">New Credit Card Is Here!</div>
+                    <div className="incident-title">Your New Card is Ready</div>
                   </div>
                 </div>
 
@@ -275,7 +275,7 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc" style={{ marginTop: '0.25rem' }}>
-                  Your new card has been generated and connected to your account. All payments have been reactivated.
+                  Your new credit card is active and ready to use immediately.
                 </p>
 
                 <button
@@ -295,7 +295,7 @@ export default function ActScreen({ onNavigateTab }) {
                 L3 WORKFLOW STATES (Unified Single-Click Action)
                 ========================================== */}
 
-            {/* L3 State 1: Unified Prompt (Freeze & Replace) */}
+            {/* L3 State 1: Unified Prompt (Lock & Replace) */}
             {incident.status === 'l3_unified_prompt' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -304,14 +304,14 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l3-badge">L3 High Autonomy</div>
-                    <div className="incident-title">Emergency Autonomous Action</div>
+                    <div className="incident-title">Suspicious Charge Flagged</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Unauthorized charge of{' '}
-                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> flagged on card{' '}
-                  <strong>•••• {incident.cardLast4}</strong> at <em>{incident.merchant || 'International POS'}</em>.
+                  We detected an unauthorized charge of{' '}
+                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> on card{' '}
+                  <strong>•••• {incident.cardLast4}</strong> at <em>{incident.merchant || 'International POS'}</em>. We recommend locking your compromised card and instantly issuing a safe replacement card.
                 </p>
 
                 <button
@@ -319,12 +319,12 @@ export default function ActScreen({ onNavigateTab }) {
                   onClick={() => fraudWorkflow.executeL3Unified()}
                 >
                   <Lock size={15} />
-                  <span>Freeze & Replace</span>
+                  <span>Lock & Replace</span>
                 </button>
               </div>
             )}
 
-            {/* L3 State 2: Freezing In Progress */}
+            {/* L3 State 2: Locking In Progress */}
             {incident.status === 'l3_freezing' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -333,12 +333,12 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l3-badge">L3 Autonomous • Step 1/2</div>
-                    <div className="incident-title">Freezing Card in Progress...</div>
+                    <div className="incident-title">Securing Your Card...</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Issuing emergency block command to card network... Card replacement will follow automatically.
+                  Locking your compromised card to prevent further charges... Replacement card will follow automatically.
                 </p>
 
                 {/* Progress bar (10 seconds) */}
@@ -352,7 +352,7 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">Network handshake active • Auto-provision queued</span>
+                    <span className="progress-status-text">Step 1 of 2: Locking card across all networks</span>
                   </div>
                 </div>
               </div>
@@ -367,12 +367,12 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                   <div className="incident-title-block">
                     <div className="incident-badge l3-badge">L3 Autonomous • Step 2/2</div>
-                    <div className="incident-title">Replacing Card in Progress...</div>
+                    <div className="incident-title">Generating Your New Card</div>
                   </div>
                 </div>
 
                 <p className="incident-desc">
-                  Generating verified 16-digit credit card number, fresh dynamic CVV, and updating security vault...
+                  Card locked. Now creating your new credit card with fresh security credentials
                 </p>
 
                 {/* Progress bar (10 seconds) */}
@@ -386,7 +386,7 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">RBI tokenization & automated key sync</span>
+                    <span className="progress-status-text">Step 2 of 2: Setting up fresh digital credentials</span>
                   </div>
                 </div>
               </div>
@@ -400,8 +400,8 @@ export default function ActScreen({ onNavigateTab }) {
                     <Sparkles size={20} color="#10b981" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge success-badge">Issued & Active</div>
-                    <div className="incident-title">New Credit Card Is Here!</div>
+                    <div className="incident-badge success-badge">Autonomous Complete</div>
+                    <div className="incident-title">Your New Card is Ready</div>
                   </div>
                 </div>
 
@@ -418,7 +418,7 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc" style={{ marginTop: '0.25rem' }}>
-                  Your new card has been generated and connected to your account. All payments have been reactivated.
+                  Your compromised card has been blocked and your new digital card is ready for use.
                 </p>
 
                 <button

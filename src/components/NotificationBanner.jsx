@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, MessageSquare, Music2, Image, Bell, X, ShieldAlert } from 'lucide-react';
+import {
+  Phone,
+  MessageSquare,
+  Music2,
+  Image,
+  Bell,
+  ChevronDown,
+  ShieldAlert,
+  Lock,
+  CreditCard,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react';
 
 const ICON_MAP = {
   Phone,
@@ -8,15 +20,33 @@ const ICON_MAP = {
   Music2,
   Image,
   Bell,
-  ShieldAlert
+  ShieldAlert,
+  Lock,
+  CreditCard,
+  Sparkles,
+  CheckCircle2
 };
 
 export default function NotificationBanner({ notification, onOpenApp, onDismiss, onExpandShade }) {
   if (!notification) return null;
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Reset to compact state whenever a new notification arrives
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [notification?.id]);
+
   const IconComponent = ICON_MAP[notification.icon] || Bell;
 
   const handleCardClick = () => {
+    if (!isExpanded) {
+      // First click on card: Expand to read full details
+      setIsExpanded(true);
+      return;
+    }
+
+    // Second click on card (when already expanded): Open the app
     if (notification.onClickCard) {
       notification.onClickCard();
     } else if (onOpenApp) {
@@ -25,42 +55,63 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
     if (onDismiss) onDismiss();
   };
 
+  const handleToggleExpand = (e) => {
+    e.stopPropagation();
+    setIsExpanded((prev) => !prev);
+  };
+
+  const badgeLevelKey = (notification.autonomyBadge || '').toLowerCase().slice(0, 2);
+
   return (
     <AnimatePresence>
       <div className="notification-banner-wrapper">
         <motion.div
-          className="notification-card"
+          key={notification.id}
+          className={`notification-card ${isExpanded ? 'is-expanded' : 'is-compact'}`}
           initial={{ y: -70, opacity: 0, scale: 0.95 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: -70, opacity: 0, scale: 0.95 }}
           transition={{ type: 'spring', damping: 24, stiffness: 350 }}
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={0.4}
+          layout
+          drag={true}
+          dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+          dragElastic={0.65}
           onDragEnd={(e, info) => {
-            if (info.offset.y < -30 && onDismiss) {
-              onDismiss();
-            } else if ((info.offset.y > 25 || info.velocity.y > 150) && onExpandShade) {
-              onExpandShade();
+            // Horizontal swipe left or right (Real mobile dismiss gesture)
+            if (info.offset.x > 60 || info.velocity.x > 200) {
+              if (onDismiss) onDismiss();
+            } else if (info.offset.x < -60 || info.velocity.x < -200) {
+              if (onDismiss) onDismiss();
+            }
+            // Vertical swipe up (dismiss upwards)
+            else if (info.offset.y < -30 || info.velocity.y < -200) {
+              if (onDismiss) onDismiss();
+            }
+            // Vertical swipe down (pull down notification shade)
+            else if (info.offset.y > 35 || info.velocity.y > 200) {
+              if (onExpandShade) onExpandShade();
             }
           }}
           onClick={handleCardClick}
           style={{ cursor: 'pointer' }}
         >
+          {/* Leading App/Action Icon */}
           <div
             className="notif-icon-badge"
             style={{
               background:
                 notification.appId === 'gmail'
                   ? '#ffffff'
-                  : notification.color || '#6366f1',
-              fontWeight: 800,
-              fontSize: '1rem',
-              color: '#fff'
+                  : notification.color
+                  ? `linear-gradient(135deg, ${notification.color}, ${notification.color}dd)`
+                  : 'linear-gradient(135deg, #6366f1, #4f46e5)',
+              boxShadow: notification.color ? `0 4px 12px ${notification.color}40` : 'none'
             }}
           >
-            {notification.appId === 'lumen_ai' ? (
-              <span>L</span>
+            {notification.icon && ICON_MAP[notification.icon] ? (
+              <IconComponent size={18} color="#fff" />
+            ) : notification.appId === 'lumen_ai' ? (
+              <Sparkles size={17} color="#fff" />
             ) : notification.appId === 'gmail' ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M2 6.5V17.5C2 18.3284 2.67157 19 3.5 19H6.5V10.5L2 7.125V6.5Z" fill="#4285F4"/>
@@ -69,22 +120,46 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
                 <path d="M17.5 5H6.5C5.67157 5 5 5.67157 5 6.5V7.125L12 12.375L19 7.125V6.5C19 5.67157 18.3284 5 17.5 5Z" fill="#FBBC04"/>
               </svg>
             ) : (
-              <IconComponent size={20} />
+              <IconComponent size={18} />
             )}
           </div>
 
+          {/* Main Content Area */}
           <div className="notif-text-content">
+            {/* Header: App Name + Autonomy Badge + Timestamp + Expand Chevron */}
             <div className="notif-header-line">
-              <span className="notif-app-name">{notification.appName}</span>
-              {notification.autonomyBadge && (
-                <span className="notif-autonomy-badge">{notification.autonomyBadge}</span>
-              )}
-              <span className="notif-timestamp">{notification.time || 'Now'}</span>
+              <div className="notif-header-left">
+                <span className="notif-app-name">{notification.appName || 'Lumen'}</span>
+                {notification.autonomyBadge && (
+                  <span className={`notif-autonomy-pill pill-${badgeLevelKey}`}>
+                    {notification.autonomyBadge}
+                  </span>
+                )}
+              </div>
+              <div className="notif-header-right">
+                <span className="notif-timestamp">{notification.time || 'Now'}</span>
+                <button
+                  className="notif-expand-btn"
+                  onClick={handleToggleExpand}
+                  title={isExpanded ? 'Collapse' : 'Expand to see full message'}
+                >
+                  <ChevronDown
+                    size={14}
+                    className={`notif-chevron-icon ${isExpanded ? 'expanded' : ''}`}
+                  />
+                </button>
+              </div>
             </div>
-            <div className="notif-title">{notification.title}</div>
-            <div className="notif-body">{notification.body}</div>
 
-            {/* Action Buttons */}
+            {/* The Hero: Prominent, Crisp Headline */}
+            <div className="notif-title">{notification.title}</div>
+
+            {/* Body Text: Truncated when collapsed, full when expanded */}
+            <div className={`notif-body ${isExpanded ? 'expanded' : 'collapsed'}`}>
+              {notification.body}
+            </div>
+
+            {/* Modern Tactile Action Buttons (Always visible in 1 tap!) */}
             {Array.isArray(notification.actions) && notification.actions.length > 0 && (
               <div className="notif-actions-row">
                 {notification.actions.map((act, idx) => (
@@ -103,25 +178,6 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
               </div>
             )}
           </div>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onDismiss) onDismiss();
-            }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#94a3b8',
-              cursor: 'pointer',
-              padding: '2px',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            title="Dismiss notification"
-          >
-            <X size={14} />
-          </button>
         </motion.div>
       </div>
     </AnimatePresence>

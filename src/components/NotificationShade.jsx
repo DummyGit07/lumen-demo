@@ -16,7 +16,12 @@ import {
   Image,
   Bell,
   Sliders,
-  Sun
+  Sun,
+  ShieldAlert,
+  Lock,
+  CreditCard,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -28,7 +33,12 @@ const ICON_MAP = {
   music: Music2,
   Image,
   gallery: Image,
-  Bell
+  Bell,
+  ShieldAlert,
+  Lock,
+  CreditCard,
+  Sparkles,
+  CheckCircle2
 };
 
 export default function NotificationShade({ 
@@ -197,8 +207,10 @@ export default function NotificationShade({
                           color: '#fff'
                         }}
                       >
-                        {item.appId === 'lumen_ai' ? (
-                          <span style={{ fontSize: '0.85rem' }}>L</span>
+                        {item.icon && ICON_MAP[item.icon] ? (
+                          <IconComp size={16} color="#fff" />
+                        ) : item.appId === 'lumen_ai' ? (
+                          <Sparkles size={16} color="#fff" />
                         ) : item.appId === 'gmail' ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                             <path d="M2 6.5V17.5C2 18.3284 2.67157 19 3.5 19H6.5V10.5L2 7.125V6.5Z" fill="#4285F4"/>
@@ -213,10 +225,14 @@ export default function NotificationShade({
 
                       <div className="shade-item-content">
                         <div className="shade-item-top">
-                          <span className="shade-item-app">{item.appName || 'System'}</span>
-                          {item.autonomyBadge && (
-                            <span className="notif-autonomy-badge">{item.autonomyBadge}</span>
-                          )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span className="shade-item-app">{item.appName || 'Lumen'}</span>
+                            {item.autonomyBadge && (
+                              <span className={`notif-autonomy-pill pill-${(item.autonomyBadge || '').toLowerCase().slice(0, 2)}`}>
+                                {item.autonomyBadge}
+                              </span>
+                            )}
+                          </div>
                           <span className="shade-item-time">{item.time || 'Now'}</span>
                         </div>
                         <div className="shade-item-title">{item.title}</div>
