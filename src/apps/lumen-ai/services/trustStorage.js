@@ -3,6 +3,8 @@
 
 const STORAGE_KEY_AUTONOMY = 'lumen_trust_autonomy_level_v1';
 const STORAGE_KEY_FRAUD = 'lumen_trust_fraud_incident_v1';
+export const DEFAULT_USER_ADDRESS = 'Flat 402, Skyline Towers, 100ft Road, Indiranagar, Bengaluru - 560038';
+const STORAGE_KEY_USER_ADDRESS = 'lumen_user_delivery_address_v1';
 
 export const AUTONOMY_LEVELS = {
   L1: {
@@ -108,6 +110,28 @@ class TrustStorageService {
 
   clearFraudIncident() {
     this.setFraudIncident(null);
+  }
+
+  // Delivery Address Management
+  getUserAddress() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_USER_ADDRESS);
+      return stored && stored.trim() ? stored : DEFAULT_USER_ADDRESS;
+    } catch {
+      return DEFAULT_USER_ADDRESS;
+    }
+  }
+
+  setUserAddress(address) {
+    try {
+      const val = address && address.trim() ? address.trim() : DEFAULT_USER_ADDRESS;
+      localStorage.setItem(STORAGE_KEY_USER_ADDRESS, val);
+      this.notify('address_updated', val);
+      return val;
+    } catch (e) {
+      console.warn('Failed to save delivery address:', e);
+      return DEFAULT_USER_ADDRESS;
+    }
   }
 
   // Navigation Request (to open Lumen tab or submodal)

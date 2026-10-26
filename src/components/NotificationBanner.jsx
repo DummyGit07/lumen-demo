@@ -11,7 +11,11 @@ import {
   Lock,
   CreditCard,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  MapPin,
+  Edit3,
+  Check,
+  X
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -31,11 +35,15 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
   if (!notification) return null;
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [addressInput, setAddressInput] = useState(notification?.deliveryAddress || '');
 
-  // Reset to compact state whenever a new notification arrives
+  // Reset to compact state & reset address when new notification arrives
   useEffect(() => {
     setIsExpanded(false);
-  }, [notification?.id]);
+    setIsEditingAddress(false);
+    setAddressInput(notification?.deliveryAddress || '');
+  }, [notification?.id, notification?.deliveryAddress]);
 
   const IconComponent = ICON_MAP[notification.icon] || Bell;
 
@@ -58,6 +66,22 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
   const handleToggleExpand = (e) => {
     e.stopPropagation();
     setIsExpanded((prev) => !prev);
+  };
+
+  const handleSaveAddress = (e) => {
+    e.stopPropagation();
+    if (addressInput.trim()) {
+      setIsEditingAddress(false);
+      if (notification.onUpdateAddress) {
+        notification.onUpdateAddress(addressInput.trim());
+      }
+    }
+  };
+
+  const handleCancelAddress = (e) => {
+    e.stopPropagation();
+    setAddressInput(notification?.deliveryAddress || '');
+    setIsEditingAddress(false);
   };
 
   const badgeLevelKey = (notification.autonomyBadge || '').toLowerCase().slice(0, 2);
@@ -159,6 +183,69 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
               {notification.body}
             </div>
 
+            {/* Address Verification Box (L2 Semi-Autonomous flow) */}
+            {notification.addressVerification && (
+              <div
+                className="notif-address-box"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {!isEditingAddress ? (
+                  <div className="notif-address-view">
+                    <div className="notif-address-header">
+                      <span className="notif-address-label">
+                        <MapPin size={12} className="notif-address-pin" /> Delivery Address
+                      </span>
+                      <button
+                        type="button"
+                        className="notif-address-edit-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsEditingAddress(true);
+                          setIsExpanded(true);
+                        }}
+                      >
+                        <Edit3 size={11} />
+                        <span>Edit</span>
+                      </button>
+                    </div>
+                    <div className="notif-address-value">
+                      {addressInput || notification.deliveryAddress || 'Address on file'}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="notif-address-edit-form">
+                    <div className="notif-address-edit-title">
+                      <MapPin size={12} /> Edit Delivery Address:
+                    </div>
+                    <textarea
+                      className="notif-address-textarea"
+                      value={addressInput}
+                      onChange={(e) => setAddressInput(e.target.value)}
+                      rows={2}
+                      autoFocus
+                      placeholder="Enter complete delivery address..."
+                    />
+                    <div className="notif-address-edit-actions">
+                      <button
+                        type="button"
+                        className="notif-addr-btn cancel"
+                        onClick={handleCancelAddress}
+                      >
+                        <X size={12} /> Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="notif-addr-btn save"
+                        onClick={handleSaveAddress}
+                      >
+                        <Check size={12} /> Save Address
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Modern Tactile Action Buttons (Always visible in 1 tap!) */}
             {Array.isArray(notification.actions) && notification.actions.length > 0 && (
               <div className="notif-actions-row">
@@ -168,7 +255,7 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
                     className={`notif-btn notif-btn-${act.variant || 'default'}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (act.onClick) act.onClick();
+                      if (act.onClick) act.onClick(addressInput.trim() || notification?.deliveryAddress);
                       if (onDismiss) onDismiss();
                     }}
                   >

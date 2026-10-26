@@ -744,6 +744,217 @@ html, body, #root {
   display: block;
 }
 
+/* Notification Actions Row (Always visible 1-tap UX) */
+.notif-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.notif-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.notif-btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.notif-btn-primary:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.notif-btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.notif-btn-success:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.notif-btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.notif-btn-danger:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.notif-btn-default {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.notif-btn-default:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+/* Notification Interactive Address Box */
+.notif-address-box {
+  margin-top: 8px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 10px;
+  padding: 8px 10px;
+  transition: all 0.2s ease;
+}
+
+.notif-address-box:hover {
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.notif-address-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.notif-address-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f59e0b;
+}
+
+.notif-address-pin {
+  color: #f59e0b;
+}
+
+.notif-address-edit-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+.notif-address-edit-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.notif-address-value {
+  font-size: 0.68rem;
+  color: #e2e8f0;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.notif-address-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notif-address-edit-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.notif-address-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  padding: 5px 7px;
+  resize: none;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.notif-address-textarea:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.notif-address-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.notif-addr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.notif-addr-btn.cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.notif-addr-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+}
+
+.notif-addr-btn.save {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.notif-addr-btn.save:hover {
+  filter: brightness(1.1);
+}
+
 /* Bottom 3-Button Android Navigation Bar */
 .phone-bottom-nav-bar {
   height: 42px;
@@ -4515,6 +4726,150 @@ html, body, #root {
 
 .notif-btn:active {
   transform: scale(0.96);
+}
+
+/* Act Screen Interactive Address Box */
+.act-address-box {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0 12px 0;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.act-address-box:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.act-address-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.act-address-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f59e0b;
+}
+
+.act-address-pin {
+  color: #f59e0b;
+}
+
+.act-address-edit-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.act-address-edit-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.act-address-value {
+  font-size: 0.74rem;
+  color: #f1f5f9;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.act-address-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.act-address-edit-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.act-address-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  padding: 7px 10px;
+  resize: vertical;
+  min-height: 52px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.act-address-textarea:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.act-address-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.act-addr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.act-addr-btn.cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.act-addr-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+}
+
+.act-addr-btn.save {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+}
+
+.act-addr-btn.save:hover {
+  filter: brightness(1.1);
 }
 
 /* Hide scrollbar while preserving scrollability */

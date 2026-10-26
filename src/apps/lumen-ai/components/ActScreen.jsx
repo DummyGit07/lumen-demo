@@ -10,13 +10,19 @@ import {
   Sparkles,
   RefreshCw,
   CheckCircle2,
-  Cpu
+  Cpu,
+  MapPin,
+  Edit3,
+  Check,
+  X
 } from 'lucide-react';
 import { trustStorage } from '../services/trustStorage';
 import { fraudWorkflow } from '../services/fraudWorkflow';
 
 export default function ActScreen({ onNavigateTab }) {
   const [incident, setIncident] = useState(() => trustStorage.getFraudIncident());
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [addressInput, setAddressInput] = useState(() => trustStorage.getUserAddress());
 
   useEffect(() => {
     const unsub = trustStorage.subscribe((event, data) => {
@@ -26,6 +32,27 @@ export default function ActScreen({ onNavigateTab }) {
     });
     return unsub;
   }, []);
+
+  useEffect(() => {
+    if (incident?.deliveryAddress) {
+      setAddressInput(incident.deliveryAddress);
+    } else {
+      setAddressInput(trustStorage.getUserAddress());
+    }
+    setIsEditingAddress(false);
+  }, [incident?.deliveryAddress, incident?.status]);
+
+  const handleSaveAddress = () => {
+    if (addressInput.trim()) {
+      trustStorage.setUserAddress(addressInput.trim());
+      setIsEditingAddress(false);
+    }
+  };
+
+  const handleCancelAddress = () => {
+    setAddressInput(incident?.deliveryAddress || trustStorage.getUserAddress());
+    setIsEditingAddress(false);
+  };
 
   const hasValidIncident =
     incident &&
@@ -189,7 +216,7 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L2 State 3: Card Locked / Prompt for Replacement */}
+            {/* L2 State 3: Card Locked / Prompt for Replacement with Address Verification */}
             {incident.status === 'l2_freeze_done' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -203,15 +230,68 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc">
-                  No further charges can go through on card <strong>•••• {incident.cardLast4}</strong>. Would you like us to generate a new card now?
+                  No further charges can go through on card <strong>•••• {incident.cardLast4}</strong>. Verify your delivery address for physical card dispatch:
                 </p>
+
+                {/* Interactive Address Box */}
+                <div className="act-address-box">
+                  {!isEditingAddress ? (
+                    <div className="act-address-view">
+                      <div className="act-address-header">
+                        <span className="act-address-label">
+                          <MapPin size={13} className="act-address-pin" /> Physical Card Delivery Address
+                        </span>
+                        <button
+                          type="button"
+                          className="act-address-edit-btn"
+                          onClick={() => setIsEditingAddress(true)}
+                        >
+                          <Edit3 size={12} />
+                          <span>Edit</span>
+                        </button>
+                      </div>
+                      <div className="act-address-value">
+                        {addressInput || trustStorage.getUserAddress()}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="act-address-edit-form">
+                      <div className="act-address-edit-title">
+                        <MapPin size={13} /> Edit Delivery Address:
+                      </div>
+                      <textarea
+                        className="act-address-textarea"
+                        value={addressInput}
+                        onChange={(e) => setAddressInput(e.target.value)}
+                        rows={2}
+                        placeholder="Enter full address for card delivery..."
+                      />
+                      <div className="act-address-edit-actions">
+                        <button
+                          type="button"
+                          className="act-addr-btn cancel"
+                          onClick={handleCancelAddress}
+                        >
+                          <X size={12} /> Cancel
+                        </button>
+                        <button
+                          type="button"
+                          className="act-addr-btn save"
+                          onClick={handleSaveAddress}
+                        >
+                          <Check size={12} /> Save Address
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <button
                   className="incident-action-btn primary"
-                  onClick={() => fraudWorkflow.executeL2Replace()}
+                  onClick={() => fraudWorkflow.executeL2Replace(addressInput)}
                 >
                   <RefreshCw size={15} />
-                  <span>Order Replacement Card</span>
+                  <span>Confirm & Replace Card</span>
                 </button>
               </div>
             )}
@@ -372,7 +452,7 @@ export default function ActScreen({ onNavigateTab }) {
                 </div>
 
                 <p className="incident-desc">
-                  Card locked. Now creating your new credit card with fresh security credentials
+                  Card locked. Dispatching your physical replacement card to verified address on file (<strong>{(incident.deliveryAddress || trustStorage.getUserAddress()).split(',')[0]}</strong>). Setting up fresh credentials now...
                 </p>
 
                 {/* Progress bar (10 seconds) */}

@@ -274,13 +274,15 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
       // Formally freeze the credit card in financeStorage
       financeStorage.freezeCard(incident.cardId);
 
+      const userAddress = trustStorage.getUserAddress();
       const updated = {
         ...incident,
-        status: 'l2_freeze_done'
+        status: 'l2_freeze_done',
+        deliveryAddress: userAddress
       };
       trustStorage.setFraudIncident(updated);
 
-      // Notification: Card locked, prompt for replacement
+      // Notification: Card locked, prompt for replacement with address verification
       const replaceNotifId = `notif-l2-replace-${Date.now()}`;
       this.activeNotifId = replaceNotifId;
 
@@ -292,14 +294,19 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           icon: 'CreditCard',
           autonomyBadge: 'L2',
           title: 'Card Successfully Locked',
-          body: 'No further charges can go through on this card. Would you like to request a new card now?',
+          body: 'No further charges can go through. Verify delivery address for physical replacement card:',
+          addressVerification: true,
+          deliveryAddress: userAddress,
           color: '#10b981',
-          duration: 5000,
+          duration: 10000,
+          onUpdateAddress: (newAddr) => {
+            trustStorage.setUserAddress(newAddr);
+          },
           actions: [
             {
-              label: 'Replace Card',
+              label: 'Confirm & Replace Card',
               variant: 'primary',
-              onClick: () => this.executeL2Replace()
+              onClick: (confirmedAddr) => this.executeL2Replace(confirmedAddr)
             }
           ]
         });
@@ -308,16 +315,22 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
   }
 
   // L2 Step 2: Replacing Card
-  executeL2Replace() {
+  executeL2Replace(customAddress) {
     this.dismissActiveNotification();
 
     const incident = trustStorage.getFraudIncident();
     if (!incident) return;
 
+    if (customAddress && customAddress.trim()) {
+      trustStorage.setUserAddress(customAddress.trim());
+    }
+    const finalAddress = trustStorage.getUserAddress();
+
     // Status: replacing in progress
     trustStorage.setFraudIncident({
       ...incident,
-      status: 'l2_replacing'
+      status: 'l2_replacing',
+      deliveryAddress: finalAddress
     });
 
     // Notification: Setting up new card
@@ -330,8 +343,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         appId: 'lumen_ai',
         appName: 'Lumen',
         icon: 'CreditCard',
+        autonomyBadge: 'L2',
         title: 'Generating Replacement Card...',
-        body: 'Setting up your new digital card with fresh security credentials...',
+        body: `Card locked. Dispatching fresh card to ${finalAddress.split(',')[0]}...`,
         color: '#6366f1',
         duration: 5000
       });
@@ -347,7 +361,8 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
       const updated = {
         ...incident,
         status: 'l2_replaced',
-        newCard
+        newCard,
+        deliveryAddress: finalAddress
       };
       trustStorage.setFraudIncident(updated);
 
@@ -363,9 +378,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           icon: 'Sparkles',
           autonomyBadge: 'L2',
           title: 'Your New Card is Ready',
-          body: 'Your new digital card is active and ready to use immediately.',
+          body: `Virtual card active immediately. Physical card dispatched to ${finalAddress.split(',')[0]}.`,
           color: '#10b981',
-          duration: 5000,
+          duration: 6000,
           onClickCard: () => this.executeL2ViewNewCard(),
           actions: [
             {
@@ -476,10 +491,12 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
       // Formally freeze card
       financeStorage.freezeCard(incident.cardId);
 
+      const userAddress = trustStorage.getUserAddress();
       // Phase 2: Automatically start replacement without user intervention
       trustStorage.setFraudIncident({
         ...incident,
-        status: 'l3_replacing'
+        status: 'l3_replacing',
+        deliveryAddress: userAddress
       });
 
       const replacingNotifId = `notif-l3-replacing-${Date.now()}`;
@@ -491,8 +508,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           appId: 'lumen_ai',
           appName: 'Lumen',
           icon: 'CreditCard',
+          autonomyBadge: 'L3',
           title: 'Generating Your New Card...',
-          body: 'Card locked. Now creating your new credit card with fresh security credentials',
+          body: `Card locked. Dispatching fresh card to verified address on file (${userAddress.split(',')[0]})...`,
           color: '#6366f1',
           duration: 5000
         });
@@ -508,7 +526,8 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         const updated = {
           ...incident,
           status: 'l3_replaced',
-          newCard
+          newCard,
+          deliveryAddress: userAddress
         };
         trustStorage.setFraudIncident(updated);
 
@@ -524,9 +543,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
             icon: 'Sparkles',
             autonomyBadge: 'L3',
             title: 'Your New Card is Ready',
-            body: 'Your compromised card has been locked and your new digital card is ready for use.',
+            body: `Your new card is active immediately. Physical card dispatched to verified address on file (${userAddress.split(',')[0]}).`,
             color: '#10b981',
-            duration: 5000,
+            duration: 6000,
             onClickCard: () => this.executeL3ViewNewCard(),
             actions: [
               {
