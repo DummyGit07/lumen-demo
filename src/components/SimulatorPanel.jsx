@@ -11,7 +11,8 @@ import {
   Sparkles,
   ShieldAlert,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  Clock
 } from 'lucide-react';
 import { fraudWorkflow } from '../apps/lumen-ai/services/fraudWorkflow';
 import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
@@ -22,6 +23,8 @@ export default function SimulatorPanel({
   onToggleNotificationShade,
   sampleNotifications = [],
   onTriggerNotification,
+  autoDismissNotification = false,
+  onToggleAutoDismiss,
   battery,
   setBattery,
   wifi,
@@ -251,6 +254,56 @@ export default function SimulatorPanel({
                           transition: 'transform 0.2s'
                         }}
                       />
+                    </button>
+
+                    {/* Auto-disappear Notification Toggle Button */}
+                    <button
+                      className={`panel-button ${autoDismissNotification ? 'active' : ''}`}
+                      onClick={() => {
+                        if (playHapticSound) playHapticSound('click');
+                        if (onToggleAutoDismiss) onToggleAutoDismiss();
+                      }}
+                      title="Toggle whether notification banners automatically disappear from screen"
+                      style={{
+                        width: '100%',
+                        marginBottom: '0.55rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.5rem 0.75rem',
+                        fontSize: '0.73rem',
+                        background: autoDismissNotification
+                          ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(79, 70, 229, 0.22))'
+                          : 'rgba(255, 255, 255, 0.04)',
+                        border: `1px solid ${autoDismissNotification ? 'rgba(99, 102, 241, 0.45)' : 'rgba(255, 255, 255, 0.09)'
+                          }`,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Clock size={13} color={autoDismissNotification ? '#818cf8' : '#94a3b8'} />
+                        <span style={{ fontWeight: 600, color: autoDismissNotification ? '#e0e7ff' : '#cbd5e1' }}>
+                          Auto-disappear
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: '0.64rem',
+                          fontWeight: 700,
+                          padding: '2px 7px',
+                          borderRadius: '999px',
+                          background: autoDismissNotification
+                            ? 'rgba(99, 102, 241, 0.35)'
+                            : 'rgba(255, 255, 255, 0.07)',
+                          color: autoDismissNotification ? '#c7d2fe' : '#94a3b8',
+                          border: `1px solid ${autoDismissNotification ? 'rgba(99, 102, 241, 0.45)' : 'rgba(255, 255, 255, 0.12)'
+                            }`
+                        }}
+                      >
+                        {autoDismissNotification ? 'ON (5s)' : 'OFF'}
+                      </span>
                     </button>
 
                     <div style={{ fontSize: '0.68rem', color: '#94a3b8', margin: '2px 0 4px' }}>

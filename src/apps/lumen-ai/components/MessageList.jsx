@@ -1,6 +1,28 @@
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Bot, User, CornerDownRight, ShieldAlert, ArrowRight } from 'lucide-react';
+import {
+  User,
+  CornerDownRight,
+  ShieldAlert,
+  Lock,
+  Search,
+  CreditCard,
+  CheckCircle2
+} from 'lucide-react';
+
+function getStepIcon(title) {
+  const t = (title || '').toLowerCase();
+  if (t.includes('freeze') || t.includes('lock')) {
+    return <Lock size={13} color="#38bdf8" />;
+  }
+  if (t.includes('review') || t.includes('flag') || t.includes('dispute') || t.includes('transaction')) {
+    return <Search size={13} color="#fbbf24" />;
+  }
+  if (t.includes('replace') || t.includes('card')) {
+    return <CreditCard size={13} color="#a78bfa" />;
+  }
+  return <CheckCircle2 size={13} color="#34d399" />;
+}
 
 function parseBold(text) {
   if (!text) return '';
@@ -58,15 +80,22 @@ function FormattedTextBlocks({ text }) {
     if (currentList.length > 0) {
       elements.push(
         <div key={`steps-${elements.length}`} className="lumen-steps-container">
+          <div className="lumen-steps-header">
+            <span className="lumen-steps-header-tag">Action Steps</span>
+            <span className="lumen-steps-header-count">{currentList.length} Steps</span>
+          </div>
           {currentList.map((step, sIdx) => (
             <div key={sIdx} className="lumen-step-card">
-              <div className="lumen-step-num">{step.num}</div>
-              <div className="lumen-step-body">
+              <div className="lumen-step-top">
+                <span className="lumen-step-num-pill">Step {step.num}</span>
+                <span className="lumen-step-icon-wrap">{getStepIcon(step.title)}</span>
                 {step.title && (
                   <div className="lumen-step-title">{parseBold(step.title)}</div>
                 )}
-                <div className="lumen-step-desc">{parseBold(step.desc)}</div>
               </div>
+              {step.desc && (
+                <div className="lumen-step-desc">{parseBold(step.desc)}</div>
+              )}
             </div>
           ))}
         </div>
@@ -85,7 +114,7 @@ function FormattedTextBlocks({ text }) {
     }
 
     // 1. Alert Banner
-    if (trimmed.startsWith('⚠️') || trimmed.toLowerCase().includes('fraud protection notice')) {
+    if (trimmed.startsWith('⚠️') || trimmed.toLowerCase().includes('fraud protection notice') || trimmed.toLowerCase().includes('fraud protection alert')) {
       flushList();
       elements.push(
         <div key={`alert-${i}`} className="lumen-alert-banner">
@@ -130,7 +159,7 @@ function FormattedTextBlocks({ text }) {
             !lines[i + 1].trim().toLowerCase().startsWith('feel free')))
       ) {
         i++;
-        desc += ' ' + lines[i].trim();
+        desc = (desc ? desc + ' ' : '') + lines[i].trim();
       }
 
       currentList.push({ num, title, desc });
@@ -153,10 +182,24 @@ function FormattedTextBlocks({ text }) {
 }
 
 export default function MessageList({ messages, isThinking, onSelectSuggestion }) {
+  const topRef = useRef(null);
   const bottomRef = useRef(null);
+  const prevCountRef = useRef(messages.length);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const isStepGuidance = messages.some(
+      (m) =>
+        m.text?.toLowerCase().includes('fraud protection alert') ||
+        m.text?.toLowerCase().includes('fraud protection notice') ||
+        m.text?.includes('1. **Freeze')
+    );
+
+    if (isStepGuidance) {
+      topRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
+    } else if (messages.length > prevCountRef.current && prevCountRef.current > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevCountRef.current = messages.length;
   }, [messages, isThinking]);
 
   if (messages.length === 0) {
@@ -192,6 +235,7 @@ export default function MessageList({ messages, isThinking, onSelectSuggestion }
 
   return (
     <div className="lumen-chat-stream">
+      <div ref={topRef} style={{ height: 1 }} />
       {messages.map((m) => {
         const isUser = m.role === 'user';
         return (

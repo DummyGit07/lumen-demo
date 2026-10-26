@@ -98,25 +98,5 @@ export const SAMPLE_NOTIFICATIONS = [
     time: 'Just now',
     icon: 'L',
     color: '#6366f1'
-  },
-  {
-    id: 'notif-3',
-    appId: 'phone',
-    appName: 'Phone',
-    title: 'Missed Call',
-    body: 'Missed call from Alex Morgan (+1 555-0199)',
-    time: '2m ago',
-    icon: 'Phone',
-    color: '#22c55e'
-  },
-  {
-    id: 'notif-4',
-    appId: 'sms',
-    appName: 'Messages',
-    title: 'Alex Morgan',
-    body: 'Are we still meeting up this evening?',
-    time: '5m ago',
-    icon: 'MessageSquare',
-    color: '#3b82f6'
   }
 ];

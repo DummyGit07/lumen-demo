@@ -11,7 +11,7 @@ const ICON_MAP = {
   ShieldAlert
 };
 
-export default function NotificationBanner({ notification, onOpenApp, onDismiss }) {
+export default function NotificationBanner({ notification, onOpenApp, onDismiss, onExpandShade }) {
   if (!notification) return null;
 
   const IconComponent = ICON_MAP[notification.icon] || Bell;
@@ -40,6 +40,8 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss 
           onDragEnd={(e, info) => {
             if (info.offset.y < -30 && onDismiss) {
               onDismiss();
+            } else if ((info.offset.y > 25 || info.velocity.y > 150) && onExpandShade) {
+              onExpandShade();
             }
           }}
           onClick={handleCardClick}

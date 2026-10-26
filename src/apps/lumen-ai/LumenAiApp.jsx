@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, Trash2 } from 'lucide-react';
 import { useLumenFinance } from './hooks/useLumenFinance';
@@ -21,6 +21,7 @@ export default function LumenAiApp({
 }) {
   const [activeTab, setActiveTab] = useState(activeTabProp || initialTab); // 'glance' | 'ask' | 'act' | 'trust'
   const [autoOpenCard, setAutoOpenCard] = useState(Boolean(autoOpenDigitalCard));
+  const chatBodyRef = useRef(null);
 
   // Sync if parent passes activeTabProp
   useEffect(() => {
@@ -45,6 +46,13 @@ export default function LumenAiApp({
   const handleTabSwitch = (tab) => {
     setActiveTab(tab);
     if (onTabChange) onTabChange(tab);
+    if (tab === 'ask') {
+      setTimeout(() => {
+        if (chatBodyRef.current) {
+          chatBodyRef.current.scrollTop = 0;
+        }
+      }, 50);
+    }
   };
 
   // Register chat messenger & card opener with fraudWorkflow
@@ -66,6 +74,13 @@ export default function LumenAiApp({
       if (e.detail?.tab) {
         setActiveTab(e.detail.tab);
         if (onTabChange) onTabChange(e.detail.tab);
+        if (e.detail.tab === 'ask') {
+          setTimeout(() => {
+            if (chatBodyRef.current) {
+              chatBodyRef.current.scrollTop = 0;
+            }
+          }, 50);
+        }
       }
       if (e.detail?.openDigitalCard) {
         setAutoOpenCard(true);
@@ -142,7 +157,7 @@ export default function LumenAiApp({
               </div>
 
               {/* Chat Stream */}
-              <div className="lumen-body">
+              <div className="lumen-body" ref={chatBodyRef}>
                 <MessageList
                   messages={messages}
                   isThinking={isThinking}

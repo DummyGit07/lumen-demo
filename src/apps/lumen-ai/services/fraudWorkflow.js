@@ -157,26 +157,27 @@ class FraudWorkflowService {
     // Ensure the card remains active and is NEVER left in a frozen state for L1
     financeStorage.unfreezeCard(incident?.cardId || 'card-lumen-brand');
 
+    // Requirement: Remove previous messages before navigating to the ask page
+    aiStorage.clearMessages();
+
     // Direct reply coming from agent (no prior user prompt)
     const amount = incident?.amount || 4850;
     const last4 = incident?.cardLast4 || '8411';
+    const merchant = incident?.merchant || 'International POS Gateway';
 
-    const detailedMessage = `⚠️ **Fraud Protection Notice — Card •••• ${last4}**
-
-We detected an unauthorized debit of **₹${amount.toLocaleString('en-IN')}** from an unverified payment gateway.
-
-Here are the required steps to safeguard your funds:
+    const detailedMessage = `⚠️ **Fraud Protection Alert — Card •••• ${last4}**
+Flagged unauthorized debit of **₹${amount.toLocaleString('en-IN')}** at *${merchant}*. Follow these steps to safeguard your account:
 
 1. **Freeze Your Credit Card**:
-   Go to the **Glance** tab, select your credit card, and toggle **Freeze Card**. This immediately cuts off all domestic and international card networks.
-2. **Review Suspicious Charge**:
-   Check the transaction entry under **Recent Transactions** for the dispute reference code.
+   Switch to the **Glance** tab, select your Card •••• ${last4}, and toggle **Freeze Card** to immediately block all domestic and international card transactions.
+2. **Review & Flag Transaction**:
+   Verify the unauthorized entry under **Recent Transactions** in Glance and note down the dispute reference ID.
 3. **Request Card Replacement**:
-   Submit a formal re-issue request via bank helpline or request a digital token swap.
+   Submit a zero-liability replacement request to receive a new digital token and replacement card with fresh credentials.
 
-Feel free to ask me anything about filing a dispute or monitoring your bank balance!`;
+Feel free to ask me anything below about filing a chargeback or verifying your balances.`;
 
-    // Append directly to aiStorage as single source of truth (triggers lumen_ai_messages_updated)
+    // Append to aiStorage as single source of truth (triggers lumen_ai_messages_updated)
     aiStorage.appendMessage({
       id: `msg-fraud-${last4}-${Date.now()}`,
       role: 'assistant',

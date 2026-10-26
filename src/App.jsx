@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StatusBar from './components/StatusBar';
 import BottomNavBar from './components/BottomNavBar';
@@ -55,6 +55,13 @@ export default function App() {
   const [runningApps, setRunningApps] = useState([]); // Zero default active apps on initial startup
   const [internalAppScreens, setInternalAppScreens] = useState({}); // e.g. { phone: 'dialpad', sms: 'list', gallery: 'grid' }
   const [activeNotification, setActiveNotification] = useState(null);
+  const [autoDismissNotification, setAutoDismissNotification] = useState(false);
+  const autoDismissRef = useRef(false);
+
+  useEffect(() => {
+    autoDismissRef.current = autoDismissNotification;
+  }, [autoDismissNotification]);
+
   const [currentWallpaper, setCurrentWallpaper] = useState(WALLPAPERS[0]);
 
   // Hardware status
@@ -203,11 +210,13 @@ export default function App() {
       );
     }
 
-    // Auto dismiss heads-up banner from mobile screen after 3 seconds (notification remains in tray)
-    const timeoutMs = newNotif.duration || 5000;
-    setTimeout(() => {
-      setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
-    }, timeoutMs);
+    // Auto dismiss heads-up banner from mobile screen only if autoDismiss is toggled on (default is off)
+    if (autoDismissRef.current) {
+      const timeoutMs = newNotif.duration || 5000;
+      setTimeout(() => {
+        setActiveNotification((curr) => (curr?.id === newNotif.id ? null : curr));
+      }, timeoutMs);
+    }
   };
 
   // Initialize fraudWorkflow service with navigation and notification handlers
@@ -325,6 +334,7 @@ export default function App() {
                 onSlideDown={() => {
                   playHapticSound('click');
                   setIsNotificationShadeOpen(true);
+                  setActiveNotification(null);
                 }}
               />
 
@@ -364,12 +374,17 @@ export default function App() {
 
               {/* Drop-down Notification Banner */}
               <NotificationBanner
-                notification={activeNotification}
+                notification={isNotificationShadeOpen ? null : activeNotification}
                 onOpenApp={handleLaunchApp}
                 onDismiss={() => {
                   if (activeNotification) {
                     dismissNotification(activeNotification.id);
                   }
+                }}
+                onExpandShade={() => {
+                  playHapticSound('click');
+                  setIsNotificationShadeOpen(true);
+                  setActiveNotification(null);
                 }}
               />
 
@@ -475,9 +490,17 @@ export default function App() {
         {/* 3. Right Side: Simulation Controller (Separated Component) */}
         <SimulatorPanel
           isNotificationShadeOpen={isNotificationShadeOpen}
-          onToggleNotificationShade={() => setIsNotificationShadeOpen(!isNotificationShadeOpen)}
+          onToggleNotificationShade={() => {
+            const next = !isNotificationShadeOpen;
+            setIsNotificationShadeOpen(next);
+            if (next) {
+              setActiveNotification(null);
+            }
+          }}
           sampleNotifications={SAMPLE_NOTIFICATIONS}
           onTriggerNotification={triggerNotification}
+          autoDismissNotification={autoDismissNotification}
+          onToggleAutoDismiss={() => setAutoDismissNotification((prev) => !prev)}
           battery={battery}
           setBattery={setBattery}
           wifi={wifi}
