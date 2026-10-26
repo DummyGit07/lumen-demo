@@ -53,13 +53,14 @@ export default function TrustScreen({ onNavigateTab }) {
   };
 
   const handleSelectAutonomy = (levelKey) => {
-    if (levelKey === 'l2') {
-      showToast('L2 Semi-Autonomous is coming in the next release');
-      return;
-    }
     const updated = trustStorage.setAutonomyLevel(levelKey);
     setAutonomyLevel(updated);
-    showToast(`Autonomy set to ${updated === 'l1' ? 'L1 Guided' : 'L3 Autonomous'}`);
+    const labelMap = {
+      l1: 'L1 Guided',
+      l2: 'L2 Semi-Auto',
+      l3: 'L3 Autonomous'
+    };
+    showToast(`Autonomy set to ${labelMap[updated] || 'L1 Guided'}`);
   };
 
   const handleLimitChange = (val) => {
@@ -87,7 +88,21 @@ export default function TrustScreen({ onNavigateTab }) {
   };
 
   const isL1 = autonomyLevel === 'l1';
-  const themeColor = isL1 ? '#38bdf8' : '#10b981';
+  const isL2 = autonomyLevel === 'l2';
+  const isL3 = autonomyLevel === 'l3';
+
+  const themeColor = isL1 ? '#38bdf8' : isL2 ? '#f59e0b' : '#10b981';
+  const badgeLabel = isL1 ? 'L1 Guided' : isL2 ? 'L2 Semi-Auto' : 'L3 Autonomous';
+  const badgeBg = isL1
+    ? 'rgba(56, 189, 248, 0.14)'
+    : isL2
+    ? 'rgba(245, 158, 11, 0.14)'
+    : 'rgba(16, 185, 129, 0.14)';
+  const badgeBorder = isL1
+    ? 'rgba(56, 189, 248, 0.3)'
+    : isL2
+    ? 'rgba(245, 158, 11, 0.3)'
+    : 'rgba(16, 185, 129, 0.3)';
 
   return (
     <div className="lumen-trust-scroll">
@@ -130,7 +145,11 @@ export default function TrustScreen({ onNavigateTab }) {
       <div
         className="spectrum-card"
         style={{
-          borderColor: isL1 ? 'rgba(56, 189, 248, 0.35)' : 'rgba(16, 185, 129, 0.4)'
+          borderColor: isL1
+            ? 'rgba(56, 189, 248, 0.35)'
+            : isL2
+            ? 'rgba(245, 158, 11, 0.35)'
+            : 'rgba(16, 185, 129, 0.4)'
         }}
       >
         <div className="spectrum-header">
@@ -140,11 +159,11 @@ export default function TrustScreen({ onNavigateTab }) {
               className="spectrum-badge"
               style={{
                 color: themeColor,
-                background: isL1 ? 'rgba(56, 189, 248, 0.14)' : 'rgba(16, 185, 129, 0.14)',
-                borderColor: isL1 ? 'rgba(56, 189, 248, 0.3)' : 'rgba(16, 185, 129, 0.3)'
+                background: badgeBg,
+                borderColor: badgeBorder
               }}
             >
-              {isL1 ? 'L1 Guided' : 'L3 Autonomous'}
+              {badgeLabel}
             </span>
           </div>
 
@@ -179,7 +198,8 @@ export default function TrustScreen({ onNavigateTab }) {
               <div className="trust-info-popover-text">
                 Controls the authority you delegate to Lumen AI during fraud & unauthorized transactions.<br />
                 • <strong>L1 Guided:</strong> AI flags anomalies and provides step-by-step guidance in Ask. You freeze and order cards yourself.<br />
-                • <strong>L3 Autonomous:</strong> AI acts in real time with 1 tap, automatically freezing the card and generating a ready-to-use digital card.
+                • <strong>L2 Semi-Auto:</strong> AI provides step-by-step confirmation. You approve card freeze first, then approve replacement.<br />
+                • <strong>L3 Autonomous:</strong> AI acts with 1-click &ldquo;Freeze &amp; Replace&rdquo;, automatically locking the card and issuing a ready-to-use digital card.
               </div>
             </motion.div>
           )}
@@ -194,13 +214,15 @@ export default function TrustScreen({ onNavigateTab }) {
               layout
               transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               style={{
-                left: isL1 ? '2px' : 'calc(66.66% - 2px)',
+                left: isL1 ? '2px' : isL2 ? 'calc(33.33% + 1px)' : 'calc(66.66% - 2px)',
                 width: 'calc(33.33% - 2px)',
                 background: isL1
                   ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.35))'
+                  : isL2
+                  ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35))'
                   : 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.35))',
                 borderColor: themeColor,
-                boxShadow: `0 0 16px ${isL1 ? 'rgba(56, 189, 248, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
+                boxShadow: `0 0 16px ${isL1 ? 'rgba(56, 189, 248, 0.3)' : isL2 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
               }}
             />
 
@@ -215,29 +237,23 @@ export default function TrustScreen({ onNavigateTab }) {
               <span className="spectrum-seg-label">Guided</span>
             </button>
 
-            {/* Segment 2: L2 Semi-Auto (Coming Soon) */}
+            {/* Segment 2: L2 Semi-Auto */}
             <button
-              className="spectrum-seg-btn disabled"
+              className={`spectrum-seg-btn ${isL2 ? 'active' : ''}`}
               onClick={() => handleSelectAutonomy('l2')}
-              title="Coming Soon in next release"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <span className="spectrum-seg-num" style={{ color: '#64748b' }}>
-                  L2
-                </span>
-                <span className="spectrum-soon-tag">SOON</span>
-              </div>
-              <span className="spectrum-seg-label" style={{ color: '#64748b' }}>
-                Semi-Auto
+              <span className="spectrum-seg-num" style={{ color: isL2 ? '#f59e0b' : '#94a3b8' }}>
+                L2
               </span>
+              <span className="spectrum-seg-label">Semi-Auto</span>
             </button>
 
             {/* Segment 3: L3 Autonomous */}
             <button
-              className={`spectrum-seg-btn ${!isL1 ? 'active' : ''}`}
+              className={`spectrum-seg-btn ${isL3 ? 'active' : ''}`}
               onClick={() => handleSelectAutonomy('l3')}
             >
-              <span className="spectrum-seg-num" style={{ color: !isL1 ? '#10b981' : '#94a3b8' }}>
+              <span className="spectrum-seg-num" style={{ color: isL3 ? '#10b981' : '#94a3b8' }}>
                 L3
               </span>
               <span className="spectrum-seg-label">Autonomous</span>

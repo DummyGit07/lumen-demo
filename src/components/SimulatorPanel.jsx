@@ -125,13 +125,34 @@ export default function SimulatorPanel({
                       <span
                         className="notif-autonomy-badge"
                         style={{
-                          background: autonomyLevel === 'l3' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
-                          color: autonomyLevel === 'l3' ? '#34d399' : '#60a5fa',
-                          border: `1px solid ${autonomyLevel === 'l3' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(59, 130, 246, 0.35)'}`,
+                          background:
+                            autonomyLevel === 'l3'
+                              ? 'rgba(16, 185, 129, 0.2)'
+                              : autonomyLevel === 'l2'
+                              ? 'rgba(245, 158, 11, 0.2)'
+                              : 'rgba(59, 130, 246, 0.2)',
+                          color:
+                            autonomyLevel === 'l3'
+                              ? '#34d399'
+                              : autonomyLevel === 'l2'
+                              ? '#fbbf24'
+                              : '#60a5fa',
+                          border: `1px solid ${
+                            autonomyLevel === 'l3'
+                              ? 'rgba(16, 185, 129, 0.35)'
+                              : autonomyLevel === 'l2'
+                              ? 'rgba(245, 158, 11, 0.35)'
+                              : 'rgba(59, 130, 246, 0.35)'
+                          }`,
                           padding: '2px 8px'
                         }}
                       >
-                        {autonomyLevel.toUpperCase()} {autonomyLevel === 'l3' ? '(Autonomous)' : '(Guided)'}
+                        {autonomyLevel.toUpperCase()}{' '}
+                        {autonomyLevel === 'l3'
+                          ? '(Autonomous)'
+                          : autonomyLevel === 'l2'
+                          ? '(Semi-Auto)'
+                          : '(Guided)'}
                       </span>
                     </div>
 

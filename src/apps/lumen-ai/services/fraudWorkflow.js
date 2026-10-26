@@ -105,6 +105,8 @@ class FraudWorkflowService {
 
     if (level === 'l1') {
       this.startL1Workflow(incident);
+    } else if (level === 'l2') {
+      this.startL2Workflow(incident);
     } else {
       this.startL3Workflow(incident);
     }
@@ -198,17 +200,17 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
   }
 
   // ==========================================
-  // L3 WORKFLOW (Autonomous AI Execution)
+  // L2 WORKFLOW (Semi-Autonomous: Two-Step Manual Approval)
   // ==========================================
-  startL3Workflow(incident) {
+  startL2Workflow(incident) {
     const updated = {
       ...incident,
-      status: 'l3_freeze_prompt'
+      status: 'l2_freeze_prompt'
     };
     trustStorage.setFraudIncident(updated);
 
-    // Notification for L3 initial prompt
-    const notifId = `notif-l3-freeze-${Date.now()}`;
+    // Notification for L2 initial prompt: Freeze Card
+    const notifId = `notif-l2-freeze-${Date.now()}`;
     this.activeNotifId = notifId;
 
     if (this.notificationTrigger) {
@@ -216,24 +218,24 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         id: notifId,
         appId: 'lumen_ai',
         appName: 'Lumen AI • Security',
-        autonomyBadge: 'L3 Autonomy',
+        autonomyBadge: 'L2 Autonomy',
         title: 'Emergency Card Action',
         body: 'Want to freeze the credit card to prevent further charges?',
-        color: '#ef4444',
+        color: '#f59e0b',
         duration: 5000,
         actions: [
           {
             label: 'Freeze Now',
             variant: 'danger',
-            onClick: () => this.executeL3Freeze()
+            onClick: () => this.executeL2Freeze()
           }
         ]
       });
     }
   }
 
-  // L3 Step 1: Freezing
-  executeL3Freeze() {
+  // L2 Step 1: Freezing
+  executeL2Freeze() {
     this.dismissActiveNotification();
 
     const incident = trustStorage.getFraudIncident();
@@ -242,11 +244,11 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
     // Set status to in progress
     trustStorage.setFraudIncident({
       ...incident,
-      status: 'l3_freezing'
+      status: 'l2_freezing'
     });
 
     // Notification: "Initiated freezing the credit card"
-    const notifId = `notif-l3-freezing-${Date.now()}`;
+    const notifId = `notif-l2-freezing-${Date.now()}`;
     this.activeNotifId = notifId;
 
     if (this.notificationTrigger) {
@@ -256,7 +258,7 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         appName: 'Lumen AI • Security',
         title: 'Security Protocol Activated',
         body: 'Initiated freezing the credit card in the background...',
-        color: '#0284c7',
+        color: '#f59e0b',
         duration: 5000
       });
     }
@@ -270,12 +272,12 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
 
       const updated = {
         ...incident,
-        status: 'l3_freeze_done'
+        status: 'l2_freeze_done'
       };
       trustStorage.setFraudIncident(updated);
 
       // Notification: "The card has been freezed successfully. Want to apply for replacement..."
-      const replaceNotifId = `notif-l3-replace-${Date.now()}`;
+      const replaceNotifId = `notif-l2-replace-${Date.now()}`;
       this.activeNotifId = replaceNotifId;
 
       if (this.notificationTrigger) {
@@ -283,7 +285,7 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           id: replaceNotifId,
           appId: 'lumen_ai',
           appName: 'Lumen AI • Security',
-          autonomyBadge: 'L3 Autonomy',
+          autonomyBadge: 'L2 Autonomy',
           title: 'Card Freezed Successfully',
           body: 'The card has been freezed successfully. Want to apply for replacement of this credit card?',
           color: '#10b981',
@@ -292,7 +294,7 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
             {
               label: 'Replace Card',
               variant: 'primary',
-              onClick: () => this.executeL3Replace()
+              onClick: () => this.executeL2Replace()
             }
           ]
         });
@@ -300,8 +302,8 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
     }, 10000);
   }
 
-  // L3 Step 2: Replacing Card
-  executeL3Replace() {
+  // L2 Step 2: Replacing Card
+  executeL2Replace() {
     this.dismissActiveNotification();
 
     const incident = trustStorage.getFraudIncident();
@@ -310,11 +312,11 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
     // Status: replacing in progress
     trustStorage.setFraudIncident({
       ...incident,
-      status: 'l3_replacing'
+      status: 'l2_replacing'
     });
 
     // Notification: "Applied for new credit card"
-    const notifId = `notif-l3-applied-${Date.now()}`;
+    const notifId = `notif-l2-applied-${Date.now()}`;
     this.activeNotifId = notifId;
 
     if (this.notificationTrigger) {
@@ -338,13 +340,13 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
 
       const updated = {
         ...incident,
-        status: 'l3_replaced',
+        status: 'l2_replaced',
         newCard
       };
       trustStorage.setFraudIncident(updated);
 
       // Notification: "New credit card is here"
-      const readyNotifId = `notif-l3-ready-${Date.now()}`;
+      const readyNotifId = `notif-l2-ready-${Date.now()}`;
       this.activeNotifId = readyNotifId;
 
       if (this.notificationTrigger) {
@@ -352,21 +354,179 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           id: readyNotifId,
           appId: 'lumen_ai',
           appName: 'Lumen AI • Security',
-          autonomyBadge: 'L3 Autonomy',
+          autonomyBadge: 'L2 Autonomy',
           title: 'New Credit Card Issued',
           body: 'New credit card is here! Fresh CVV and 16-digit credentials ready to view.',
           color: '#10b981',
           duration: 5000,
-          onClickCard: () => this.executeL3ViewNewCard(),
+          onClickCard: () => this.executeL2ViewNewCard(),
           actions: [
             {
               label: 'View New Card',
               variant: 'success',
-              onClick: () => this.executeL3ViewNewCard()
+              onClick: () => this.executeL2ViewNewCard()
             }
           ]
         });
       }
+    }, 10000);
+  }
+
+  // L2 Step 3: View New Card
+  executeL2ViewNewCard() {
+    this.dismissActiveNotification();
+    trustStorage.clearFraudIncident();
+
+    if (this.appNavigator) {
+      this.appNavigator('lumen_ai', 'glance', { openDigitalCard: true });
+    }
+
+    if (this.glanceCardOpener) {
+      this.glanceCardOpener();
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('lumen_switch_tab', {
+          detail: { tab: 'glance', openDigitalCard: true }
+        })
+      );
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
+      }, 250);
+    }
+  }
+
+  // ==========================================
+  // L3 WORKFLOW (High Autonomy: Single "Freeze & Replace" Action)
+  // ==========================================
+  startL3Workflow(incident) {
+    const updated = {
+      ...incident,
+      status: 'l3_unified_prompt'
+    };
+    trustStorage.setFraudIncident(updated);
+
+    // Notification for L3 unified prompt: Single button for full process
+    const notifId = `notif-l3-unified-${Date.now()}`;
+    this.activeNotifId = notifId;
+
+    if (this.notificationTrigger) {
+      this.notificationTrigger({
+        id: notifId,
+        appId: 'lumen_ai',
+        appName: 'Lumen AI • Security',
+        autonomyBadge: 'L3 Autonomy',
+        title: 'Emergency Card Action',
+        body: 'Want to freeze the credit card to prevent further charges?',
+        color: '#10b981',
+        duration: 5000,
+        actions: [
+          {
+            label: 'Freeze & Replace',
+            variant: 'danger',
+            onClick: () => this.executeL3Unified()
+          }
+        ]
+      });
+    }
+  }
+
+  // L3 Unified Action: Executes Freezing then automatically proceeds to Replacement
+  executeL3Unified() {
+    this.dismissActiveNotification();
+
+    const incident = trustStorage.getFraudIncident();
+    if (!incident) return;
+
+    // Phase 1: Freezing in progress
+    trustStorage.setFraudIncident({
+      ...incident,
+      status: 'l3_freezing'
+    });
+
+    const notifId = `notif-l3-freezing-${Date.now()}`;
+    this.activeNotifId = notifId;
+
+    if (this.notificationTrigger) {
+      this.notificationTrigger({
+        id: notifId,
+        appId: 'lumen_ai',
+        appName: 'Lumen AI • Security',
+        title: 'Security Protocol Activated',
+        body: 'Initiated freezing the credit card in the background...',
+        color: '#0284c7',
+        duration: 5000
+      });
+    }
+
+    // After 10s: card is frozen, then AUTOMATICALLY transition to replacement
+    setTimeout(() => {
+      this.dismissActiveNotification();
+
+      // Formally freeze card
+      financeStorage.freezeCard(incident.cardId);
+
+      // Phase 2: Automatically start replacement without user intervention
+      trustStorage.setFraudIncident({
+        ...incident,
+        status: 'l3_replacing'
+      });
+
+      const replacingNotifId = `notif-l3-replacing-${Date.now()}`;
+      this.activeNotifId = replacingNotifId;
+
+      if (this.notificationTrigger) {
+        this.notificationTrigger({
+          id: replacingNotifId,
+          appId: 'lumen_ai',
+          appName: 'Lumen AI • Security',
+          title: 'Card Freezed • Provisioning New Card',
+          body: 'Card freezed successfully. Generating fresh digital credentials in background...',
+          color: '#6366f1',
+          duration: 5000
+        });
+      }
+
+      // After another 10s: Replacement card is ready
+      setTimeout(() => {
+        this.dismissActiveNotification();
+
+        // Generate brand new card and update credentials
+        const newCard = financeStorage.generateAndReplaceCard(incident.cardId);
+
+        const updated = {
+          ...incident,
+          status: 'l3_replaced',
+          newCard
+        };
+        trustStorage.setFraudIncident(updated);
+
+        // Final notification: "New credit card is here"
+        const readyNotifId = `notif-l3-ready-${Date.now()}`;
+        this.activeNotifId = readyNotifId;
+
+        if (this.notificationTrigger) {
+          this.notificationTrigger({
+            id: readyNotifId,
+            appId: 'lumen_ai',
+            appName: 'Lumen AI • Security',
+            autonomyBadge: 'L3 Autonomy',
+            title: 'New Credit Card Issued',
+            body: 'New credit card is here! Fresh CVV and 16-digit credentials ready to view.',
+            color: '#10b981',
+            duration: 5000,
+            onClickCard: () => this.executeL3ViewNewCard(),
+            actions: [
+              {
+                label: 'View New Card',
+                variant: 'success',
+                onClick: () => this.executeL3ViewNewCard()
+              }
+            ]
+          });
+        }
+      }, 10000);
     }, 10000);
   }
 

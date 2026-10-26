@@ -32,9 +32,13 @@ export default function ActScreen({ onNavigateTab }) {
     [
       'awaiting_confirmation',
       'l1_steps',
-      'l3_freeze_prompt',
+      'l2_freeze_prompt',
+      'l2_freezing',
+      'l2_freeze_done',
+      'l2_replacing',
+      'l2_replaced',
+      'l3_unified_prompt',
       'l3_freezing',
-      'l3_freeze_done',
       'l3_replacing',
       'l3_replaced'
     ].includes(incident.status);
@@ -119,15 +123,19 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L3 State 1: Freeze Prompt */}
-            {incident.status === 'l3_freeze_prompt' && (
+            {/* ==========================================
+                L2 WORKFLOW STATES (Two-Step Manual Approval)
+                ========================================== */}
+
+            {/* L2 State 1: Freeze Prompt */}
+            {incident.status === 'l2_freeze_prompt' && (
               <div className="incident-content">
                 <div className="incident-header">
                   <div className="incident-icon-pulse danger">
-                    <ShieldAlert size={20} color="#ef4444" />
+                    <ShieldAlert size={20} color="#f59e0b" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l3-badge">L3 Autonomous Protection</div>
+                    <div className="incident-badge l2-badge">L2 Semi-Autonomous</div>
                     <div className="incident-title">Emergency Freeze Required</div>
                   </div>
                 </div>
@@ -140,7 +148,7 @@ export default function ActScreen({ onNavigateTab }) {
 
                 <button
                   className="incident-action-btn danger"
-                  onClick={() => fraudWorkflow.executeL3Freeze()}
+                  onClick={() => fraudWorkflow.executeL2Freeze()}
                 >
                   <Lock size={15} />
                   <span>Freeze Now</span>
@@ -148,15 +156,15 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L3 State 2: Freezing In Progress (5 Seconds) */}
-            {incident.status === 'l3_freezing' && (
+            {/* L2 State 2: Freezing In Progress */}
+            {incident.status === 'l2_freezing' && (
               <div className="incident-content">
                 <div className="incident-header">
                   <div className="incident-icon-pulse spin">
-                    <Loader2 size={20} color="#38bdf8" />
+                    <Loader2 size={20} color="#f59e0b" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l3-badge">L3 Background Worker</div>
+                    <div className="incident-badge l2-badge">L2 Background Worker</div>
                     <div className="incident-title">Freezing Card in Progress...</div>
                   </div>
                 </div>
@@ -165,7 +173,6 @@ export default function ActScreen({ onNavigateTab }) {
                   Issuing emergency block command to domestic and international card networks for •••• {incident.cardLast4}...
                 </p>
 
-                {/* Progress bar (10 seconds) */}
                 <div className="incident-progress-box">
                   <div className="incident-progress-track">
                     <motion.div
@@ -182,15 +189,15 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L3 State 3: Freeze Completed / Replace Prompt */}
-            {incident.status === 'l3_freeze_done' && (
+            {/* L2 State 3: Freeze Completed / Replace Prompt */}
+            {incident.status === 'l2_freeze_done' && (
               <div className="incident-content">
                 <div className="incident-header">
                   <div className="incident-icon-pulse success">
                     <CheckCircle2 size={20} color="#10b981" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l3-badge">L3 Card Secured</div>
+                    <div className="incident-badge l2-badge">L2 Card Secured</div>
                     <div className="incident-title">Card Freezed Successfully</div>
                   </div>
                 </div>
@@ -201,7 +208,7 @@ export default function ActScreen({ onNavigateTab }) {
 
                 <button
                   className="incident-action-btn primary"
-                  onClick={() => fraudWorkflow.executeL3Replace()}
+                  onClick={() => fraudWorkflow.executeL2Replace()}
                 >
                   <RefreshCw size={15} />
                   <span>Apply for New Card</span>
@@ -209,7 +216,149 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
 
-            {/* L3 State 4: Replacing In Progress (5 Seconds) */}
+            {/* L2 State 4: Replacing In Progress */}
+            {incident.status === 'l2_replacing' && (
+              <div className="incident-content">
+                <div className="incident-header">
+                  <div className="incident-icon-pulse spin">
+                    <Loader2 size={20} color="#a855f7" />
+                  </div>
+                  <div className="incident-title-block">
+                    <div className="incident-badge l2-badge">L2 Digital Provisioning</div>
+                    <div className="incident-title">Replacing Card in Progress...</div>
+                  </div>
+                </div>
+
+                <p className="incident-desc">
+                  Generating verified 16-digit credit card number, fresh dynamic CVV, and updating security vault...
+                </p>
+
+                <div className="incident-progress-box">
+                  <div className="incident-progress-track">
+                    <motion.div
+                      className="incident-progress-fill replace-fill"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 10, ease: 'linear' }}
+                    />
+                  </div>
+                  <div className="progress-meta-row">
+                    <span className="progress-status-text">RBI tokenization & key sync</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* L2 State 5: Replaced & Issued */}
+            {incident.status === 'l2_replaced' && (
+              <div className="incident-content">
+                <div className="incident-header">
+                  <div className="incident-icon-pulse success">
+                    <Sparkles size={20} color="#10b981" />
+                  </div>
+                  <div className="incident-title-block">
+                    <div className="incident-badge success-badge">Issued & Active</div>
+                    <div className="incident-title">New Credit Card Is Here!</div>
+                  </div>
+                </div>
+
+                <div className="new-card-preview-mini">
+                  <div className="mini-card-icon">
+                    <CreditCard size={18} color="#a855f7" />
+                  </div>
+                  <div className="mini-card-details">
+                    <div className="mini-card-name">Lumen Visa Signature</div>
+                    <div className="mini-card-num">
+                      •••• {incident.newCard?.last4 || 'Active'}
+                    </div>
+                  </div>
+                </div>
+
+                <p className="incident-desc" style={{ marginTop: '0.25rem' }}>
+                  Your new card has been generated and connected to your account. All payments have been reactivated.
+                </p>
+
+                <button
+                  className="incident-action-btn success"
+                  onClick={() => {
+                    fraudWorkflow.executeL2ViewNewCard();
+                    if (onNavigateTab) onNavigateTab('glance');
+                  }}
+                >
+                  <CreditCard size={15} />
+                  <span>View New Card</span>
+                </button>
+              </div>
+            )}
+
+            {/* ==========================================
+                L3 WORKFLOW STATES (Unified Single-Click Action)
+                ========================================== */}
+
+            {/* L3 State 1: Unified Prompt (Freeze & Replace) */}
+            {incident.status === 'l3_unified_prompt' && (
+              <div className="incident-content">
+                <div className="incident-header">
+                  <div className="incident-icon-pulse danger">
+                    <ShieldAlert size={20} color="#10b981" />
+                  </div>
+                  <div className="incident-title-block">
+                    <div className="incident-badge l3-badge">L3 High Autonomy</div>
+                    <div className="incident-title">Emergency Autonomous Action</div>
+                  </div>
+                </div>
+
+                <p className="incident-desc">
+                  Unauthorized charge of{' '}
+                  <strong style={{ color: '#fff' }}>₹{incident.amount?.toLocaleString('en-IN')}</strong> flagged on card{' '}
+                  <strong>•••• {incident.cardLast4}</strong> at <em>{incident.merchant || 'International POS'}</em>.
+                </p>
+
+                <button
+                  className="incident-action-btn danger"
+                  onClick={() => fraudWorkflow.executeL3Unified()}
+                >
+                  <Lock size={15} />
+                  <span>Freeze & Replace</span>
+                </button>
+              </div>
+            )}
+
+            {/* L3 State 2: Freezing In Progress */}
+            {incident.status === 'l3_freezing' && (
+              <div className="incident-content">
+                <div className="incident-header">
+                  <div className="incident-icon-pulse spin">
+                    <Loader2 size={20} color="#38bdf8" />
+                  </div>
+                  <div className="incident-title-block">
+                    <div className="incident-badge l3-badge">L3 Autonomous • Step 1/2</div>
+                    <div className="incident-title">Freezing Card in Progress...</div>
+                  </div>
+                </div>
+
+                <p className="incident-desc">
+                  Issuing emergency block command to card network... Card replacement will follow automatically.
+                </p>
+
+                {/* Progress bar (10 seconds) */}
+                <div className="incident-progress-box">
+                  <div className="incident-progress-track">
+                    <motion.div
+                      className="incident-progress-fill freeze-fill"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 10, ease: 'linear' }}
+                    />
+                  </div>
+                  <div className="progress-meta-row">
+                    <span className="progress-status-text">Network handshake active • Auto-provision queued</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* L3 State 3: Auto-Replacing In Progress */}
             {incident.status === 'l3_replacing' && (
               <div className="incident-content">
                 <div className="incident-header">
@@ -217,7 +366,7 @@ export default function ActScreen({ onNavigateTab }) {
                     <Loader2 size={20} color="#a855f7" />
                   </div>
                   <div className="incident-title-block">
-                    <div className="incident-badge l3-badge">L3 Digital Provisioning</div>
+                    <div className="incident-badge l3-badge">L3 Autonomous • Step 2/2</div>
                     <div className="incident-title">Replacing Card in Progress...</div>
                   </div>
                 </div>
@@ -237,13 +386,13 @@ export default function ActScreen({ onNavigateTab }) {
                     />
                   </div>
                   <div className="progress-meta-row">
-                    <span className="progress-status-text">RBI tokenization & key sync</span>
+                    <span className="progress-status-text">RBI tokenization & automated key sync</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* L3 State 5: Replaced & Issued */}
+            {/* L3 State 4: Replaced & Issued */}
             {incident.status === 'l3_replaced' && (
               <div className="incident-content">
                 <div className="incident-header">

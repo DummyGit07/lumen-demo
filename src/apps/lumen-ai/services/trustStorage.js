@@ -18,16 +18,15 @@ export const AUTONOMY_LEVELS = {
     label: 'L2: Semi-Autonomous',
     shortLabel: 'L2 Autonomy',
     badgeColor: '#f59e0b',
-    description: 'AI performs routine optimizations with threshold-based guardrails. (Skipped for future releases).',
-    tag: 'Coming Soon',
-    disabled: true
+    description: 'AI performs emergency remediation with step-by-step confirmation: user approves card freeze first, then approves card replacement.',
+    tag: 'Two-Step Approval'
   },
   L3: {
     id: 'l3',
     label: 'L3: High Autonomy',
     shortLabel: 'L3 Autonomy',
     badgeColor: '#10b981',
-    description: 'AI can autonomously execute urgent emergency actions (instant card freeze & replacement generation) with 1-click approvals.',
+    description: 'AI executes end-to-end emergency remediation via a single unified Freeze & Replace action, automatically provisioning a new card.',
     tag: 'Autonomous AI'
   }
 };
@@ -64,7 +63,7 @@ class TrustStorageService {
   getAutonomyLevel() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_AUTONOMY);
-      if (stored === 'l3') return 'l3';
+      if (stored === 'l3' || stored === 'l2') return stored;
       return 'l1'; // default is L1
     } catch {
       return 'l1';
@@ -73,7 +72,7 @@ class TrustStorageService {
 
   setAutonomyLevel(level) {
     try {
-      const valid = level === 'l3' ? 'l3' : 'l1';
+      const valid = ['l1', 'l2', 'l3'].includes(level) ? level : 'l1';
       localStorage.setItem(STORAGE_KEY_AUTONOMY, valid);
       this.notify('autonomy_changed', valid);
       return valid;
