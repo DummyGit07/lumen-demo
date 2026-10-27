@@ -56,6 +56,15 @@ export default function GlanceScreen({
     return () => window.removeEventListener('lumen_open_digital_card', handleOpen);
   }, []);
 
+  // Auto open recurring modal when triggered externally (e.g., from notification)
+  useEffect(() => {
+    const handleOpenRecurring = () => {
+      setIsRecurringModalOpen(true);
+    };
+    window.addEventListener('lumen_open_recurring_modal', handleOpenRecurring);
+    return () => window.removeEventListener('lumen_open_recurring_modal', handleOpenRecurring);
+  }, []);
+
   // Primary Focus: Lumen Credit Card
   const primaryCard = cards[0];
 

@@ -224,5 +224,17 @@ export const recurringStorage = {
       brand,
       maskedDisplay: active?.last4 ? `•••• •••• •••• ${active.last4}` : '•••• •••• •••• 8411'
     };
+  },
+
+  // Explicit sync method
+  syncWithNewCard(newCard) {
+    this.notify();
   }
 };
+
+// Automatically sync when credit cards are issued or updated in financeStorage
+if (typeof window !== 'undefined') {
+  window.addEventListener('lumen_finance_storage_update', () => {
+    recurringStorage.notify();
+  });
+}

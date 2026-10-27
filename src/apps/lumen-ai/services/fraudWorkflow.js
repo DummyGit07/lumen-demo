@@ -4,6 +4,7 @@
 import { trustStorage } from './trustStorage';
 import { financeStorage } from './financeStorage';
 import { aiStorage } from './aiStorage';
+import { recurringStorage } from './recurringStorage';
 
 class FraudWorkflowService {
   constructor() {
@@ -358,6 +359,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
       // Generate brand new card and update credentials
       const newCard = financeStorage.generateAndReplaceCard(incident.cardId);
 
+      // Sync recurring subscriptions with newly issued card
+      recurringStorage.syncWithNewCard(newCard);
+
       const updated = {
         ...incident,
         status: 'l2_replaced',
@@ -366,9 +370,11 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
       };
       trustStorage.setFraudIncident(updated);
 
-      // Notification: New card ready
+      // Notification: New card ready & recurring bills updated
       const readyNotifId = `notif-l2-ready-${Date.now()}`;
       this.activeNotifId = readyNotifId;
+
+      const userSmallAddress = finalAddress.split(',')[0] || 'Indiranagar';
 
       if (this.notificationTrigger) {
         this.notificationTrigger({
@@ -377,21 +383,47 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
           appName: 'Lumen',
           icon: 'Sparkles',
           autonomyBadge: 'L2',
-          title: 'Your New Card is Ready',
-          body: `Instant digital card is active immediately. Physical card dispatched to ${finalAddress.split(',')[0]}.`,
+          title: 'New Card Issued & Subscriptions Updated',
+          body: `Your new digital card is active and autopay for all recurring bills has been updated. Physical card is on its way to your delivery address (${userSmallAddress}).`,
           color: '#10b981',
-          duration: 8000,
+          duration: 10000,
           onClickCard: () => this.executeL2ViewNewCard(),
           actions: [
             {
               label: 'View New Card',
               variant: 'success',
               onClick: () => this.executeL2ViewNewCard()
+            },
+            {
+              label: 'Recurring Bills',
+              variant: 'default',
+              onClick: () => this.executeViewRecurringBills()
             }
           ]
         });
       }
     }, 10000);
+  }
+
+  // View Recurring Bills Modal from Notification Action
+  executeViewRecurringBills() {
+    this.dismissActiveNotification();
+    trustStorage.clearFraudIncident();
+
+    if (this.appNavigator) {
+      this.appNavigator('lumen_ai', 'glance');
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('lumen_switch_tab', {
+          detail: { tab: 'glance' }
+        })
+      );
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('lumen_open_recurring_modal'));
+      }, 250);
+    }
   }
 
   // L2 Step 3: View New Card
@@ -523,6 +555,9 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         // Generate brand new card and update credentials
         const newCard = financeStorage.generateAndReplaceCard(incident.cardId);
 
+        // Sync recurring subscriptions with newly issued card
+        recurringStorage.syncWithNewCard(newCard);
+
         const updated = {
           ...incident,
           status: 'l3_replaced',
@@ -531,9 +566,11 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
         };
         trustStorage.setFraudIncident(updated);
 
-        // Final notification: "Your New Card is Ready"
+        // Final notification: "Card Replaced & Subscriptions Secured"
         const readyNotifId = `notif-l3-ready-${Date.now()}`;
         this.activeNotifId = readyNotifId;
+
+        const userSmallAddress = userAddress.split(',')[0] || 'Indiranagar';
 
         if (this.notificationTrigger) {
           this.notificationTrigger({
@@ -542,16 +579,21 @@ Feel free to ask me anything below about filing a chargeback or verifying your b
             appName: 'Lumen',
             icon: 'Sparkles',
             autonomyBadge: 'L3',
-            title: 'Your New Card is Ready',
-            body: `Instant digital card is active immediately. Physical card dispatched to verified address on file (${userAddress.split(',')[0]}).`,
+            title: 'Card Replaced & Subscriptions Secured',
+            body: `Your new digital card is active and all recurring bills have been updated. Physical card has been dispatched to your address (${userSmallAddress}).`,
             color: '#10b981',
-            duration: 8000,
+            duration: 10000,
             onClickCard: () => this.executeL3ViewNewCard(),
             actions: [
               {
                 label: 'View New Card',
                 variant: 'success',
                 onClick: () => this.executeL3ViewNewCard()
+              },
+              {
+                label: 'Recurring Bills',
+                variant: 'default',
+                onClick: () => this.executeViewRecurringBills()
               }
             ]
           });
