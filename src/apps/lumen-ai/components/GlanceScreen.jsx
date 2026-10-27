@@ -4,17 +4,17 @@ import {
   CreditCard,
   Building2,
   Send,
-  QrCode,
   ArrowUpRight,
   RotateCcw,
-  Sparkles,
   Wifi,
   ReceiptText,
-  ChevronRight
+  ChevronRight,
+  Repeat
 } from 'lucide-react';
 import PayModal from './PayModal';
 import AllTransactionsModal from './AllTransactionsModal';
 import DigitalCardModal from './DigitalCardModal';
+import RecurringPaymentsModal from './RecurringPaymentsModal';
 import { detectCardBrand } from '../services/financeStorage';
 
 export default function GlanceScreen({
@@ -37,6 +37,7 @@ export default function GlanceScreen({
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(false);
   const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(Boolean(autoOpenDigitalCard));
+  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
 
   // Sync when autoOpenDigitalCard prop becomes true
   useEffect(() => {
@@ -126,24 +127,12 @@ export default function GlanceScreen({
 
         <button
           className="glance-action-btn"
-          onClick={() => setIsPayModalOpen(true)}
-        >
-          <div className="action-icon-circle">
-            <QrCode size={16} />
-          </div>
-          <span>Scan UPI</span>
-        </button>
-
-        <button
-          className="glance-action-btn"
-          onClick={() => {
-            if (onNavigateTab) onNavigateTab('ask');
-          }}
+          onClick={() => setIsRecurringModalOpen(true)}
         >
           <div className="action-icon-circle" style={{ background: 'rgba(99, 102, 241, 0.25)' }}>
-            <Sparkles size={16} color="#818cf8" />
+            <Repeat size={16} color="#818cf8" />
           </div>
-          <span>AI Insight</span>
+          <span>Recurring Payment</span>
         </button>
       </div>
 
@@ -358,6 +347,12 @@ export default function GlanceScreen({
         card={primaryCard}
         brand={detectedBrand}
         onToggleStatus={toggleCardStatus}
+      />
+
+      {/* Recurring Subscriptions & Autopay Modal */}
+      <RecurringPaymentsModal
+        isOpen={isRecurringModalOpen}
+        onClose={() => setIsRecurringModalOpen(false)}
       />
     </div>
   );
