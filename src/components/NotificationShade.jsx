@@ -7,40 +7,12 @@ import {
   VolumeX, 
   Flashlight, 
   Moon, 
-  Plane, 
   Trash2, 
   ChevronUp, 
-  Phone, 
-  MessageSquare, 
-  Music2, 
-  Image,
-  Bell,
-  Sliders,
   Sun,
-  ShieldAlert,
-  Lock,
-  CreditCard,
-  Sparkles,
-  CheckCircle2
+  Bell
 } from 'lucide-react';
 import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
-
-const ICON_MAP = {
-  Phone,
-  phone: Phone,
-  MessageSquare,
-  sms: MessageSquare,
-  Music2,
-  music: Music2,
-  Image,
-  gallery: Image,
-  Bell,
-  ShieldAlert,
-  Lock,
-  CreditCard,
-  Sparkles,
-  CheckCircle2
-};
 
 export default function NotificationShade({ 
   isOpen, 
@@ -177,9 +149,7 @@ export default function NotificationShade({
               </div>
             ) : (
               <AnimatePresence>
-                {notifications.map((item) => {
-                  const IconComp = ICON_MAP[item.appId] || ICON_MAP[item.icon] || Bell;
-                  return (
+                {notifications.map((item) => (
                     <motion.div
                       key={item.id}
                       className="shade-notif-item"
@@ -197,33 +167,6 @@ export default function NotificationShade({
                         onClose();
                       }}
                     >
-                      <div 
-                        className="shade-item-icon"
-                        style={{ 
-                          background: item.appId === 'gmail' ? '#ffffff' : (item.color || '#6366f1'),
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 800,
-                          color: '#fff'
-                        }}
-                      >
-                        {item.icon && ICON_MAP[item.icon] ? (
-                          <IconComp size={16} color="#fff" />
-                        ) : item.appId === 'lumen_ai' ? (
-                          <Sparkles size={16} color="#fff" />
-                        ) : item.appId === 'gmail' ? (
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <path d="M2 6.5V17.5C2 18.3284 2.67157 19 3.5 19H6.5V10.5L2 7.125V6.5Z" fill="#4285F4"/>
-                            <path d="M17.5 19H20.5C21.3284 19 22 18.3284 22 17.5V6.5L17.5 9.875V19Z" fill="#34A853"/>
-                            <path d="M17.5 9.875L12 14L6.5 9.875V19H17.5V9.875Z" fill="#EA4335"/>
-                            <path d="M17.5 5H6.5C5.67157 5 5 5.67157 5 6.5V7.125L12 12.375L19 7.125V6.5C19 5.67157 18.3284 5 17.5 5Z" fill="#FBBC04"/>
-                          </svg>
-                        ) : (
-                          <IconComp size={16} color="#fff" />
-                        )}
-                      </div>
-
                       <div className="shade-item-content">
                         <div className="shade-item-top">
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -269,8 +212,7 @@ export default function NotificationShade({
                         ×
                       </button>
                     </motion.div>
-                  );
-                })}
+                ))}
               </AnimatePresence>
             )}
           </div>

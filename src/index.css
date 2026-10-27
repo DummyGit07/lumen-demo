@@ -601,31 +601,18 @@ html, body, #root {
   background: rgba(18, 23, 37, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 16px;
-  padding: 0.8rem 0.95rem;
+  padding: 0.85rem 1rem;
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
-  align-items: flex-start;
-  gap: 0.8rem;
+  flex-direction: column;
   cursor: pointer;
   transition: transform 0.15s ease;
 }
 
-.notif-icon-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: #fff;
-}
-
 .notif-text-content {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
 }
 
 .notif-header-line {
@@ -687,61 +674,20 @@ html, body, #root {
   color: #64748b;
 }
 
-.notif-expand-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 2px 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.notif-expand-btn:hover {
-  color: #f1f5f9;
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.notif-chevron-icon {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.notif-chevron-icon.expanded {
-  transform: rotate(180deg);
-}
-
 .notif-title {
   font-size: 0.86rem;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
-  line-height: 1.25;
+  line-height: 1.3;
   margin-top: 2px;
 }
 
 .notif-body {
-  font-size: 0.71rem;
+  font-size: 0.72rem;
   color: #cbd5e1;
-  line-height: 1.4;
+  line-height: 1.45;
   margin-top: 4px;
-  transition: all 0.2s ease;
-}
-
-.notif-body.collapsed {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: normal;
-}
-
-.notif-body.expanded {
-  display: block;
 }
 
 /* Notification Actions Row (Always visible 1-tap UX) */
@@ -1427,10 +1373,10 @@ html, body, #root {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 0.55rem 0.7rem;
+  padding: 0.65rem 0.8rem;
   display: flex;
   align-items: flex-start;
-  gap: 0.55rem;
+  gap: 0.6rem;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
@@ -1439,16 +1385,6 @@ html, body, #root {
 .shade-notif-item:hover {
   background: rgba(255, 255, 255, 0.09);
   border-color: rgba(255, 255, 255, 0.16);
-}
-
-.shade-item-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
 .shade-item-content {
@@ -1460,7 +1396,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
 }
 
 .shade-item-app {
@@ -1475,18 +1411,17 @@ html, body, #root {
 }
 
 .shade-item-title {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .shade-item-body {
-  font-size: 0.66rem;
-  color: #94a3b8;
-  line-height: 1.3;
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  line-height: 1.35;
+  margin-top: 2px;
 }
 
 .shade-item-close {
