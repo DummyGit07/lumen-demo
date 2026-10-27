@@ -102,9 +102,9 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
                   </span>
                 )}
               </div>
-              <div className="notif-header-right">
+              {/* <div className="notif-header-right">
                 <span className="notif-timestamp">{notification.time || 'Now'}</span>
-              </div>
+              </div> */}
             </div>
 
             {/* Headline */}
