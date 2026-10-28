@@ -23,6 +23,8 @@
   --phone-width: calc(var(--phone-height) * 0.49);
   --phone-radius: 44px;
   --bezel-thickness: 10px;
+  --mobile-font-scale: 1;
+  --mobile-icon-scale: 0.8;
 }
 
 * {
@@ -273,6 +275,133 @@ html, body, #root {
   color: #a5b4fc;
 }
 
+/* Simulator Custom Sliders for Sizing */
+.sim-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.6rem 0.65rem;
+}
+
+.sim-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sim-slider-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.sim-slider-badge {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.sim-range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  cursor: pointer;
+  margin: 0.4rem 0 0.2rem;
+  transition: background 0.2s;
+}
+
+.sim-range-input:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.sim-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.sim-range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.85);
+}
+
+.sim-range-input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+  cursor: pointer;
+}
+
+.sim-preset-chips {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.sim-chip-btn {
+  flex: 1;
+  padding: 0.28rem 0.2rem;
+  font-size: 0.65rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.sim-chip-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+.sim-chip-btn.active {
+  background: rgba(99, 102, 241, 0.22);
+  border-color: rgba(99, 102, 241, 0.5);
+  color: #a5b4fc;
+  font-weight: 700;
+}
+
+.sim-live-preview {
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: font-size 0.15s ease;
+}
+
 .notification-sender-box {
   display: flex;
   flex-direction: column;
@@ -518,7 +647,7 @@ html, body, #root {
   justify-content: space-between;
   padding: 0 1.15rem;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   letter-spacing: -0.01em;
   flex-shrink: 0;
@@ -574,7 +703,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 2px;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
 }
 
 /* Phone Viewport */
@@ -635,7 +764,7 @@ html, body, #root {
 }
 
 .notif-app-name {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.02em;
@@ -643,7 +772,7 @@ html, body, #root {
 }
 
 .notif-autonomy-pill {
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   padding: 1px 6px;
   border-radius: 9999px;
@@ -670,12 +799,12 @@ html, body, #root {
 }
 
 .notif-timestamp {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #64748b;
 }
 
 .notif-title {
-  font-size: 0.86rem;
+  font-size: calc(0.86rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
@@ -684,7 +813,7 @@ html, body, #root {
 }
 
 .notif-body {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   line-height: 1.45;
   margin-top: 4px;
@@ -706,7 +835,7 @@ html, body, #root {
   gap: 6px;
   padding: 6px 12px;
   border-radius: 9px;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   cursor: pointer;
   border: 1px solid transparent;
@@ -786,7 +915,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -801,7 +930,7 @@ html, body, #root {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #cbd5e1;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   padding: 2px 7px;
   border-radius: 6px;
@@ -819,7 +948,7 @@ html, body, #root {
 }
 
 .notif-address-value {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #e2e8f0;
   line-height: 1.35;
   font-weight: 500;
@@ -835,7 +964,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fbbf24;
 }
@@ -847,7 +976,7 @@ html, body, #root {
   border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: 6px;
   color: #ffffff;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   line-height: 1.35;
   padding: 5px 7px;
   resize: none;
@@ -871,7 +1000,7 @@ html, body, #root {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 6px;
@@ -958,14 +1087,14 @@ html, body, #root {
 }
 
 .widget-big-time {
-  font-size: 2.75rem;
+  font-size: calc(2.75rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
 }
 
 .widget-date-weather {
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
   margin-top: 0.3rem;
@@ -989,9 +1118,10 @@ html, body, #root {
 }
 
 .app-icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: calc(48px * var(--mobile-icon-scale, 1));
+  height: calc(48px * var(--mobile-icon-scale, 1));
+  border-radius: calc(14px * var(--mobile-icon-scale, 1));
+  transition: width 0.15s ease, height 0.15s ease, border-radius 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1016,7 +1146,7 @@ html, body, #root {
   right: -5px;
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   min-width: 18px;
   height: 18px;
@@ -1033,7 +1163,7 @@ html, body, #root {
 }
 
 .app-label {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 500;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -1074,7 +1204,7 @@ html, body, #root {
 }
 
 .recents-title {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--mobile-font-scale, 1));
   font-weight: 700;
 }
 
@@ -1084,7 +1214,7 @@ html, body, #root {
   color: #fff;
   padding: 0.25rem 0.6rem;
   border-radius: 16px;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
 }
@@ -1146,7 +1276,7 @@ html, body, #root {
 }
 
 .recents-card-name {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #fff;
 }
@@ -1166,7 +1296,7 @@ html, body, #root {
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   display: flex;
   align-items: center;
@@ -1182,7 +1312,7 @@ html, body, #root {
   justify-content: center;
   gap: 0.5rem;
   color: #94a3b8;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
 }
 
 /* Active App Viewport */
@@ -1222,14 +1352,14 @@ html, body, #root {
 }
 
 .shade-clock {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
 }
 
 .shade-date {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   font-weight: 500;
 }
@@ -1267,7 +1397,7 @@ html, body, #root {
   align-items: center;
   gap: 0.25rem;
   cursor: pointer;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   transition: all 0.15s ease;
 }
@@ -1320,7 +1450,7 @@ html, body, #root {
   align-items: center;
   justify-content: space-between;
   padding: 0.2rem 0.25rem 0.4rem;
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #cbd5e1;
 }
@@ -1329,7 +1459,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #94a3b8;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1365,7 +1495,7 @@ html, body, #root {
   justify-content: center;
   gap: 0.4rem;
   color: #64748b;
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   min-height: 120px;
 }
 
@@ -1400,25 +1530,25 @@ html, body, #root {
 }
 
 .shade-item-app {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #e2e8f0;
 }
 
 .shade-item-time {
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
 .shade-item-title {
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #fff;
   line-height: 1.3;
 }
 
 .shade-item-body {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   line-height: 1.35;
   margin-top: 2px;
@@ -1428,7 +1558,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #64748b;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--mobile-font-scale, 1));
   line-height: 1;
   padding: 0 4px;
   cursor: pointer;
@@ -1515,13 +1645,13 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--mobile-font-scale, 1));
   color: #fff;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
 }
 
 .lumen-app-title {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   line-height: 1.1;
 }
@@ -1530,7 +1660,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #a5b4fc;
 }
 
@@ -1589,7 +1719,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: calc(2rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
@@ -1597,13 +1727,13 @@ html, body, #root {
 }
 
 .lumen-hero-title {
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .lumen-hero-subtitle {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   margin-top: 0.35rem;
   max-width: 240px;
@@ -1624,7 +1754,7 @@ html, body, #root {
   border-radius: 12px;
   padding: 0.55rem 0.85rem;
   color: #cbd5e1;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   text-align: left;
   display: flex;
   align-items: center;
@@ -1676,7 +1806,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
@@ -1697,7 +1827,7 @@ html, body, #root {
 .lumen-bubble {
   padding: 0.65rem 0.75rem;
   border-radius: 14px;
-  font-size: 0.77rem;
+  font-size: calc(0.77rem * var(--mobile-font-scale, 1));
   line-height: 1.5;
   word-break: break-word;
   box-sizing: border-box;
@@ -1721,7 +1851,7 @@ html, body, #root {
 }
 
 .lumen-message-text {
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   line-height: 1.5;
 }
 
@@ -1757,7 +1887,7 @@ html, body, #root {
 }
 
 .lumen-alert-text {
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fca5a5;
   line-height: 1.4;
@@ -1780,7 +1910,7 @@ html, body, #root {
 }
 
 .lumen-steps-header-tag {
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1788,7 +1918,7 @@ html, body, #root {
 }
 
 .lumen-steps-header-count {
-  font-size: 0.64rem;
+  font-size: calc(0.64rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   background: rgba(255, 255, 255, 0.06);
   padding: 1px 6px;
@@ -1826,7 +1956,7 @@ html, body, #root {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
   border: 1px solid rgba(99, 102, 241, 0.45);
   color: #c7d2fe;
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   display: inline-flex;
   align-items: center;
@@ -1842,13 +1972,13 @@ html, body, #root {
 }
 
 .lumen-step-title {
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #f8fafc;
 }
 
 .lumen-step-desc {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   line-height: 1.45;
   width: 100%;
@@ -1860,7 +1990,7 @@ html, body, #root {
   border-radius: 8px;
   padding: 0.5rem 0.7rem;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
   color: #38bdf8;
   overflow-x: auto;
   margin: 0.4rem 0;
@@ -1868,7 +1998,7 @@ html, body, #root {
 }
 
 .lumen-message-time {
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   color: rgba(255, 255, 255, 0.5);
   margin-top: 4px;
   text-align: right;
@@ -1939,7 +2069,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   outline: none;
   padding: 0 4px;
   font-family: inherit;
@@ -2007,7 +2137,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   outline: none;
   font-family: inherit;
 }
@@ -2035,7 +2165,7 @@ html, body, #root {
   border-radius: 50%;
   background: #ea4335;
   color: #fff;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -2049,7 +2179,7 @@ html, body, #root {
 
 .gmail-category-tag {
   padding: 0.5rem 1rem 0.35rem;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.05em;
@@ -2078,13 +2208,13 @@ html, body, #root {
 }
 
 .gmail-empty-title {
-  font-size: 1rem;
+  font-size: calc(1rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
 }
 
 .gmail-empty-desc {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   margin-top: 0.35rem;
   line-height: 1.4;
@@ -2098,7 +2228,7 @@ html, body, #root {
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(234, 67, 53, 0.35);
@@ -2135,7 +2265,7 @@ html, body, #root {
   border-radius: 50%;
   background: #2563eb;
   color: #fff;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -2146,7 +2276,7 @@ html, body, #root {
 .gmail-sender-avatar.large {
   width: 40px;
   height: 40px;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--mobile-font-scale, 1));
 }
 
 .gmail-row-content {
@@ -2162,18 +2292,18 @@ html, body, #root {
 }
 
 .gmail-row-sender {
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   font-weight: 500;
   color: #e2e8f0;
 }
 
 .gmail-row-time {
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
 .gmail-row-subject {
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   white-space: nowrap;
   overflow: hidden;
@@ -2181,7 +2311,7 @@ html, body, #root {
 }
 
 .gmail-row-snippet {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
   color: #64748b;
   white-space: nowrap;
   overflow: hidden;
@@ -2210,7 +2340,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(234, 67, 53, 0.45);
@@ -2260,7 +2390,7 @@ html, body, #root {
 }
 
 .gmail-detail-subject-line h2 {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
 }
@@ -2269,7 +2399,7 @@ html, body, #root {
   background: rgba(255, 255, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   flex-shrink: 0;
 }
@@ -2292,24 +2422,24 @@ html, body, #root {
 }
 
 .gmail-sender-name {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #fff;
 }
 
 .gmail-sender-time {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
 .gmail-sender-sub {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
 .gmail-detail-body {
   padding: 1rem;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   line-height: 1.5;
   color: #e2e8f0;
 }
@@ -2327,7 +2457,7 @@ html, body, #root {
   border-radius: 20px;
   padding: 0.45rem 0.85rem;
   color: #cbd5e1;
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -2356,7 +2486,7 @@ html, body, #root {
 }
 
 .gmail-compose-title {
-  font-size: 0.88rem;
+  font-size: calc(0.88rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #fff;
   margin-left: 0.5rem;
@@ -2399,13 +2529,13 @@ html, body, #root {
 }
 
 .gmail-field-label {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   width: 40px;
 }
 
 .gmail-field-value-static {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
 }
 
@@ -2414,7 +2544,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   outline: none;
   font-family: inherit;
 }
@@ -2435,7 +2565,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   outline: none;
   resize: none;
   font-family: inherit;
@@ -2469,7 +2599,7 @@ html, body, #root {
 }
 
 .gmail-drawer-logo-text {
-  font-size: 1.3rem;
+  font-size: calc(1.3rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ea4335;
   letter-spacing: -0.02em;
@@ -2484,7 +2614,7 @@ html, body, #root {
 
 .gmail-drawer-section-title {
   padding: 0.4rem 0.75rem;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #94a3b8;
   text-transform: uppercase;
@@ -2496,7 +2626,7 @@ html, body, #root {
   gap: 0.85rem;
   padding: 0.65rem 0.85rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -2595,20 +2725,20 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--mobile-font-scale, 1));
   color: #fff;
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
 .glance-greeting {
-  font-size: 0.94rem;
+  font-size: calc(0.94rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #f8fafc;
   line-height: 1.2;
 }
 
 .glance-status {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #10b981;
   font-weight: 600;
 }
@@ -2622,7 +2752,7 @@ html, body, #root {
   color: #94a3b8;
   padding: 0.35rem 0.65rem;
   border-radius: 14px;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -2650,7 +2780,7 @@ html, body, #root {
 }
 
 .metric-label {
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   font-weight: 600;
   text-transform: uppercase;
@@ -2658,7 +2788,7 @@ html, body, #root {
 }
 
 .metric-value {
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   margin: 3px 0 2px;
@@ -2670,7 +2800,7 @@ html, body, #root {
 }
 
 .metric-sub {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #64748b;
   font-weight: 500;
 }
@@ -2688,7 +2818,7 @@ html, body, #root {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #cbd5e1;
   margin-top: 0.25rem;
@@ -2713,7 +2843,7 @@ html, body, #root {
 }
 
 .glance-section-count {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   flex-shrink: 0;
 }
@@ -2725,7 +2855,7 @@ html, body, #root {
   background: rgba(99, 102, 241, 0.12);
   border: 1px solid rgba(99, 102, 241, 0.25);
   color: #a5b4fc;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   cursor: pointer;
   padding: 3px 8px;
@@ -2777,7 +2907,7 @@ html, body, #root {
 }
 
 .card-bank-name {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--mobile-font-scale, 1));
   font-weight: 900;
   color: #fff;
   letter-spacing: 0.08em;
@@ -2785,13 +2915,13 @@ html, body, #root {
 }
 
 .card-brand-pipe {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--mobile-font-scale, 1));
   color: rgba(255, 255, 255, 0.35);
   font-weight: 300;
 }
 
 .card-brand-name {
-  font-size: 1rem;
+  font-size: calc(1rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #c084fc;
   letter-spacing: 0.08em;
@@ -2820,7 +2950,7 @@ html, body, #root {
 
 .card-masked-digits {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #cbd5e1;
   letter-spacing: 0.08em;
@@ -2834,13 +2964,13 @@ html, body, #root {
 }
 
 .card-outstanding-label {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   font-weight: 500;
 }
 
 .card-outstanding-amount {
-  font-size: 0.86rem;
+  font-size: calc(0.86rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #f87171;
   white-space: nowrap;
@@ -2877,7 +3007,7 @@ html, body, #root {
 
 .card-full-number-display {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.98rem;
+  font-size: calc(0.98rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #f8fafc;
   letter-spacing: 0.12em;
@@ -2893,14 +3023,14 @@ html, body, #root {
 }
 
 .meta-label {
-  font-size: 0.54rem;
+  font-size: calc(0.54rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   font-weight: 600;
   letter-spacing: 0.06em;
 }
 
 .meta-value {
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   color: #fff;
   font-weight: 700;
   margin-top: 1px;
@@ -2916,7 +3046,7 @@ html, body, #root {
 .outstanding-flex {
   display: flex;
   justify-content: space-between;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #e2e8f0;
   font-weight: 600;
 }
@@ -2955,7 +3085,7 @@ html, body, #root {
   padding: 0.8rem 0.4rem;
   cursor: pointer;
   color: #e2e8f0;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   transition: all 0.15s ease;
 }
@@ -3022,7 +3152,7 @@ html, body, #root {
   border-radius: 10px;
   color: #fff;
   font-weight: 800;
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3031,7 +3161,7 @@ html, body, #root {
 }
 
 .bank-name {
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
   margin-bottom: 2px;
@@ -3041,7 +3171,7 @@ html, body, #root {
 }
 
 .bank-ac-num {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   font-weight: 500;
   letter-spacing: 0.03em;
@@ -3049,7 +3179,7 @@ html, body, #root {
 }
 
 .bank-ac-type {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   font-weight: 500;
   margin-top: 1px;
@@ -3064,7 +3194,7 @@ html, body, #root {
 }
 
 .bank-balance {
-  font-size: 0.96rem;
+  font-size: calc(0.96rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
@@ -3081,7 +3211,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #818cf8;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
   margin-top: 3px;
@@ -3095,7 +3225,7 @@ html, body, #root {
   gap: 4px;
   padding: 2px 7px;
   border-radius: 99px;
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   border: none;
   cursor: pointer;
@@ -3137,7 +3267,7 @@ html, body, #root {
   background: transparent;
   border: none;
   color: #c084fc;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
   margin-top: 3px;
@@ -3169,7 +3299,7 @@ html, body, #root {
   gap: 0.45rem;
   padding: 1.5rem 0.5rem;
   color: #94a3b8;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   text-align: center;
 }
 
@@ -3225,7 +3355,7 @@ html, body, #root {
 }
 
 .txn-recipient {
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
   margin-bottom: 2px;
@@ -3236,7 +3366,7 @@ html, body, #root {
 }
 
 .txn-meta {
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   display: flex;
   align-items: center;
@@ -3257,13 +3387,13 @@ html, body, #root {
 .txn-dot {
   flex-shrink: 0;
   color: #64748b;
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--mobile-font-scale, 1));
 }
 
 .txn-time {
   flex-shrink: 0;
   color: #94a3b8;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
 }
 
 .txn-right {
@@ -3281,7 +3411,7 @@ html, body, #root {
   display: inline-flex;
   align-items: baseline;
   white-space: nowrap;
-  font-size: 0.84rem;
+  font-size: calc(0.84rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   letter-spacing: -0.01em;
 }
@@ -3291,7 +3421,7 @@ html, body, #root {
 }
 
 .txn-note {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #64748b;
   margin-top: 1px;
   white-space: nowrap;
@@ -3338,7 +3468,7 @@ html, body, #root {
   border: none;
   cursor: pointer;
   color: #94a3b8;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   position: relative;
   border-radius: 10px;
@@ -3406,7 +3536,7 @@ html, body, #root {
 .lumen-upi-badge {
   background: #10b981;
   color: #fff;
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   font-weight: 900;
   padding: 2px 6px;
   border-radius: 4px;
@@ -3436,7 +3566,7 @@ html, body, #root {
   color: #cbd5e1;
   padding: 0.35rem 0.6rem;
   border-radius: 20px;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -3460,7 +3590,7 @@ html, body, #root {
 }
 
 .lumen-input-group label {
-  font-size: 0.64rem;
+  font-size: calc(0.64rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #94a3b8;
 }
@@ -3471,7 +3601,7 @@ html, body, #root {
   border-radius: 12px;
   padding: 0.55rem 0.75rem;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   outline: none;
 }
 
@@ -3489,7 +3619,7 @@ html, body, #root {
 }
 
 .lumen-inr-symbol {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #818cf8;
   margin-right: 6px;
@@ -3500,7 +3630,7 @@ html, body, #root {
   border: none;
   outline: none;
   color: #fff;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   width: 100%;
 }
@@ -3558,13 +3688,13 @@ html, body, #root {
 }
 
 .lumen-method-name {
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
 }
 
 .lumen-method-sub {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
@@ -3577,7 +3707,7 @@ html, body, #root {
   color: #fca5a5;
   padding: 0.5rem 0.75rem;
   border-radius: 10px;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
 }
 
 .lumen-primary-action-btn {
@@ -3590,7 +3720,7 @@ html, body, #root {
   border: none;
   padding: 0.65rem;
   border-radius: 12px;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
@@ -3616,20 +3746,20 @@ html, body, #root {
 }
 
 .lumen-success-title {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
 }
 
 .lumen-success-amount {
-  font-size: 1.6rem;
+  font-size: calc(1.6rem * var(--mobile-font-scale, 1));
   font-weight: 900;
   color: #10b981;
   margin: 0.25rem 0;
 }
 
 .lumen-success-recipient {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   margin-bottom: 1rem;
 }
@@ -3649,7 +3779,7 @@ html, body, #root {
 .lumen-detail-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
@@ -3675,21 +3805,21 @@ html, body, #root {
 }
 
 .dummy-title {
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   margin-bottom: 0.2rem;
 }
 
 .dummy-subtitle {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #818cf8;
   margin-bottom: 0.65rem;
 }
 
 .dummy-desc {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   line-height: 1.5;
   max-width: 260px;
@@ -3702,7 +3832,7 @@ html, body, #root {
   gap: 6px;
   background: rgba(236, 72, 153, 0.12);
   color: #f472b6;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 99px;
@@ -3722,7 +3852,7 @@ html, body, #root {
   color: #fff;
   padding: 0.5rem 1.1rem;
   border-radius: 12px;
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -3771,14 +3901,14 @@ html, body, #root {
 }
 
 .trust-hero-title {
-  font-size: 0.98rem;
+  font-size: calc(0.98rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.01em;
 }
 
 .trust-hero-subtitle {
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   margin-top: 1px;
 }
@@ -3791,7 +3921,7 @@ html, body, #root {
   border: 1px solid rgba(16, 185, 129, 0.3);
   padding: 3px 8px;
   border-radius: 99px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #34d399;
   font-weight: 700;
 }
@@ -3812,7 +3942,7 @@ html, body, #root {
   background: rgba(16, 185, 129, 0.18);
   border: 1px solid rgba(16, 185, 129, 0.4);
   color: #34d399;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   padding: 5px 10px;
   border-radius: 8px;
@@ -3822,7 +3952,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #818cf8;
   letter-spacing: 0.08em;
@@ -3854,14 +3984,14 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #94a3b8;
   letter-spacing: 0.06em;
 }
 
 .spectrum-badge {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 99px;
@@ -3922,19 +4052,19 @@ html, body, #root {
 }
 
 .spectrum-seg-num {
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   letter-spacing: -0.01em;
 }
 
 .spectrum-seg-label {
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   font-weight: 600;
 }
 
 .spectrum-soon-tag {
-  font-size: 0.5rem;
+  font-size: calc(0.5rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   background: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
@@ -3972,14 +4102,14 @@ html, body, #root {
 }
 
 .spectrum-detail-title {
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.01em;
 }
 
 .spectrum-detail-desc {
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   line-height: 1.4;
   margin-top: 2px;
@@ -4002,14 +4132,14 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   color: #cbd5e1;
   text-align: center;
 }
 
 .spectrum-step-icon {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
 }
 
 .spectrum-arrow {
@@ -4056,21 +4186,21 @@ html, body, #root {
 }
 
 .apple-policy-title {
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.01em;
 }
 
 .apple-policy-desc {
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   line-height: 1.35;
   margin-top: 2px;
 }
 
 .apple-policy-val-pill {
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 6px;
@@ -4123,7 +4253,7 @@ html, body, #root {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 7px;
   padding: 4px 2px;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #94a3b8;
   cursor: pointer;
@@ -4182,7 +4312,7 @@ html, body, #root {
   margin-top: 0.6rem;
   padding-top: 0.45rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.61rem;
+  font-size: calc(0.61rem * var(--mobile-font-scale, 1));
   font-weight: 600;
 }
 
@@ -4225,14 +4355,14 @@ html, body, #root {
 }
 
 .trust-info-popover-title {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #c7d2fe;
   margin-bottom: 2px;
 }
 
 .trust-info-popover-text {
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   line-height: 1.45;
 }
@@ -4333,7 +4463,7 @@ html, body, #root {
 
 .incident-badge {
   display: inline-block;
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -4367,7 +4497,7 @@ html, body, #root {
 }
 
 .incident-title {
-  font-size: 0.88rem;
+  font-size: calc(0.88rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
@@ -4376,7 +4506,7 @@ html, body, #root {
 }
 
 .incident-desc {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
   line-height: 1.5;
   margin: 0;
@@ -4391,7 +4521,7 @@ html, body, #root {
   border: none;
   border-radius: 12px;
   padding: 0.7rem 1rem;
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -4468,7 +4598,7 @@ html, body, #root {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
@@ -4512,7 +4642,7 @@ html, body, #root {
 }
 
 .mini-card-name {
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fff;
   white-space: nowrap;
@@ -4521,7 +4651,7 @@ html, body, #root {
 }
 
 .mini-card-num {
-  font-size: 0.67rem;
+  font-size: calc(0.67rem * var(--mobile-font-scale, 1));
   color: #c084fc;
   font-family: monospace;
   font-weight: 600;
@@ -4557,14 +4687,14 @@ html, body, #root {
 }
 
 .act-empty-title {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #fff;
   margin-bottom: 0.3rem;
 }
 
 .act-empty-desc {
-  font-size: 0.69rem;
+  font-size: calc(0.69rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   line-height: 1.45;
   max-width: 260px;
@@ -4578,7 +4708,7 @@ html, body, #root {
   background: rgba(16, 185, 129, 0.1);
   color: #34d399;
   border: 1px solid rgba(16, 185, 129, 0.25);
-  font-size: 0.64rem;
+  font-size: calc(0.64rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 99px;
@@ -4596,7 +4726,7 @@ html, body, #root {
    NOTIFICATION ACTION BUTTONS & AUTONOMY BADGES
    ============================================================ */
 .notif-autonomy-badge {
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   padding: 1px 6px;
   border-radius: 4px;
@@ -4616,7 +4746,7 @@ html, body, #root {
   border: none;
   border-radius: 9999px;
   padding: 6px 14px;
-  font-size: 0.71rem;
+  font-size: calc(0.71rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -4691,7 +4821,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -4706,7 +4836,7 @@ html, body, #root {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: #cbd5e1;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 6px;
@@ -4724,7 +4854,7 @@ html, body, #root {
 }
 
 .act-address-value {
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   color: #f1f5f9;
   line-height: 1.45;
   font-weight: 500;
@@ -4740,7 +4870,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #fbbf24;
 }
@@ -4752,7 +4882,7 @@ html, body, #root {
   border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: 8px;
   color: #ffffff;
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   line-height: 1.45;
   padding: 7px 10px;
   resize: vertical;
@@ -4777,7 +4907,7 @@ html, body, #root {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 7px;
@@ -4873,13 +5003,13 @@ html, body, #root {
 }
 
 .recurring-title {
-  font-size: 0.96rem;
+  font-size: calc(0.96rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
 }
 
 .recurring-subtitle {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   margin-top: 1px;
 }
@@ -4928,13 +5058,13 @@ html, body, #root {
 }
 
 .summary-title {
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
 }
 
 .summary-subtitle {
-  font-size: 0.64rem;
+  font-size: calc(0.64rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
@@ -4945,7 +5075,7 @@ html, body, #root {
   background: linear-gradient(135deg, #4f46e5, #6366f1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   padding: 5px 12px;
   border-radius: 8px;
@@ -4997,7 +5127,7 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--mobile-font-scale, 1));
   color: #ffffff;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
@@ -5009,13 +5139,13 @@ html, body, #root {
 }
 
 .item-platform-name {
-  font-size: 0.84rem;
+  font-size: calc(0.84rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
 }
 
 .item-plan-name {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--mobile-font-scale, 1));
   color: #cbd5e1;
 }
 
@@ -5026,7 +5156,7 @@ html, body, #root {
   background: rgba(168, 85, 247, 0.14);
   border: 1px solid rgba(168, 85, 247, 0.3);
   color: #c084fc;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 6px;
@@ -5041,13 +5171,13 @@ html, body, #root {
 }
 
 .item-price-tag {
-  font-size: 0.88rem;
+  font-size: calc(0.88rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #ffffff;
 }
 
 .item-cycle-tag {
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
@@ -5058,7 +5188,7 @@ html, body, #root {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #cbd5e1;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 6px;
@@ -5088,7 +5218,7 @@ html, body, #root {
 }
 
 .hero-platform-name {
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   letter-spacing: -0.01em;
 }
@@ -5099,7 +5229,7 @@ html, body, #root {
   backdrop-filter: blur(8px);
   padding: 2px 10px;
   border-radius: 99px;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   margin: 6px 0;
 }
@@ -5112,12 +5242,12 @@ html, body, #root {
 }
 
 .hero-price {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--mobile-font-scale, 1));
   font-weight: 900;
 }
 
 .hero-cycle {
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   opacity: 0.8;
 }
 
@@ -5128,7 +5258,7 @@ html, body, #root {
 }
 
 .section-label {
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #94a3b8;
   text-transform: uppercase;
@@ -5149,7 +5279,7 @@ html, body, #root {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 0.73rem;
+  font-size: calc(0.73rem * var(--mobile-font-scale, 1));
   color: #e2e8f0;
   line-height: 1.35;
 }
@@ -5183,7 +5313,7 @@ html, body, #root {
 }
 
 .card-bank-name {
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
 }
@@ -5192,7 +5322,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.64rem;
+  font-size: calc(0.64rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   background: rgba(16, 185, 129, 0.16);
   border: 1px solid rgba(16, 185, 129, 0.35);
@@ -5211,7 +5341,7 @@ html, body, #root {
 
 .card-number-display {
   font-family: monospace;
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #f1f5f9;
@@ -5221,7 +5351,7 @@ html, body, #root {
 .card-meta-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--mobile-font-scale, 1));
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: 8px;
   margin-top: 6px;
@@ -5230,7 +5360,7 @@ html, body, #root {
 .card-meta-label {
   display: block;
   color: #64748b;
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -5244,7 +5374,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.64rem;
+  font-size: calc(0.64rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
@@ -5260,7 +5390,7 @@ html, body, #root {
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #e2e8f0;
   border-radius: 10px;
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--mobile-font-scale, 1));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -5311,12 +5441,12 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--mobile-font-scale, 1));
   color: #ffffff;
 }
 
 .platform-chip-name {
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
   text-align: center;
@@ -5357,21 +5487,21 @@ html, body, #root {
 }
 
 .plan-picker-name {
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
   display: block;
 }
 
 .plan-picker-benefits {
-  font-size: 0.63rem;
+  font-size: calc(0.63rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
   display: block;
   margin-top: 1px;
 }
 
 .plan-picker-price {
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--mobile-font-scale, 1));
   font-weight: 800;
   color: #10b981;
   text-align: right;
@@ -5379,7 +5509,7 @@ html, body, #root {
 }
 
 .plan-picker-cycle {
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--mobile-font-scale, 1));
   color: #64748b;
   font-weight: normal;
 }
@@ -5414,18 +5544,18 @@ html, body, #root {
 
 .mini-card-number {
   font-family: monospace;
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #ffffff;
 }
 
 .mini-card-expiry {
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--mobile-font-scale, 1));
   color: #94a3b8;
 }
 
 .mini-card-badge {
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   color: #10b981;
   background: rgba(16, 185, 129, 0.15);
@@ -5442,7 +5572,7 @@ html, body, #root {
   background: linear-gradient(135deg, #10b981, #059669);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--mobile-font-scale, 1));
   font-weight: 700;
   padding: 0.75rem;
   border-radius: 12px;

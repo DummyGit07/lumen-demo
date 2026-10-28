@@ -77,7 +77,7 @@ export default function StatusBar({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.68rem', color: '#f8fafc', paddingLeft: '4px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'calc(0.68rem * var(--mobile-font-scale, 1))', color: '#f8fafc', paddingLeft: '4px' }}
               >
                 <Bell size={12} color="#f59e0b" />
                 <span style={{ maxWidth: '130px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -90,7 +90,7 @@ export default function StatusBar({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.68rem', color: '#ec4899', paddingLeft: '4px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'calc(0.68rem * var(--mobile-font-scale, 1))', color: '#ec4899', paddingLeft: '4px' }}
               >
                 <Music size={12} className="pulse-icon" />
                 <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

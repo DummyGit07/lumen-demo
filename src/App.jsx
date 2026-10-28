@@ -71,6 +71,41 @@ export default function App() {
   const [phoneFinish, setPhoneFinish] = useState('titanium'); // 'titanium' | 'midnight' | 'silver'
   const [phoneScale, setPhoneScale] = useState(1); // 0.85 | 1 | 1.1
 
+  // Dynamic Icon Size (default 80%) and Dynamic Mobile Font Size (default 100%)
+  const [iconScale, setIconScale] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lumen_icon_scale_v2');
+      if (saved !== null) return parseFloat(saved);
+      // Migrate legacy key if user customized it away from 1.0, otherwise default to 0.8 (80%)
+      const legacy = localStorage.getItem('lumen_icon_scale');
+      if (legacy && parseFloat(legacy) !== 1.0) return parseFloat(legacy);
+      return 0.8;
+    } catch {
+      return 0.8;
+    }
+  });
+
+  const [fontScale, setFontScale] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lumen_font_scale');
+      return saved ? parseFloat(saved) : 1.0;
+    } catch {
+      return 1.0;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lumen_icon_scale_v2', String(iconScale));
+    } catch { }
+  }, [iconScale]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lumen_font_scale', String(fontScale));
+    } catch { }
+  }, [fontScale]);
+
   // Update internal sub-screen for a particular app
   const setAppScreen = (appId, screen) => {
     setInternalAppScreens((prev) => ({ ...prev, [appId]: screen }));
@@ -307,7 +342,13 @@ export default function App() {
             }}
           >
             {/* Screen Chassis (Inner phone viewport) */}
-            <div className="screen-chassis">
+            <div
+              className="screen-chassis"
+              style={{
+                '--mobile-font-scale': fontScale,
+                '--mobile-icon-scale': iconScale
+              }}
+            >
               {/* Wallpaper Layer */}
               <div
                 className="phone-wallpaper"
@@ -396,6 +437,7 @@ export default function App() {
                       key="home-screen"
                       apps={apps}
                       onLaunchApp={handleLaunchApp}
+                      iconScale={iconScale}
                     />
                   )}
 
@@ -512,6 +554,10 @@ export default function App() {
           setPhoneFinish={setPhoneFinish}
           phoneScale={phoneScale}
           setPhoneScale={setPhoneScale}
+          iconScale={iconScale}
+          setIconScale={setIconScale}
+          fontScale={fontScale}
+          setFontScale={setFontScale}
           playHapticSound={playHapticSound}
         />
       </main>

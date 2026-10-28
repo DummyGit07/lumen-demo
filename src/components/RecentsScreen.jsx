@@ -53,7 +53,7 @@ export default function RecentsScreen({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Layers size={18} color="#a5b4fc" />
           <span className="recents-title">Recent Apps</span>
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+          <span style={{ fontSize: 'calc(0.75rem * var(--mobile-font-scale, 1))', color: '#94a3b8' }}>
             ({runningApps.length})
           </span>
         </div>
@@ -69,7 +69,7 @@ export default function RecentsScreen({
         <div className="recents-empty">
           <Layers size={36} color="#475569" />
           <span>No recent apps</span>
-          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
+          <span style={{ fontSize: 'calc(0.72rem * var(--mobile-font-scale, 1))', color: '#64748b' }}>
             Tap the Home (○) button to launch an app
           </span>
         </div>
@@ -136,7 +136,7 @@ export default function RecentsScreen({
                       {index === 0 && (
                         <span
                           style={{
-                            fontSize: '0.6rem',
+                            fontSize: 'calc(0.6rem * var(--mobile-font-scale, 1))',
                             fontWeight: 700,
                             padding: '1px 6px',
                             borderRadius: '6px',
@@ -179,7 +179,7 @@ export default function RecentsScreen({
                           alignItems: 'center',
                           gap: '8px',
                           color: '#e2e8f0',
-                          fontSize: '0.8rem',
+                          fontSize: 'calc(0.8rem * var(--mobile-font-scale, 1))',
                           fontWeight: 600,
                         }}
                       >
@@ -200,7 +200,7 @@ export default function RecentsScreen({
                           background: 'rgba(255, 255, 255, 0.04)',
                           borderRadius: '12px',
                           padding: '1rem',
-                          fontSize: '0.75rem',
+                          fontSize: 'calc(0.75rem * var(--mobile-font-scale, 1))',
                           color: '#94a3b8',
                           lineHeight: '1.5',
                         }}

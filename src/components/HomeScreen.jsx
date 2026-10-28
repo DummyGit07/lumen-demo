@@ -33,7 +33,7 @@ function renderAppIconContent(app, size = 26) {
   return <IconComp size={size} strokeWidth={2.2} />;
 }
 
-export default function HomeScreen({ apps, onLaunchApp }) {
+export default function HomeScreen({ apps, onLaunchApp, iconScale = 0.8 }) {
   const [time, setTime] = useState('');
   const [dateStr, setDateStr] = useState('');
 
@@ -49,6 +49,16 @@ export default function HomeScreen({ apps, onLaunchApp }) {
   }, []);
 
   const dockApps = apps.filter((a) => a.inDock);
+
+  const gridIconSize = Math.max(16, Math.round(24 * iconScale));
+  const dockIconSize = Math.max(14, Math.round(20 * iconScale));
+  const gridBoxSize = Math.round(48 * iconScale);
+  const dockBoxSize = Math.round(46 * iconScale);
+  const gridBorderRadius = Math.round(14 * iconScale);
+  const dockBorderRadius = Math.round(13 * iconScale);
+
+  // Dynamic vertical gap so larger icons fit comfortably without collision
+  const dynamicRowGap = `${Math.max(0.45, 1.0 - (iconScale - 1) * 1.4).toFixed(2)}rem`;
 
   return (
     <motion.div
@@ -71,7 +81,15 @@ export default function HomeScreen({ apps, onLaunchApp }) {
       </div>
 
       {/* Main App Grid */}
-      <div className="app-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginTop: '0.75rem', gap: '1rem 0.6rem' }}>
+      <div
+        className="app-grid"
+        style={{
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          marginTop: '0.75rem',
+          gap: `${dynamicRowGap} 0.6rem`,
+          transition: 'gap 0.2s ease'
+        }}
+      >
         {apps.map((app) => (
           <motion.div
             key={app.id}
@@ -84,10 +102,13 @@ export default function HomeScreen({ apps, onLaunchApp }) {
               className="app-icon-box" 
               style={{ 
                 background: app.color,
+                width: gridBoxSize,
+                height: gridBoxSize,
+                borderRadius: gridBorderRadius,
                 boxShadow: app.id === 'gmail' ? '0 4px 12px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.08)' : undefined
               }}
             >
-              {renderAppIconContent(app, 24)}
+              {renderAppIconContent(app, gridIconSize)}
               {app.badge && <span className="app-badge-unread">{app.badge}</span>}
             </div>
             <span className="app-label">{app.name}</span>
@@ -109,13 +130,13 @@ export default function HomeScreen({ apps, onLaunchApp }) {
               className="app-icon-box" 
               style={{ 
                 background: app.color, 
-                width: 46, 
-                height: 46, 
-                borderRadius: 13,
+                width: dockBoxSize, 
+                height: dockBoxSize, 
+                borderRadius: dockBorderRadius,
                 boxShadow: app.id === 'gmail' ? '0 3px 10px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.08)' : undefined
               }}
             >
-              {renderAppIconContent(app, 20)}
+              {renderAppIconContent(app, dockIconSize)}
               {app.badge && <span className="app-badge-unread">{app.badge}</span>}
             </div>
           </motion.div>

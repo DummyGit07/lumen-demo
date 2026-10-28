@@ -12,7 +12,9 @@ import {
   ShieldAlert,
   ShieldCheck,
   RotateCcw,
-  Clock
+  Clock,
+  Type,
+  LayoutGrid
 } from 'lucide-react';
 import { fraudWorkflow } from '../apps/lumen-ai/services/fraudWorkflow';
 import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
@@ -36,6 +38,10 @@ export default function SimulatorPanel({
   setPhoneFinish,
   phoneScale,
   setPhoneScale,
+  iconScale = 1.0,
+  setIconScale,
+  fontScale = 1.0,
+  setFontScale,
   playHapticSound
 }) {
   // Collapsible sub-simulators (Lumen Fraud open by default)
@@ -129,21 +135,20 @@ export default function SimulatorPanel({
                             autonomyLevel === 'l3'
                               ? 'rgba(16, 185, 129, 0.2)'
                               : autonomyLevel === 'l2'
-                              ? 'rgba(245, 158, 11, 0.2)'
-                              : 'rgba(59, 130, 246, 0.2)',
+                                ? 'rgba(245, 158, 11, 0.2)'
+                                : 'rgba(59, 130, 246, 0.2)',
                           color:
                             autonomyLevel === 'l3'
                               ? '#34d399'
                               : autonomyLevel === 'l2'
-                              ? '#fbbf24'
-                              : '#60a5fa',
-                          border: `1px solid ${
-                            autonomyLevel === 'l3'
-                              ? 'rgba(16, 185, 129, 0.35)'
-                              : autonomyLevel === 'l2'
+                                ? '#fbbf24'
+                                : '#60a5fa',
+                          border: `1px solid ${autonomyLevel === 'l3'
+                            ? 'rgba(16, 185, 129, 0.35)'
+                            : autonomyLevel === 'l2'
                               ? 'rgba(245, 158, 11, 0.35)'
                               : 'rgba(59, 130, 246, 0.35)'
-                          }`,
+                            }`,
                           padding: '2px 8px'
                         }}
                       >
@@ -151,8 +156,8 @@ export default function SimulatorPanel({
                         {autonomyLevel === 'l3'
                           ? '(Autonomous)'
                           : autonomyLevel === 'l2'
-                          ? '(Semi-Auto)'
-                          : '(Guided)'}
+                            ? '(Semi-Auto)'
+                            : '(Guided)'}
                       </span>
                     </div>
 
@@ -349,7 +354,7 @@ export default function SimulatorPanel({
           </div>
 
           {/* 2. Sub-Simulator: Device & Status */}
-          <div className={`sub-sim-item ${openSections.status ? 'open' : ''}`}>
+          {/* <div className={`sub-sim-item ${openSections.status ? 'open' : ''}`}>
             <div
               className="sub-sim-header"
               onClick={() => toggleSection('status')}
@@ -408,10 +413,10 @@ export default function SimulatorPanel({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div> */}
 
           {/* 3. Sub-Simulator: Wallpaper */}
-          <div className={`sub-sim-item ${openSections.wallpaper ? 'open' : ''}`}>
+          {/* <div className={`sub-sim-item ${openSections.wallpaper ? 'open' : ''}`}>
             <div
               className="sub-sim-header"
               onClick={() => toggleSection('wallpaper')}
@@ -459,10 +464,10 @@ export default function SimulatorPanel({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div> */}
 
           {/* 4. Sub-Simulator: Chassis Finish */}
-          <div className={`sub-sim-item ${openSections.finish ? 'open' : ''}`}>
+          {/* <div className={`sub-sim-item ${openSections.finish ? 'open' : ''}`}>
             <div
               className="sub-sim-header"
               onClick={() => toggleSection('finish')}
@@ -505,7 +510,7 @@ export default function SimulatorPanel({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div> */}
 
           {/* 5. Sub-Simulator: Display Scale */}
           <div className={`sub-sim-item ${openSections.scale ? 'open' : ''}`}>
@@ -548,6 +553,164 @@ export default function SimulatorPanel({
                         </button>
                       ))}
                     </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* 6. Sub-Simulator: Icon & Font Sizing */}
+          <div className={`sub-sim-item ${openSections.sizing ? 'open' : ''}`} style={{ borderColor: 'rgba(168, 85, 247, 0.3)' }}>
+            <div
+              className="sub-sim-header"
+              onClick={() => toggleSection('sizing')}
+              style={{ background: 'rgba(168, 85, 247, 0.08)' }}
+            >
+              <div className="sub-sim-title-group">
+                <Type size={14} color="#c084fc" />
+                <span style={{ color: '#fff', fontWeight: 700 }}>Icon & Font Sizing</span>
+              </div>
+              <ChevronDown
+                size={14}
+                className={`sub-sim-chevron ${openSections.sizing ? 'open' : ''}`}
+              />
+            </div>
+            <AnimatePresence>
+              {openSections.sizing && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="sub-sim-body" style={{ background: 'rgba(15, 23, 42, 0.45)' }}>
+                    {/* Slider 1: Home Screen Icons Size */}
+                    <div className="sim-slider-container">
+                      <div className="sim-slider-header">
+                        <div className="sim-slider-label">
+                          <LayoutGrid size={13} color="#c084fc" />
+                          <span>Home Screen Icons</span>
+                        </div>
+                        <span className="sim-slider-badge" style={{ color: '#c084fc', borderColor: 'rgba(192, 132, 252, 0.35)', background: 'rgba(192, 132, 252, 0.15)' }}>
+                          {Math.round(iconScale * 100)}%
+                        </span>
+                      </div>
+
+                      <input
+                        type="range"
+                        className="sim-range-input"
+                        min="0.75"
+                        max="1.25"
+                        step="0.05"
+                        value={iconScale}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (setIconScale) setIconScale(val);
+                        }}
+                      />
+
+                      <div className="sim-preset-chips">
+                        {[
+                          { label: '80% (Default)', val: 0.8 },
+                          { label: '100%', val: 1.0 },
+                          { label: '120%', val: 1.2 }
+                        ].map((chip) => (
+                          <button
+                            key={chip.label}
+                            type="button"
+                            className={`sim-chip-btn ${Math.abs(iconScale - chip.val) < 0.02 ? 'active' : ''}`}
+                            onClick={() => {
+                              if (playHapticSound) playHapticSound('click');
+                              if (setIconScale) setIconScale(chip.val);
+                            }}
+                          >
+                            {chip.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Slider 2: System Font Size (Inside Screen Only) */}
+                    <div className="sim-slider-container">
+                      <div className="sim-slider-header">
+                        <div className="sim-slider-label">
+                          <Type size={13} color="#38bdf8" />
+                          <span>Mobile Font Size</span>
+                        </div>
+                        <span className="sim-slider-badge" style={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.35)', background: 'rgba(56, 189, 248, 0.15)' }}>
+                          {Math.round(fontScale * 100)}%
+                        </span>
+                      </div>
+
+                      <input
+                        type="range"
+                        className="sim-range-input"
+                        min="0.80"
+                        max="1.25"
+                        step="0.05"
+                        value={fontScale}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (setFontScale) setFontScale(val);
+                        }}
+                      />
+
+                      <div className="sim-preset-chips">
+                        {[
+                          { label: 'Small', val: 0.85 },
+                          { label: 'Default', val: 1.0 },
+                          { label: 'Large', val: 1.15 },
+                          { label: 'XL', val: 1.25 }
+                        ].map((chip) => (
+                          <button
+                            key={chip.label}
+                            type="button"
+                            className={`sim-chip-btn ${Math.abs(fontScale - chip.val) < 0.02 ? 'active' : ''}`}
+                            onClick={() => {
+                              if (playHapticSound) playHapticSound('click');
+                              if (setFontScale) setFontScale(chip.val);
+                            }}
+                          >
+                            {chip.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Live typography preview */}
+                      <div
+                        className="sim-live-preview"
+                        style={{ fontSize: `${(0.72 * fontScale).toFixed(2)}rem` }}
+                      >
+                        Aa Live Text • 10:24 • Notification & chat
+                      </div>
+                    </div>
+
+                    {/* Quick Reset All Sizing */}
+                    {(Math.abs(iconScale - 0.8) > 0.02 || Math.abs(fontScale - 1.0) > 0.02) && (
+                      <button
+                        className="panel-button"
+                        onClick={() => {
+                          if (playHapticSound) playHapticSound('click');
+                          if (setIconScale) setIconScale(0.8);
+                          if (setFontScale) setFontScale(1.0);
+                        }}
+                        style={{
+                          width: '100%',
+                          fontSize: '0.68rem',
+                          padding: '0.35rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px',
+                          color: '#94a3b8',
+                          marginTop: '4px'
+                        }}
+                      >
+                        <RotateCcw size={11} />
+                        <span>Reset Sizing (Icons 80%, Font 100%)</span>
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}

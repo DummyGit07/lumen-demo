@@ -220,7 +220,7 @@ export default function NotificationShade({
           {/* Bottom Pull-Up Handle */}
           <div className="shade-bottom-handle" onClick={onClose}>
             <div className="shade-pill-bar" />
-            <span style={{ fontSize: '0.62rem', color: '#94a3b8', marginTop: 2 }}>
+            <span style={{ fontSize: 'calc(0.62rem * var(--mobile-font-scale, 1))', color: '#94a3b8', marginTop: 2 }}>
               Slide up to close
             </span>
           </div>
