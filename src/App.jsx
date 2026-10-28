@@ -13,6 +13,8 @@ import PhoneApp from './components/apps/PhoneApp';
 import SmsApp from './components/apps/SmsApp';
 import GalleryApp from './components/apps/GalleryApp';
 import MusicApp from './components/apps/MusicApp';
+import CalendarApp from './components/apps/CalendarApp';
+import NotesApp from './components/apps/NotesApp';
 import LumenAiApp from './apps/lumen-ai/LumenAiApp';
 import GmailApp from './apps/gmail/GmailApp';
 import { fraudWorkflow } from './apps/lumen-ai/services/fraudWorkflow';
@@ -112,19 +114,32 @@ export default function App() {
   };
 
   const [apps, setApps] = useState(INITIAL_APPS);
+
+  // Auto-sync apps when INITIAL_APPS list changes (ensures Notes replaces Clock immediately)
+  useEffect(() => {
+    setApps((prevApps) => {
+      const hasClock = prevApps.some((a) => a.id === 'clock');
+      const hasNotes = prevApps.some((a) => a.id === 'notes');
+      if (hasClock || !hasNotes || prevApps.length !== INITIAL_APPS.length) {
+        return INITIAL_APPS;
+      }
+      return prevApps;
+    });
+  }, []);
   const [isNotificationShadeOpen, setIsNotificationShadeOpen] = useState(false);
   const [notificationList, setNotificationList] = useState([]); // Completely empty by default, dynamic like a real phone!
 
   // Launch / Open an App
   const handleLaunchApp = (appId) => {
+    const targetId = appId === 'clock' ? 'notes' : appId;
     playHapticSound('click');
-    setActiveAppId(appId);
+    setActiveAppId(targetId);
     setMode('app');
     // Move newly opened app to the very front of runningApps (MRU order)
-    setRunningApps((prev) => [appId, ...prev.filter((id) => id !== appId)]);
+    setRunningApps((prev) => [targetId, ...prev.filter((id) => id !== targetId)]);
     // Clear unread notification badge when opening the app, just like a real phone
     setApps((prev) =>
-      prev.map((a) => (a.id === appId ? { ...a, badge: null } : a))
+      prev.map((a) => (a.id === targetId || a.id === appId ? { ...a, badge: null } : a))
     );
   };
 
@@ -512,6 +527,14 @@ export default function App() {
                           setInternalScreen={(s) => setAppScreen('gmail', s)}
                           onNewEmailNotification={triggerNotification}
                         />
+                      )}
+
+                      {activeAppId === 'calendar' && (
+                        <CalendarApp />
+                      )}
+
+                      {(activeAppId === 'notes' || activeAppId === 'clock') && (
+                        <NotesApp />
                       )}
                     </motion.div>
                   )}

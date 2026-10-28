@@ -7,7 +7,9 @@ import {
   Image, 
   Trash2, 
   ArrowUp,
-  Layers
+  Layers,
+  NotebookPen,
+  Calendar
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -15,6 +17,8 @@ const ICON_MAP = {
   sms: MessageSquare,
   gallery: Image,
   music: Music2,
+  notes: NotebookPen,
+  calendar: Calendar,
 };
 
 export default function RecentsScreen({

@@ -26,6 +26,43 @@ export const WALLPAPERS = [
 ];
 
 export const INITIAL_APPS = [
+  // 1. Main Home Screen Apps (Row 1)
+  {
+    id: 'calendar',
+    name: 'Calendar',
+    icon: 'Calendar',
+    color: 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)',
+    badge: null,
+    inDock: false
+  },
+  {
+    id: 'notes',
+    name: 'Notes',
+    icon: 'NotebookPen',
+    color: '#ffffff',
+    badge: null,
+    inDock: false
+  },
+  {
+    id: 'gmail',
+    name: 'Gmail',
+    isGmail: true,
+    icon: 'Mail',
+    color: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+    badge: null,
+    inDock: false
+  },
+  {
+    id: 'lumen_ai',
+    name: 'Lumen AI',
+    isLetterLogo: true,
+    letter: 'L',
+    color: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    badge: null,
+    inDock: false
+  },
+
+  // 2. Bottom Quick Launch Dock Apps (Pinned at Bottom)
   {
     id: 'phone',
     name: 'Phone',
@@ -57,24 +94,6 @@ export const INITIAL_APPS = [
     color: 'linear-gradient(135deg, #ec4899, #db2777)',
     badge: null,
     inDock: true
-  },
-  {
-    id: 'gmail',
-    name: 'Gmail',
-    isGmail: true,
-    icon: 'Mail',
-    color: '#ffffff',
-    badge: null,
-    inDock: false
-  },
-  {
-    id: 'lumen_ai',
-    name: 'Lumen AI',
-    isLetterLogo: true,
-    letter: 'L',
-    color: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-    badge: null,
-    inDock: false
   }
 ];
 
