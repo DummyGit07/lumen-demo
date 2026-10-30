@@ -1,26 +1,26 @@
 export const WALLPAPERS = [
   {
-    id: 'aurora',
-    name: 'Cosmic Aurora',
-    url: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #030712 100%)',
-    accent: '#a855f7'
+    id: 'ios_glass_flow',
+    name: 'iOS 18 Glass Wave',
+    url: 'radial-gradient(ellipse at 85% 15%, rgba(59, 130, 246, 0.85) 0%, rgba(37, 99, 235, 0.4) 40%, transparent 70%), radial-gradient(ellipse at 15% 85%, rgba(168, 85, 247, 0.85) 0%, rgba(126, 34, 206, 0.4) 40%, transparent 70%), linear-gradient(150deg, #090d16 0%, #0f172a 50%, #030712 100%)',
+    accent: '#38bdf8'
   },
   {
-    id: 'cyber',
-    name: 'Cyberpunk Neon',
-    url: 'radial-gradient(circle at 80% 20%, #4338ca 0%, #1e1b4b 40%, #0f172a 90%)',
-    accent: '#06b6d4'
-  },
-  {
-    id: 'sunset',
-    name: 'Sunset Glow',
-    url: 'linear-gradient(180deg, #4c0519 0%, #831843 30%, #431407 70%, #0f172a 100%)',
+    id: 'ios_solar_bloom',
+    name: 'iOS 17 Solar Bloom',
+    url: 'radial-gradient(circle at 20% 25%, rgba(244, 63, 94, 0.85) 0%, rgba(225, 29, 72, 0.35) 45%, transparent 70%), radial-gradient(circle at 85% 75%, rgba(251, 146, 60, 0.8) 0%, rgba(234, 88, 12, 0.35) 45%, transparent 75%), linear-gradient(165deg, #190624 0%, #0f172a 60%, #020617 100%)',
     accent: '#f43f5e'
   },
   {
-    id: 'emerald',
-    name: 'Deep Emerald',
-    url: 'linear-gradient(135deg, #064e3b 0%, #022c22 45%, #052e16 80%, #020617 100%)',
+    id: 'titanium_slate',
+    name: 'Titanium Graphite',
+    url: 'radial-gradient(circle at 50% 20%, rgba(148, 163, 184, 0.35) 0%, rgba(100, 116, 139, 0.15) 50%, transparent 80%), radial-gradient(circle at 80% 80%, rgba(51, 65, 85, 0.6) 0%, transparent 60%), linear-gradient(180deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
+    accent: '#94a3b8'
+  },
+  {
+    id: 'emerald_mesh',
+    name: 'iOS Deep Emerald',
+    url: 'radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.75) 0%, rgba(5, 150, 105, 0.3) 50%, transparent 75%), radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.6) 0%, transparent 65%), linear-gradient(155deg, #022c22 0%, #031e17 40%, #020617 100%)',
     accent: '#10b981'
   }
 ];
@@ -31,7 +31,7 @@ export const INITIAL_APPS = [
     id: 'calendar',
     name: 'Calendar',
     icon: 'Calendar',
-    color: 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)',
+    color: '#ffffff',
     badge: null,
     inDock: false
   },
@@ -39,16 +39,16 @@ export const INITIAL_APPS = [
     id: 'notes',
     name: 'Notes',
     icon: 'NotebookPen',
-    color: '#ffffff',
+    color: '#fafaf9',
     badge: null,
     inDock: false
   },
   {
     id: 'gmail',
-    name: 'Gmail',
+    name: 'Mail',
     isGmail: true,
     icon: 'Mail',
-    color: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+    color: 'linear-gradient(180deg, #2ea5ff 0%, #007aff 100%)',
     badge: null,
     inDock: false
   },
@@ -57,7 +57,7 @@ export const INITIAL_APPS = [
     name: 'Lumen AI',
     isLetterLogo: true,
     letter: 'L',
-    color: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    color: 'radial-gradient(circle at 50% 40%, #1e1e2e 0%, #0f1016 70%, #090a0f 100%)',
     badge: null,
     inDock: false
   },
@@ -67,7 +67,7 @@ export const INITIAL_APPS = [
     id: 'phone',
     name: 'Phone',
     icon: 'Phone',
-    color: 'linear-gradient(135deg, #22c55e, #16a34a)',
+    color: 'linear-gradient(180deg, #38d664 0%, #28a745 100%)',
     badge: null,
     inDock: true
   },
@@ -75,15 +75,15 @@ export const INITIAL_APPS = [
     id: 'sms',
     name: 'Messages',
     icon: 'MessageSquare',
-    color: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+    color: 'linear-gradient(180deg, #38d664 0%, #28a745 100%)',
     badge: null,
     inDock: true
   },
   {
     id: 'gallery',
-    name: 'Gallery',
+    name: 'Photos',
     icon: 'Image',
-    color: 'linear-gradient(135deg, #f59e0b, #d97706)',
+    color: '#ffffff',
     badge: null,
     inDock: true
   },
@@ -91,7 +91,7 @@ export const INITIAL_APPS = [
     id: 'music',
     name: 'Music',
     icon: 'Music2',
-    color: 'linear-gradient(135deg, #ec4899, #db2777)',
+    color: 'linear-gradient(180deg, #fc3c44 0%, #fa233b 100%)',
     badge: null,
     inDock: true
   }

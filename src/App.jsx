@@ -115,16 +115,9 @@ export default function App() {
 
   const [apps, setApps] = useState(INITIAL_APPS);
 
-  // Auto-sync apps when INITIAL_APPS list changes (ensures Notes replaces Clock immediately)
+  // Auto-sync apps when INITIAL_APPS list changes
   useEffect(() => {
-    setApps((prevApps) => {
-      const hasClock = prevApps.some((a) => a.id === 'clock');
-      const hasNotes = prevApps.some((a) => a.id === 'notes');
-      if (hasClock || !hasNotes || prevApps.length !== INITIAL_APPS.length) {
-        return INITIAL_APPS;
-      }
-      return prevApps;
-    });
+    setApps(INITIAL_APPS);
   }, []);
   const [isNotificationShadeOpen, setIsNotificationShadeOpen] = useState(false);
   const [notificationList, setNotificationList] = useState([]); // Completely empty by default, dynamic like a real phone!
@@ -541,7 +534,7 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-              {/* Bottom 3-Button Navigation Bar (◁ Back, ○ Home, □ Recents) */}
+              {/* iOS Home Indicator Bar (Tap to go Home, drag/double-tap for Recents) */}
               <BottomNavBar
                 onBack={handleBack}
                 onHome={handleHome}
