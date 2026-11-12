@@ -5,6 +5,7 @@ import {
   DEFAULT_CARDS,
   DEFAULT_TRANSACTIONS
 } from '../services/financeStorage';
+import { disputeWorkflow } from '../services/disputeWorkflow';
 
 export function useLumenFinance() {
   const [banks, setBanks] = useState(() => financeStorage.loadBanks());
@@ -90,6 +91,10 @@ export function useLumenFinance() {
 
       setBanks(updatedBanks);
       setTransactions(updatedTxns);
+
+      // Check for duplicate transaction dispute (2 transactions to same recipient within 60s)
+      disputeWorkflow.checkForDuplicatePayment(newTxn);
+
       return { success: true, txn: newTxn };
     }
 
@@ -141,6 +146,10 @@ export function useLumenFinance() {
 
       setCards(updatedCards);
       setTransactions(updatedTxns);
+
+      // Check for duplicate transaction dispute (2 transactions to same recipient within 60s)
+      disputeWorkflow.checkForDuplicatePayment(newTxn);
+
       return { success: true, txn: newTxn };
     }
 

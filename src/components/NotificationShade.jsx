@@ -191,7 +191,11 @@ export default function NotificationShade({
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (act.onClick) act.onClick(trustStorage.getUserAddress());
-                                  onClose();
+                                  if ((act.label === 'View' || act.tab || act.openApp) && onOpenApp) {
+                                    onOpenApp(act.appId || item.appId || 'lumen_ai');
+                                    onClose();
+                                  }
+                                  onDismissOne(item.id);
                                 }}
                               >
                                 {act.label}

@@ -14,13 +14,18 @@ import {
   MapPin,
   Edit3,
   Check,
-  X
+  X,
+  AlertCircle,
+  Clock
 } from 'lucide-react';
 import { trustStorage } from '../services/trustStorage';
 import { fraudWorkflow } from '../services/fraudWorkflow';
+import { disputeWorkflow } from '../services/disputeWorkflow';
+import { formatRelativeTime } from '../services/financeStorage';
 
 export default function ActScreen({ onNavigateTab }) {
   const [incident, setIncident] = useState(() => trustStorage.getFraudIncident());
+  const [disputeIncident, setDisputeIncident] = useState(() => trustStorage.getDisputeIncident());
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [addressInput, setAddressInput] = useState(() => trustStorage.getUserAddress());
 
@@ -28,6 +33,8 @@ export default function ActScreen({ onNavigateTab }) {
     const unsub = trustStorage.subscribe((event, data) => {
       if (event === 'incident_updated') {
         setIncident(data);
+      } else if (event === 'dispute_incident_updated') {
+        setDisputeIncident(data);
       } else if (event === 'address_updated') {
         setAddressInput(data);
       }
@@ -72,11 +79,187 @@ export default function ActScreen({ onNavigateTab }) {
       'l3_replaced'
     ].includes(incident.status);
 
+  const isL1Dispute = Boolean(
+    disputeIncident &&
+    (!disputeIncident.autonomyLevel || disputeIncident.autonomyLevel === 'l1')
+  );
+
   return (
-    <div className="lumen-act-scroll">
-      <AnimatePresence mode="wait">
-        {/* Case 1: Active Incident Action Card */}
-        {hasValidIncident ? (
+    <div
+      className="lumen-act-scroll"
+      style={{
+        flex: 1,
+        minHeight: 0,
+        height: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        padding: '0.85rem 0.85rem 6.5rem',
+        boxSizing: 'border-box',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}
+    >
+      <AnimatePresence>
+        {/* Case A: Active Duplicate Transaction Dispute Action Card */}
+        {disputeIncident && (
+          <motion.div
+            key={disputeIncident.id || 'dispute-incident-card'}
+            className="act-incident-card"
+            initial={{ opacity: 0, scale: 0.95, y: -6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -6 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              borderColor: 'rgba(245, 158, 11, 0.45)',
+              padding: '0.9rem 0.85rem',
+              margin: 'auto 0',
+              marginBottom: hasValidIncident ? '12px' : 'auto',
+              width: '100%',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              overflowY: 'auto',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+          >
+            <div className="incident-content">
+              <div className="incident-header" style={{ alignItems: 'flex-start', gap: '10px' }}>
+                <div
+                  className="incident-icon-pulse"
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    borderColor: 'rgba(245, 158, 11, 0.4)',
+                    flexShrink: 0,
+                    marginTop: '2px'
+                  }}
+                >
+                  <AlertCircle size={18} color="#f59e0b" />
+                </div>
+                <div className="incident-title-block" style={{ minWidth: 0, flex: 1 }}>
+                  <div
+                    className="incident-badge"
+                    style={{
+                      background: 'rgba(56, 189, 248, 0.14)',
+                      color: '#38bdf8',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      fontSize: '0.62rem',
+                      padding: '2px 7px',
+                      borderRadius: '99px',
+                      marginBottom: '3px'
+                    }}
+                  >
+                    {disputeIncident.autonomyLevel === 'l1'
+                      ? 'L1 Guided Review'
+                      : disputeIncident.autonomyLevel === 'l2'
+                        ? 'L2 Semi-Auto'
+                        : 'L3 Autonomous'}
+                  </div>
+                  <div
+                    className="incident-title"
+                    style={{
+                      fontSize: '0.84rem',
+                      fontWeight: 800,
+                      color: '#fff',
+                      whiteSpace: 'normal',
+                      lineHeight: 1.25,
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    Duplicate Charge Detected
+                  </div>
+                </div>
+              </div>
+
+              <p className="incident-desc" style={{ fontSize: '0.74rem', lineHeight: 1.35, marginTop: '8px' }}>
+                Lumen AI detected an unintentional duplicate payment of{' '}
+                <strong style={{ color: '#fff' }}>
+                  ₹{disputeIncident.amount?.toLocaleString('en-IN')}
+                </strong>{' '}
+                to <strong style={{ color: '#fff' }}>{disputeIncident.merchant}</strong>.
+              </p>
+
+              {/* Customer-Oriented Real Transaction Breakdown */}
+              <div
+                style={{
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  padding: '9px 11px',
+                  margin: '9px 0 11px 0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '7px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Latest Transaction ID</span>
+                  <span style={{ color: '#38bdf8', fontFamily: 'monospace', fontWeight: 700, fontSize: '0.76rem' }}>
+                    {disputeIncident.currentTxnId}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Original Transaction ID</span>
+                  <span style={{ color: '#cbd5e1', fontFamily: 'monospace', fontSize: '0.74rem' }}>
+                    {disputeIncident.previousTxnId}
+                  </span>
+                </div>
+
+                <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.06)', margin: '1px 0' }} />
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Merchant / Recipient</span>
+                  <span style={{ color: '#fff', fontWeight: 600 }}>{disputeIncident.merchant}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Duplicate Amount</span>
+                  <span style={{ color: '#ef4444', fontWeight: 700 }}>
+                    ₹{disputeIncident.amount?.toLocaleString('en-IN')}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Payment Account</span>
+                  <span style={{ color: '#cbd5e1' }}>{disputeIncident.sourceName}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Original Charge</span>
+                  <span style={{ color: '#cbd5e1' }}>
+                    {formatRelativeTime(disputeIncident.previousTxnTime)}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
+                  <span style={{ color: '#94a3b8' }}>Duplicate Charge</span>
+                  <span style={{ color: '#f59e0b', fontWeight: 600 }}>
+                    {formatRelativeTime(disputeIncident.currentTxnTime)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Only show Mark as Read button for L1 dispute */}
+              {isL1Dispute && (
+                <button
+                  className="incident-action-btn success"
+                  onClick={() => disputeWorkflow.resolveDispute()}
+                  style={{ width: '100%', marginTop: '2px', padding: '0.6rem 0.8rem', fontSize: '0.76rem' }}
+                >
+                  <CheckCircle2 size={15} />
+                  <span>Mark as read</span>
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Case B: Active Fraud Incident Action Card */}
+        {hasValidIncident && (
           <motion.div
             key={incident.status}
             className="act-incident-card"
@@ -516,8 +699,10 @@ export default function ActScreen({ onNavigateTab }) {
               </div>
             )}
           </motion.div>
-        ) : (
-          /* Case 2: Clean Empty State (No Active Actions) */
+        )}
+
+        {/* Case C: Clean Empty State (No Active Actions) */}
+        {!hasValidIncident && !disputeIncident && (
           <motion.div
             key="act-empty-state"
             className="act-empty-state-card"

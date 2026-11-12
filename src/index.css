@@ -3593,6 +3593,14 @@ body,
   overflow-x: hidden;
   padding: 0.5rem 0;
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.all-txns-scroll-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ========================================================
@@ -4530,12 +4538,19 @@ body,
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
-  padding: 1.25rem 1rem 2rem;
+  padding: 1rem 0.9rem 6rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.lumen-act-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Actionable Incident Card */
@@ -4549,7 +4564,16 @@ body,
   padding: 1.2rem 1.1rem;
   box-shadow: 0 10px 32px rgba(239, 68, 68, 0.2);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.act-incident-card::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .act-incident-card::before {
@@ -4828,6 +4852,7 @@ body,
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: auto 0;
 }
 
 .act-empty-icon-wrap {

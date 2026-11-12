@@ -3,6 +3,8 @@
 
 const STORAGE_KEY_AUTONOMY = 'lumen_trust_autonomy_level_v1';
 const STORAGE_KEY_FRAUD = 'lumen_trust_fraud_incident_v1';
+const STORAGE_KEY_DISPUTE_AUTONOMY = 'lumen_trust_dispute_autonomy_v1';
+const STORAGE_KEY_DISPUTE = 'lumen_trust_dispute_incident_v1';
 export const DEFAULT_USER_ADDRESS = 'Flat 402, Skyline Towers, 100ft Road, Indiranagar, Bengaluru - 560038';
 const STORAGE_KEY_USER_ADDRESS = 'lumen_user_delivery_address_v1';
 
@@ -30,6 +32,33 @@ export const AUTONOMY_LEVELS = {
     badgeColor: '#10b981',
     description: 'AI executes end-to-end emergency remediation via a single unified Freeze & Replace action, automatically provisioning a new card.',
     tag: 'Autonomous AI'
+  }
+};
+
+export const DISPUTE_AUTONOMY_LEVELS = {
+  L1: {
+    id: 'l1',
+    label: 'L1: Guided Review',
+    shortLabel: 'L1 Guided',
+    badgeColor: '#38bdf8',
+    description: 'AI detects accidental duplicate charges and flags them. You review full transaction details and resolve manually.',
+    tag: 'Manual Resolution'
+  },
+  L2: {
+    id: 'l2',
+    label: 'L2: Semi-Autonomous',
+    shortLabel: 'L2 Semi-Auto',
+    badgeColor: '#f59e0b',
+    description: 'AI detects duplicate charges and prepares dispute remediation with 1-click merchant reversal request.',
+    tag: 'Assisted Dispute'
+  },
+  L3: {
+    id: 'l3',
+    label: 'L3: High Autonomy',
+    shortLabel: 'L3 Autonomous',
+    badgeColor: '#10b981',
+    description: 'AI automatically contacts merchant gateway or bank to reverse duplicate charges without intervention.',
+    tag: 'Auto-Reversal'
   }
 };
 
@@ -110,6 +139,57 @@ class TrustStorageService {
 
   clearFraudIncident() {
     this.setFraudIncident(null);
+  }
+
+  // Dispute Autonomy Level
+  getDisputeAutonomyLevel() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_DISPUTE_AUTONOMY);
+      if (stored === 'l3' || stored === 'l2') return stored;
+      return 'l1'; // default L1
+    } catch {
+      return 'l1';
+    }
+  }
+
+  setDisputeAutonomyLevel(level) {
+    try {
+      const valid = ['l1', 'l2', 'l3'].includes(level) ? level : 'l1';
+      localStorage.setItem(STORAGE_KEY_DISPUTE_AUTONOMY, valid);
+      this.notify('dispute_autonomy_changed', valid);
+      return valid;
+    } catch (e) {
+      console.warn('Failed to save dispute autonomy level:', e);
+      return 'l1';
+    }
+  }
+
+  // Dispute Incident Management
+  getDisputeIncident() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_DISPUTE);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  setDisputeIncident(incident) {
+    try {
+      if (!incident) {
+        localStorage.removeItem(STORAGE_KEY_DISPUTE);
+        this.notify('dispute_incident_updated', null);
+      } else {
+        localStorage.setItem(STORAGE_KEY_DISPUTE, JSON.stringify(incident));
+        this.notify('dispute_incident_updated', incident);
+      }
+    } catch (e) {
+      console.warn('Failed to save dispute incident:', e);
+    }
+  }
+
+  clearDisputeIncident() {
+    this.setDisputeIncident(null);
   }
 
   // Delivery Address Management

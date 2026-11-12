@@ -18,6 +18,7 @@ import NotesApp from './components/apps/NotesApp';
 import LumenAiApp from './apps/lumen-ai/LumenAiApp';
 import GmailApp from './apps/gmail/GmailApp';
 import { fraudWorkflow } from './apps/lumen-ai/services/fraudWorkflow';
+import { disputeWorkflow } from './apps/lumen-ai/services/disputeWorkflow';
 
 import { INITIAL_APPS, WALLPAPERS, SAMPLE_NOTIFICATIONS } from './constants/apps';
 
@@ -262,26 +263,74 @@ export default function App() {
     }
   };
 
-  // Initialize fraudWorkflow service with navigation and notification handlers
+  // Initialize fraudWorkflow & disputeWorkflow services with navigation and notification handlers
   useEffect(() => {
+    const navHandler = (appId, tab, extra = {}) => {
+      if (tab) {
+        setInternalAppScreens((prev) => ({ ...prev, [appId]: tab }));
+        if (extra.openDigitalCard) {
+          setInternalAppScreens((prev) => ({ ...prev, lumen_ai_open_card: true }));
+        }
+      }
+      handleLaunchApp(appId);
+      if (tab) {
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
+          );
+        }, 50);
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
+          );
+        }, 180);
+      }
+    };
+
     fraudWorkflow.init({
       triggerNotification,
       dismissNotification,
-      navigateApp: (appId, tab, extra = {}) => {
-        handleLaunchApp(appId);
-        if (tab) {
-          setAppScreen(appId, tab);
-          if (extra.openDigitalCard) {
-            setAppScreen('lumen_ai_open_card', true);
-          }
-          setTimeout(() => {
-            window.dispatchEvent(
-              new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
-            );
-          }, 80);
-        }
-      }
+      navigateApp: navHandler
     });
+
+    disputeWorkflow.init({
+      triggerNotification,
+      dismissNotification,
+      navigateApp: navHandler
+    });
+
+    const handleGlobalTrigger = (e) => {
+      if (e.detail) {
+        triggerNotification(e.detail);
+      }
+    };
+
+    const handleGlobalDismiss = (e) => {
+      if (e.detail?.id) {
+        dismissNotification(e.detail.id);
+      }
+      if (e.detail?.filterDisputes) {
+        setActiveNotification((curr) => (curr?.id?.startsWith('notif-dispute') ? null : curr));
+        setNotificationList((prev) => prev.filter((n) => !n.id.startsWith('notif-dispute')));
+      }
+    };
+
+    const handleGlobalNavApp = (e) => {
+      const { appId, tab, extra } = e.detail || {};
+      if (appId) {
+        navHandler(appId, tab, extra);
+      }
+    };
+
+    window.addEventListener('lumen_trigger_notification', handleGlobalTrigger);
+    window.addEventListener('lumen_dismiss_notification', handleGlobalDismiss);
+    window.addEventListener('lumen_navigate_app', handleGlobalNavApp);
+
+    return () => {
+      window.removeEventListener('lumen_trigger_notification', handleGlobalTrigger);
+      window.removeEventListener('lumen_dismiss_notification', handleGlobalDismiss);
+      window.removeEventListener('lumen_navigate_app', handleGlobalNavApp);
+    };
   }, []);
 
   // Keyboard Navigation Listeners

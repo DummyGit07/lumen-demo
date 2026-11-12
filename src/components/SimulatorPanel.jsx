@@ -14,9 +14,11 @@ import {
   RotateCcw,
   Clock,
   Type,
-  LayoutGrid
+  LayoutGrid,
+  AlertCircle
 } from 'lucide-react';
 import { fraudWorkflow } from '../apps/lumen-ai/services/fraudWorkflow';
+import { disputeWorkflow } from '../apps/lumen-ai/services/disputeWorkflow';
 import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
 import { financeStorage } from '../apps/lumen-ai/services/financeStorage';
 
@@ -44,9 +46,10 @@ export default function SimulatorPanel({
   setFontScale,
   playHapticSound
 }) {
-  // Collapsible sub-simulators (Lumen Fraud open by default)
-  const [openSections, setOpenSections] = useState({ lumen_fraud: true });
+  // Collapsible sub-simulators (Collapsed by default as requested)
+  const [openSections, setOpenSections] = useState({});
   const [autonomyLevel, setAutonomyLevel] = useState(() => trustStorage.getAutonomyLevel());
+  const [disputeAutonomyLevel, setDisputeAutonomyLevel] = useState(() => trustStorage.getDisputeAutonomyLevel());
   const [simFeedback, setSimFeedback] = useState('');
 
   // Keep autonomy level synced with Trust screen settings
@@ -54,6 +57,8 @@ export default function SimulatorPanel({
     const unsub = trustStorage.subscribe((event, data) => {
       if (event === 'autonomy_changed') {
         setAutonomyLevel(data);
+      } else if (event === 'dispute_autonomy_changed') {
+        setDisputeAutonomyLevel(data);
       }
     });
     return unsub;
@@ -73,14 +78,37 @@ export default function SimulatorPanel({
       amount: 4850,
       merchant: 'Unknown POS • Global Gateway'
     });
-    setSimFeedback(`Fraud ₹4,850 simulated on •••• ${incident.cardLast4}!`);
+    // setSimFeedback(`Fraud ₹4,850 simulated on •••• ${incident.cardLast4}!`);
     setTimeout(() => setSimFeedback(''), 3500);
+  };
+
+  const handleSimulateDuplicateDispute = () => {
+    if (playHapticSound) playHapticSound('click');
+    if (onTriggerNotification) {
+      disputeWorkflow.notificationTrigger = onTriggerNotification;
+    }
+    const incident = disputeWorkflow.simulateDuplicateDispute({
+      amount: 450,
+      merchant: 'Blinkit'
+    });
+    // setSimFeedback(`Duplicate ₹450 to ${incident.merchant} detected!`);
+    setTimeout(() => setSimFeedback(''), 3500);
+  };
+
+  const handleResetDispute = () => {
+    if (playHapticSound) playHapticSound('click');
+    disputeWorkflow.resolveDispute();
+    setSimFeedback('Dispute status cleared!');
+    setTimeout(() => setSimFeedback(''), 2500);
   };
 
   const handleResetFinance = () => {
     if (playHapticSound) playHapticSound('click');
     financeStorage.resetAll();
     trustStorage.clearFraudIncident();
+    trustStorage.clearDisputeIncident();
+    disputeWorkflow.dismissActiveNotification();
+    fraudWorkflow.dismissActiveNotification();
     setSimFeedback('Card balances & incidents reset!');
     setTimeout(() => setSimFeedback(''), 2500);
   };
@@ -99,24 +127,24 @@ export default function SimulatorPanel({
 
         {/* Minimizable Sub-Simulators */}
         <div className="simulator-list">
-          {/* 0. Sub-Simulator: Lumen AI Fraud & Trust Simulation */}
-          <div className={`sub-sim-item ${openSections.lumen_fraud ? 'open' : ''}`} style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+          {/* 1. Sub-Simulator: Fraud Simulation */}
+          <div className={`sub-sim-item ${openSections.fraud_simulation ? 'open' : ''}`} style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
             <div
               className="sub-sim-header"
-              onClick={() => toggleSection('lumen_fraud')}
+              onClick={() => toggleSection('fraud_simulation')}
               style={{ background: 'rgba(239, 68, 68, 0.08)' }}
             >
               <div className="sub-sim-title-group">
                 <ShieldAlert size={14} color="#ef4444" />
-                <span style={{ color: '#fff', fontWeight: 700 }}>Fraud & Trust Workflow</span>
+                <span style={{ color: '#fff', fontWeight: 700 }}>Fraud Simulation</span>
               </div>
               <ChevronDown
                 size={14}
-                className={`sub-sim-chevron ${openSections.lumen_fraud ? 'open' : ''}`}
+                className={`sub-sim-chevron ${openSections.fraud_simulation ? 'open' : ''}`}
               />
             </div>
             <AnimatePresence>
-              {openSections.lumen_fraud && (
+              {openSections.fraud_simulation && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -127,7 +155,7 @@ export default function SimulatorPanel({
                   <div className="sub-sim-body" style={{ background: 'rgba(15, 23, 42, 0.4)' }}>
                     {/* Active Autonomy Indicator */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Trust Autonomy:</span>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Card Autonomy:</span>
                       <span
                         className="notif-autonomy-badge"
                         style={{
@@ -184,23 +212,6 @@ export default function SimulatorPanel({
                       <span>Simulate Fraud Transaction</span>
                     </button>
 
-                    {simFeedback && (
-                      <div
-                        style={{
-                          marginTop: '6px',
-                          padding: '4px 8px',
-                          background: 'rgba(16, 185, 129, 0.15)',
-                          border: '1px solid rgba(16, 185, 129, 0.3)',
-                          borderRadius: '6px',
-                          color: '#34d399',
-                          fontSize: '0.66rem',
-                          textAlign: 'center'
-                        }}
-                      >
-                        {simFeedback}
-                      </div>
-                    )}
-
                     {/* Reset Button */}
                     <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
                       <button
@@ -218,7 +229,7 @@ export default function SimulatorPanel({
                         }}
                       >
                         <RotateCcw size={11} />
-                        <span>Reset Cards & Incidents</span>
+                        <span>Reset Card Balances & Fraud</span>
                       </button>
                     </div>
                   </div>
@@ -226,6 +237,135 @@ export default function SimulatorPanel({
               )}
             </AnimatePresence>
           </div>
+
+          {/* 2. Sub-Simulator: Dispute Simulation */}
+          <div className={`sub-sim-item ${openSections.dispute_simulation ? 'open' : ''}`} style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
+            <div
+              className="sub-sim-header"
+              onClick={() => toggleSection('dispute_simulation')}
+              style={{ background: 'rgba(245, 158, 11, 0.08)' }}
+            >
+              <div className="sub-sim-title-group">
+                <AlertCircle size={14} color="#f59e0b" />
+                <span style={{ color: '#fff', fontWeight: 700 }}>Dispute Simulation</span>
+              </div>
+              <ChevronDown
+                size={14}
+                className={`sub-sim-chevron ${openSections.dispute_simulation ? 'open' : ''}`}
+              />
+            </div>
+            <AnimatePresence>
+              {openSections.dispute_simulation && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="sub-sim-body" style={{ background: 'rgba(15, 23, 42, 0.4)' }}>
+                    {/* Active Dispute Autonomy Indicator */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Dispute Autonomy:</span>
+                      <span
+                        className="notif-autonomy-badge"
+                        style={{
+                          background:
+                            disputeAutonomyLevel === 'l3'
+                              ? 'rgba(16, 185, 129, 0.2)'
+                              : disputeAutonomyLevel === 'l2'
+                                ? 'rgba(245, 158, 11, 0.2)'
+                                : 'rgba(56, 189, 248, 0.2)',
+                          color:
+                            disputeAutonomyLevel === 'l3'
+                              ? '#34d399'
+                              : disputeAutonomyLevel === 'l2'
+                                ? '#fbbf24'
+                                : '#38bdf8',
+                          border: `1px solid ${disputeAutonomyLevel === 'l3'
+                            ? 'rgba(16, 185, 129, 0.35)'
+                            : disputeAutonomyLevel === 'l2'
+                              ? 'rgba(245, 158, 11, 0.35)'
+                              : 'rgba(56, 189, 248, 0.35)'
+                            }`,
+                          padding: '2px 8px'
+                        }}
+                      >
+                        {disputeAutonomyLevel.toUpperCase()}{' '}
+                        {disputeAutonomyLevel === 'l3'
+                          ? '(Autonomous)'
+                          : disputeAutonomyLevel === 'l2'
+                            ? '(Semi-Auto)'
+                            : '(Guided)'}
+                      </span>
+                    </div>
+
+                    {/* Trigger Duplicate Payment Dispute Button */}
+                    <button
+                      className="panel-button active"
+                      onClick={handleSimulateDuplicateDispute}
+                      style={{
+                        width: '100%',
+                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                        border: 'none',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: '0.74rem',
+                        padding: '0.6rem 0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
+                      }}
+                    >
+                      <AlertCircle size={14} color="#fff" />
+                      <span>Simulate Duplicate Transaction</span>
+                    </button>
+
+                    {/* Reset Dispute Button */}
+                    {/* <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+                      <button
+                        className="panel-button"
+                        onClick={handleResetDispute}
+                        style={{
+                          width: '100%',
+                          fontSize: '0.68rem',
+                          padding: '0.35rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px',
+                          color: '#94a3b8'
+                        }}
+                      >
+                        <RotateCcw size={11} />
+                        <span>Clear Dispute Incident</span>
+                      </button>
+                    </div> */}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {simFeedback && (
+            <div
+              style={{
+                marginTop: '6px',
+                padding: '4px 8px',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '6px',
+                color: '#34d399',
+                fontSize: '0.66rem',
+                textAlign: 'center'
+              }}
+            >
+              {simFeedback}
+            </div>
+          )}
+
           {/* 1. Sub-Simulator: Notifications */}
           <div className={`sub-sim-item ${openSections.notifications ? 'open' : ''}`}>
             <div

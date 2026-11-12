@@ -22,7 +22,7 @@ export default function PayModal({
 
   // Preset recipients for rapid testing
   const presets = [
-    { name: 'Zomato', upi: 'zomato@icici', amount: 450, note: 'Dinner Order' },
+    { name: 'Blinkit', upi: 'blinkit@icici', amount: 450, note: 'Grocery Delivery' },
     { name: 'Amazon India', upi: 'amazonpay@axis', amount: 1899, note: 'Electronics' },
     { name: 'Aarav Sharma', upi: 'aarav@okhdfc', amount: 500, note: 'Coffee' },
     { name: 'Electricity Bill', upi: 'bescom@sbi', amount: 2350, note: 'Monthly Utility' }

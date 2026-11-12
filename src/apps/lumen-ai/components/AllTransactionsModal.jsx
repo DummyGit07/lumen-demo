@@ -1,19 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowUpRight, ReceiptText } from 'lucide-react';
+import { formatRelativeTime } from '../services/financeStorage';
+import TransactionDetailModal from './TransactionDetailModal';
 
 export default function AllTransactionsModal({
   isOpen,
   onClose,
   transactions = []
 }) {
+  const [selectedTxn, setSelectedTxn] = useState(null);
+
   if (!isOpen) return null;
 
   return (
     <div className="lumen-modal-overlay" onClick={onClose}>
       <motion.div
         className="lumen-pay-sheet"
-        style={{ maxHeight: '82%', display: 'flex', flexDirection: 'column' }}
+        style={{
+          maxHeight: '90%',
+          height: '86%',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '0.85rem 1rem 0.5rem',
+          overflow: 'hidden'
+        }}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
@@ -35,8 +46,18 @@ export default function AllTransactionsModal({
           </button>
         </div>
 
-        {/* Scrollable Full Transaction List */}
-        <div className="all-txns-scroll-list" style={{ flex: 1, overflowY: 'auto', padding: '0.5rem 0' }}>
+        {/* Scrollable Full Transaction List with hidden scrollbar track */}
+        <div
+          className="all-txns-scroll-list"
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            padding: '0.4rem 0',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
           {transactions.length === 0 ? (
             <div className="glance-txn-empty">
               <ReceiptText size={32} color="#475569" />
@@ -44,7 +65,13 @@ export default function AllTransactionsModal({
             </div>
           ) : (
             transactions.map((txn) => (
-              <div key={txn.id} className="glance-txn-item" style={{ padding: '0.75rem 0' }}>
+              <div
+                key={txn.id}
+                className="glance-txn-item"
+                style={{ padding: '0.75rem 0', cursor: 'pointer' }}
+                onClick={() => setSelectedTxn(txn)}
+                title="Click to view full transaction details"
+              >
                 <div className="txn-left">
                   <div
                     className="txn-icon-circle"
@@ -64,7 +91,7 @@ export default function AllTransactionsModal({
                     <div className="txn-meta">
                       <span className="txn-source" title={txn.sourceName}>{txn.sourceName}</span>
                       <span className="txn-dot">•</span>
-                      <span className="txn-time">{txn.formattedTime || 'Today'}</span>
+                      <span className="txn-time">{formatRelativeTime(txn.timestamp)}</span>
                     </div>
                   </div>
                 </div>
@@ -85,6 +112,13 @@ export default function AllTransactionsModal({
           )}
         </div>
       </motion.div>
+
+      {/* Transaction Detail Sub-Modal */}
+      <TransactionDetailModal
+        isOpen={Boolean(selectedTxn)}
+        transaction={selectedTxn}
+        onClose={() => setSelectedTxn(null)}
+      />
     </div>
   );
 }

@@ -4,6 +4,40 @@ const STORAGE_KEY_BANKS = 'lumen_finance_banks_v1';
 const STORAGE_KEY_CARDS = 'lumen_finance_cards_v1';
 const STORAGE_KEY_TXNS = 'lumen_finance_txns_v1';
 
+// Dynamic Relative Time Formatter (accurate real-time calculation)
+export function formatRelativeTime(timestamp) {
+  if (!timestamp) return 'Just now';
+  const time = new Date(timestamp).getTime();
+  if (isNaN(time)) return 'Just now';
+  const now = Date.now();
+  const diffSec = Math.max(0, Math.floor((now - time) / 1000));
+
+  if (diffSec < 45) {
+    return 'Just now';
+  }
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) {
+    return diffMin === 1 ? '1 min ago' : `${diffMin} mins ago`;
+  }
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) {
+    return diffHr === 1 ? '1 hour ago' : `${diffHr} hours ago`;
+  }
+  const diffDays = Math.floor(diffHr / 24);
+  if (diffDays === 1) {
+    return '1 day ago';
+  }
+  if (diffDays < 30) {
+    return `${diffDays} days ago`;
+  }
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) {
+    return diffMonths === 1 ? '1 month ago' : `${diffMonths} months ago`;
+  }
+  const diffYears = Math.floor(diffDays / 365);
+  return diffYears === 1 ? '1 year ago' : `${diffYears} years ago`;
+}
+
 // Card Brand Identification based on Prefix/BIN ranges & Lengths
 export function detectCardBrand(cardNumber) {
   if (!cardNumber) return 'Infinite';

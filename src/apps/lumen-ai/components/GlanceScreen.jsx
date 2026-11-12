@@ -15,7 +15,9 @@ import PayModal from './PayModal';
 import AllTransactionsModal from './AllTransactionsModal';
 import DigitalCardModal from './DigitalCardModal';
 import RecurringPaymentsModal from './RecurringPaymentsModal';
-import { detectCardBrand } from '../services/financeStorage';
+import TransactionDetailModal from './TransactionDetailModal';
+import BankAccountDetailModal from './BankAccountDetailModal';
+import { detectCardBrand, formatRelativeTime } from '../services/financeStorage';
 
 export default function GlanceScreen({
   finance,
@@ -36,6 +38,8 @@ export default function GlanceScreen({
 
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(false);
+  const [selectedTxn, setSelectedTxn] = useState(null);
+  const [selectedBank, setSelectedBank] = useState(null);
   const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(Boolean(autoOpenDigitalCard));
   const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
 
@@ -170,7 +174,7 @@ export default function GlanceScreen({
               </div>
             </div>
 
-            <div className="bank-card-right">
+            <div className="bank-card-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
               <div className="bank-balance">
                 ₹{bank.balance?.toLocaleString('en-IN')}
               </div>
@@ -179,6 +183,22 @@ export default function GlanceScreen({
                 onClick={() => setIsPayModalOpen(true)}
               >
                 Transfer <ArrowUpRight size={12} />
+              </button>
+              <button
+                type="button"
+                className="bank-pay-link"
+                style={{
+                  fontSize: '0.62rem',
+                  color: '#94a3b8',
+                  padding: '1px 5px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '5px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                }}
+                onClick={() => setSelectedBank(bank)}
+                title="View Bank Account Details"
+              >
+                View <ChevronRight size={10} />
               </button>
             </div>
           </div>
@@ -284,7 +304,13 @@ export default function GlanceScreen({
         ) : (
           <div className="glance-txn-list">
             {recentTransactions.map((txn) => (
-              <div key={txn.id} className="glance-txn-item">
+              <div
+                key={txn.id}
+                className="glance-txn-item"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedTxn(txn)}
+                title="Click to view full transaction details"
+              >
                 <div className="txn-left">
                   <div
                     className="txn-icon-circle"
@@ -308,7 +334,7 @@ export default function GlanceScreen({
                         {txn.sourceName}
                       </span>
                       <span className="txn-dot">•</span>
-                      <span className="txn-time">{txn.formattedTime || 'Today'}</span>
+                      <span className="txn-time">{formatRelativeTime(txn.timestamp)}</span>
                     </div>
                   </div>
                 </div>
@@ -362,6 +388,21 @@ export default function GlanceScreen({
       <RecurringPaymentsModal
         isOpen={isRecurringModalOpen}
         onClose={() => setIsRecurringModalOpen(false)}
+      />
+
+      {/* Individual Transaction Detail Modal */}
+      <TransactionDetailModal
+        isOpen={Boolean(selectedTxn)}
+        transaction={selectedTxn}
+        onClose={() => setSelectedTxn(null)}
+      />
+
+      {/* Connected Bank Account Details Modal */}
+      <BankAccountDetailModal
+        isOpen={Boolean(selectedBank)}
+        bank={selectedBank}
+        onClose={() => setSelectedBank(null)}
+        onInitiateTransfer={(bankId) => setIsPayModalOpen(true)}
       />
     </div>
   );
