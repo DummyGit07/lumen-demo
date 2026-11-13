@@ -330,8 +330,8 @@ export default function SimulatorPanel({
                       <span>Simulate Duplicate (Blinkit ₹450)</span>
                     </button>
 
-                    {/* L2 Active Dispute Blinkit Support Agent Options */}
-                    {disputeIncident && disputeAutonomyLevel === 'l2' && (
+                    {/* L2 / L3 Active Dispute Blinkit Support Agent Options */}
+                    {disputeIncident && (disputeAutonomyLevel === 'l2' || disputeAutonomyLevel === 'l3') && (
                       <div
                         style={{
                           marginTop: '10px',
@@ -383,7 +383,7 @@ export default function SimulatorPanel({
                         </div>
 
                         {/* Notice if user hasn't sent the email yet */}
-                        {/* {(!disputeIncident.l2Stage || disputeIncident.l2Stage === 'email_draft') && (
+                        {(!disputeIncident.l2Stage || disputeIncident.l2Stage === 'email_draft') && (
                           <div
                             style={{
                               fontSize: '0.66rem',
@@ -394,9 +394,30 @@ export default function SimulatorPanel({
                               lineHeight: 1.35
                             }}
                           >
-                            ⏳ <em>Email draft ready in Act tab. Tap "Send Email" on the phone screen to start the support chat.</em>
+                            <div style={{ marginBottom: '6px' }}>
+                              ⏳ <em>Dispute email drafted. Tap <strong>"Send Email"</strong> on the notification or Act screen to initiate support chat.</em>
+                            </div>
+                            <button
+                              onClick={() => {
+                                if (playHapticSound) playHapticSound('click');
+                                disputeWorkflow.sendInitialEmail();
+                              }}
+                              style={{
+                                width: '100%',
+                                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '5px 8px',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Send Email Now
+                            </button>
                           </div>
-                        )} */}
+                        )}
 
                         {/* 3 Floating Action Options when chat is active */}
                         {disputeIncident.l2Stage === 'chat_active' && (

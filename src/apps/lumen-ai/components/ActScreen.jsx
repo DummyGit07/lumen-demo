@@ -324,16 +324,23 @@ export default function ActScreen({ onNavigateTab }) {
                     <div
                       className="incident-badge"
                       style={{
-                        background: 'rgba(245, 158, 11, 0.18)',
-                        color: '#fbbf24',
-                        border: '1px solid rgba(245, 158, 11, 0.35)',
+                        background:
+                          disputeIncident.autonomyLevel === 'l3'
+                            ? 'rgba(16, 185, 129, 0.18)'
+                            : 'rgba(245, 158, 11, 0.18)',
+                        color: disputeIncident.autonomyLevel === 'l3' ? '#34d399' : '#fbbf24',
+                        border: `1px solid ${
+                          disputeIncident.autonomyLevel === 'l3'
+                            ? 'rgba(16, 185, 129, 0.35)'
+                            : 'rgba(245, 158, 11, 0.35)'
+                        }`,
                         fontSize: '0.62rem',
                         padding: '2px 7px',
                         borderRadius: '99px',
                         marginBottom: '3px'
                       }}
                     >
-                      L2 Semi-Auto
+                      {disputeIncident.autonomyLevel === 'l3' ? 'L3 Autonomous' : 'L2 Semi-Auto'}
                     </div>
                     <div
                       className="incident-title"
@@ -421,43 +428,51 @@ export default function ActScreen({ onNavigateTab }) {
                   />
                 </div>
 
-                {/* 2 Buttons: Dismiss & Send */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '8px', marginTop: '2px' }}>
+                {/* Initial Email Actions: Dismiss (Icon) & Send Email (Text) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
                   <button
+                    type="button"
                     className="incident-action-btn"
                     onClick={() => disputeWorkflow.resolveDispute()}
+                    title="Dismiss"
                     style={{
+                      flex: '0 0 34px',
+                      width: '34px',
+                      height: '34px',
+                      padding: 0,
+                      borderRadius: '8px',
                       background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.14)',
                       color: '#94a3b8',
-                      padding: '0.55rem',
-                      fontSize: '0.74rem',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '5px'
+                      cursor: 'pointer'
                     }}
                   >
-                    <X size={14} />
-                    {/* <span>Dismiss</span> */}
+                    <X size={15} />
                   </button>
                   <button
+                    type="button"
                     className="incident-action-btn primary"
                     onClick={() => disputeWorkflow.sendInitialEmail(emailDraftText)}
                     style={{
-                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      flex: 1,
+                      height: '34px',
+                      borderRadius: '8px',
+                      background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
                       color: '#fff',
-                      padding: '0.55rem',
                       fontSize: '0.74rem',
                       fontWeight: 700,
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '5px',
-                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)'
                     }}
                   >
-                    <Send size={13} />
-                    {/* <span>Send to {disputeIncident.merchant}</span> */}
+                    Send Email
                   </button>
                 </div>
               </>
@@ -508,18 +523,25 @@ export default function ActScreen({ onNavigateTab }) {
                         padding: '2px 7px',
                         borderRadius: '99px',
                         background:
-                          disputeIncident.l2Stage === 'resolved'
+                          disputeIncident.l2Stage === 'resolved' || disputeIncident.autonomyLevel === 'l3'
                             ? 'rgba(16, 185, 129, 0.18)'
                             : 'rgba(245, 158, 11, 0.18)',
                         color:
-                          disputeIncident.l2Stage === 'resolved' ? '#34d399' : '#fbbf24',
-                        border: `1px solid ${disputeIncident.l2Stage === 'resolved'
-                          ? 'rgba(16, 185, 129, 0.35)'
-                          : 'rgba(245, 158, 11, 0.35)'
-                          }`
+                          disputeIncident.l2Stage === 'resolved' || disputeIncident.autonomyLevel === 'l3'
+                            ? '#34d399'
+                            : '#fbbf24',
+                        border: `1px solid ${
+                          disputeIncident.l2Stage === 'resolved' || disputeIncident.autonomyLevel === 'l3'
+                            ? 'rgba(16, 185, 129, 0.35)'
+                            : 'rgba(245, 158, 11, 0.35)'
+                        }`
                       }}
                     >
-                      {disputeIncident.l2Stage === 'resolved' ? 'Resolved' : 'In Progress'}
+                      {disputeIncident.l2Stage === 'resolved'
+                        ? 'Resolved'
+                        : disputeIncident.autonomyLevel === 'l3'
+                          ? 'Autonomous'
+                          : 'In Progress'}
                     </span>
                     <button
                       onClick={() => disputeWorkflow.resolveDispute()}
@@ -539,6 +561,36 @@ export default function ActScreen({ onNavigateTab }) {
                   </div>
                 </div>
 
+                {/* Autonomous Mode Active Pill */}
+                {disputeIncident.autonomyLevel === 'l3' && disputeIncident.l2Stage === 'chat_active' && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '4px 8px',
+                      borderRadius: '7px',
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      border: '1px solid rgba(16, 185, 129, 0.28)',
+                      fontSize: '0.64rem',
+                      color: '#34d399',
+                      fontWeight: 600
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: '#34d399',
+                        boxShadow: '0 0 6px rgba(52, 211, 153, 0.8)',
+                        display: 'inline-block'
+                      }}
+                    />
+                    Autonomous Agent Active • Resolving with {disputeIncident.merchant} Support
+                  </div>
+                )}
+
                 {/* Scrollable Chat Messages Container */}
                 <div
                   style={{
@@ -555,6 +607,9 @@ export default function ActScreen({ onNavigateTab }) {
                 >
                   {(disputeIncident.chatMessages || []).map((msg) => {
                     const isUser = msg.sender === 'user';
+                    const isAuto = Boolean(msg.isAutonomous || (isUser && disputeIncident.autonomyLevel === 'l3' && msg.id !== disputeIncident.chatMessages[0]?.id));
+                    const senderLabel = msg.senderName || (isAuto ? 'Lumen AI (Autonomous)' : isUser ? 'You' : disputeIncident.merchant);
+
                     return (
                       <div
                         key={msg.id}
@@ -565,30 +620,42 @@ export default function ActScreen({ onNavigateTab }) {
                           maxWidth: '100%'
                         }}
                       >
-                        <span
+                        <div
                           style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
                             fontSize: '0.58rem',
-                            color: '#64748b',
+                            color: isAuto ? '#34d399' : '#64748b',
+                            fontWeight: isAuto ? 700 : 400,
                             marginBottom: '2px',
                             padding: '0 4px'
                           }}
                         >
-                          {isUser ? 'You' : msg.senderName || disputeIncident.merchant}
-                        </span>
+                          {isAuto && <Sparkles size={10} color="#34d399" />}
+                          <span>{senderLabel}</span>
+                        </div>
                         <div
                           style={{
                             maxWidth: '88%',
                             padding: '7px 10px',
                             borderRadius: isUser ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                            background: isUser
-                              ? 'linear-gradient(135deg, #4f46e5, #6366f1)'
-                              : 'rgba(30, 41, 59, 0.85)',
-                            border: isUser ? 'none' : '1px solid rgba(245, 158, 11, 0.25)',
+                            background: isAuto
+                              ? 'linear-gradient(135deg, #059669, #10b981)'
+                              : isUser
+                                ? 'linear-gradient(135deg, #3b82f6, #2563eb)'
+                                : 'rgba(30, 41, 59, 0.85)',
+                            border: isAuto
+                              ? '1px solid rgba(52, 211, 153, 0.45)'
+                              : isUser
+                                ? 'none'
+                                : '1px solid rgba(245, 158, 11, 0.25)',
                             color: '#fff',
                             fontSize: '0.71rem',
                             lineHeight: 1.4,
                             wordBreak: 'break-word',
-                            whiteSpace: 'pre-wrap'
+                            whiteSpace: 'pre-wrap',
+                            boxShadow: isAuto ? '0 4px 14px rgba(16, 185, 129, 0.25)' : 'none'
                           }}
                         >
                           {msg.text}
@@ -597,26 +664,31 @@ export default function ActScreen({ onNavigateTab }) {
                     );
                   })}
 
-                  {/* 3-Second Thinking Animation */}
+                  {/* 3-Second Thinking Animation in Chat */}
                   {disputeIncident.isThinking && (
                     <motion.div
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '7px',
-                        padding: '6px 10px',
-                        background: 'rgba(245, 158, 11, 0.12)',
-                        border: '1px dashed rgba(245, 158, 11, 0.4)',
-                        borderRadius: '10px',
-                        color: '#fbbf24',
-                        fontSize: '0.68rem',
-                        alignSelf: 'flex-start'
-                      }}
+                      initial={{ opacity: 0, y: 6, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className={`lumen-chat-thinking ${disputeIncident.autonomyLevel === 'l3' ? '' : 'amber-theme'}`}
                     >
-                      <Sparkles size={13} className="animate-spin" color="#f59e0b" />
-                      <span>Lumen is drafting your reply...</span>
+                      <Sparkles
+                        size={14}
+                        className="lumen-thinking-spin"
+                        color={disputeIncident.autonomyLevel === 'l3' ? '#34d399' : '#f59e0b'}
+                      />
+                      <span>
+                        {disputeIncident.thinkingMessage ||
+                          (disputeIncident.autonomyLevel === 'l3'
+                            ? 'Lumen AI is formulating autonomous reply'
+                            : 'Lumen AI is drafting reply')}
+                      </span>
+                      <div className="lumen-thinking-wave">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
                     </motion.div>
                   )}
 
@@ -671,14 +743,18 @@ export default function ActScreen({ onNavigateTab }) {
                       }
                       disabled={disputeIncident.isThinking}
                       style={{
-                        flex: 1,
+                        flex: '1 1 0%',
+                        minWidth: 0,
+                        width: 0,
+                        height: '34px',
                         background: 'rgba(15, 23, 42, 0.85)',
                         border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '10px',
+                        borderRadius: '8px',
                         color: '#fff',
-                        padding: '7px 10px',
+                        padding: '0 10px',
                         fontSize: '0.72rem',
-                        outline: 'none'
+                        outline: 'none',
+                        boxSizing: 'border-box'
                       }}
                     />
                     <button
@@ -686,22 +762,27 @@ export default function ActScreen({ onNavigateTab }) {
                       disabled={!chatInputText.trim() || disputeIncident.isThinking}
                       className="incident-action-btn primary"
                       style={{
-                        padding: '7px 11px',
-                        borderRadius: '10px',
+                        flex: '0 0 34px',
+                        width: '34px',
+                        height: '34px',
+                        padding: 0,
+                        borderRadius: '8px',
                         opacity: !chatInputText.trim() || disputeIncident.isThinking ? 0.45 : 1,
-                        display: 'flex',
+                        display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
-                        border: 'none',
+                        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                         color: '#fff',
                         cursor:
                           !chatInputText.trim() || disputeIncident.isThinking
                             ? 'default'
-                            : 'pointer'
+                            : 'pointer',
+                        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.35)',
+                        boxSizing: 'border-box'
                       }}
                     >
-                      <Send size={13} />
+                      <Send size={14} />
                     </button>
                   </form>
                 ) : (
@@ -726,26 +807,24 @@ export default function ActScreen({ onNavigateTab }) {
                     </div>
                     <button
                       onClick={() => {
-                        if (onNavigateTab) onNavigateTab('glance');
+                        if (onNavigateTab) onNavigateTab('glance', { openTransactions: true });
                         disputeWorkflow.openTransactionHistory();
-                        disputeWorkflow.resolveDispute();
+                        setTimeout(() => {
+                          disputeWorkflow.resolveDispute();
+                        }, 800);
                       }}
                       style={{
                         background: '#10b981',
                         color: '#fff',
                         border: 'none',
                         borderRadius: '6px',
-                        padding: '4px 8px',
-                        fontSize: '0.66rem',
+                        padding: '5px 11px',
+                        fontSize: '0.68rem',
                         fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
+                        cursor: 'pointer'
                       }}
                     >
-                      <span>View History</span>
-                      <ArrowRight size={11} />
+                      View Ledger
                     </button>
                   </div>
                 )}

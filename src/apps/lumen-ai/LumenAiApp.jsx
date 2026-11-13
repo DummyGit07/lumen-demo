@@ -53,9 +53,26 @@ export default function LumenAiApp({
   // AI Assistant Chat State (for 'ask' tab)
   const { messages, isThinking, sendMessage, addDirectAssistantMessage, clearChat } = useLumenAi();
 
-  const handleTabSwitch = (tab) => {
+  const handleTabSwitch = (tab, extra = {}) => {
     setActiveTab(tab);
     if (onTabChange) onTabChange(tab);
+    if (extra?.openTransactions) {
+      if (typeof window !== 'undefined') {
+        window.__lumen_auto_open_txns = true;
+      }
+      setAutoOpenTxns(true);
+      [50, 150, 300, 500].forEach((delay) => {
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('lumen_open_transactions'));
+        }, delay);
+      });
+    }
+    if (extra?.openDigitalCard) {
+      setAutoOpenCard(true);
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
+      }, 100);
+    }
     if (tab === 'ask') {
       setTimeout(() => {
         if (chatBodyRef.current) {
@@ -99,10 +116,15 @@ export default function LumenAiApp({
         }, 100);
       }
       if (e.detail?.openTransactions) {
+        if (typeof window !== 'undefined') {
+          window.__lumen_auto_open_txns = true;
+        }
         setAutoOpenTxns(true);
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('lumen_open_transactions'));
-        }, 100);
+        [50, 150, 300, 500].forEach((delay) => {
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('lumen_open_transactions'));
+          }, delay);
+        });
       }
     };
     window.addEventListener('lumen_switch_tab', handleSwitch);

@@ -40,7 +40,13 @@ export default function GlanceScreen({
   } = finance;
 
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(Boolean(autoOpenTransactions));
+  const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(() => {
+    if (typeof window !== 'undefined' && window.__lumen_auto_open_txns) {
+      window.__lumen_auto_open_txns = false;
+      return true;
+    }
+    return Boolean(autoOpenTransactions);
+  });
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
   const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(Boolean(autoOpenDigitalCard));
@@ -50,9 +56,8 @@ export default function GlanceScreen({
   useEffect(() => {
     if (autoOpenTransactions) {
       setIsAllTxnsOpen(true);
-      if (onResetAutoOpenTransactions) onResetAutoOpenTransactions();
     }
-  }, [autoOpenTransactions, onResetAutoOpenTransactions]);
+  }, [autoOpenTransactions]);
 
   // Sync when autoOpenDigitalCard prop becomes true
   useEffect(() => {
@@ -411,7 +416,10 @@ export default function GlanceScreen({
       {/* Full Transaction History Modal */}
       <AllTransactionsModal
         isOpen={isAllTxnsOpen}
-        onClose={() => setIsAllTxnsOpen(false)}
+        onClose={() => {
+          setIsAllTxnsOpen(false);
+          if (onResetAutoOpenTransactions) onResetAutoOpenTransactions();
+        }}
         transactions={transactions}
       />
 

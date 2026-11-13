@@ -266,27 +266,30 @@ export default function App() {
   // Initialize fraudWorkflow & disputeWorkflow services with navigation and notification handlers
   useEffect(() => {
     const navHandler = (appId, tab, extra = {}) => {
+      if (typeof window !== 'undefined' && extra?.openTransactions) {
+        window.__lumen_auto_open_txns = true;
+      }
       if (tab) {
         setInternalAppScreens((prev) => ({ ...prev, [appId]: tab }));
-        if (extra.openDigitalCard) {
+        if (extra?.openDigitalCard) {
           setInternalAppScreens((prev) => ({ ...prev, lumen_ai_open_card: true }));
         }
-        if (extra.openTransactions) {
+        if (extra?.openTransactions) {
           setInternalAppScreens((prev) => ({ ...prev, lumen_ai_open_transactions: true }));
         }
       }
       handleLaunchApp(appId);
       if (tab) {
-        setTimeout(() => {
-          window.dispatchEvent(
-            new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
-          );
-        }, 50);
-        setTimeout(() => {
-          window.dispatchEvent(
-            new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
-          );
-        }, 180);
+        [50, 150, 300, 500].forEach((delay) => {
+          setTimeout(() => {
+            window.dispatchEvent(
+              new CustomEvent('lumen_switch_tab', { detail: { tab, ...extra } })
+            );
+            if (extra?.openTransactions) {
+              window.dispatchEvent(new CustomEvent('lumen_open_transactions'));
+            }
+          }, delay);
+        });
       }
     };
 

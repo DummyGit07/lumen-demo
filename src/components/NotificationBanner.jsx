@@ -63,6 +63,9 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
     if (confirmationText) return;
     if (notification.onClickCard) {
       notification.onClickCard();
+      if (onOpenApp && notification.appId) {
+        onOpenApp(notification.appId);
+      }
     } else if (onOpenApp) {
       onOpenApp(notification.appId);
     }
