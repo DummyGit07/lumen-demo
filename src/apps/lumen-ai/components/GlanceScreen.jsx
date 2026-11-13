@@ -5,6 +5,7 @@ import {
   Building2,
   Send,
   ArrowUpRight,
+  ArrowDownLeft,
   RotateCcw,
   Wifi,
   ReceiptText,
@@ -23,7 +24,9 @@ export default function GlanceScreen({
   finance,
   onNavigateTab,
   autoOpenDigitalCard = false,
-  onResetAutoOpen
+  onResetAutoOpen,
+  autoOpenTransactions = false,
+  onResetAutoOpenTransactions
 }) {
   const {
     banks,
@@ -37,11 +40,19 @@ export default function GlanceScreen({
   } = finance;
 
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(false);
+  const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(Boolean(autoOpenTransactions));
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
   const [isDigitalCardOpen, setIsDigitalCardOpen] = useState(Boolean(autoOpenDigitalCard));
   const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+
+  // Sync when autoOpenTransactions prop becomes true
+  useEffect(() => {
+    if (autoOpenTransactions) {
+      setIsAllTxnsOpen(true);
+      if (onResetAutoOpenTransactions) onResetAutoOpenTransactions();
+    }
+  }, [autoOpenTransactions, onResetAutoOpenTransactions]);
 
   // Sync when autoOpenDigitalCard prop becomes true
   useEffect(() => {
@@ -58,6 +69,15 @@ export default function GlanceScreen({
     };
     window.addEventListener('lumen_open_digital_card', handleOpen);
     return () => window.removeEventListener('lumen_open_digital_card', handleOpen);
+  }, []);
+
+  // Auto open transaction history when triggered externally (e.g. from dispute recovery notification)
+  useEffect(() => {
+    const handleOpenTransactions = () => {
+      setIsAllTxnsOpen(true);
+    };
+    window.addEventListener('lumen_open_transactions', handleOpenTransactions);
+    return () => window.removeEventListener('lumen_open_transactions', handleOpenTransactions);
   }, []);
 
   // Auto open recurring modal when triggered externally (e.g., from notification)
@@ -303,58 +323,78 @@ export default function GlanceScreen({
           </div>
         ) : (
           <div className="glance-txn-list">
-            {recentTransactions.map((txn) => (
-              <div
-                key={txn.id}
-                className="glance-txn-item"
-                style={{ cursor: 'pointer' }}
-                onClick={() => setSelectedTxn(txn)}
-                title="Click to view full transaction details"
-              >
-                <div className="txn-left">
-                  <div
-                    className="txn-icon-circle"
-                    style={{
-                      background: txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
-                        ? 'rgba(239, 68, 68, 0.22)'
-                        : 'rgba(99, 102, 241, 0.15)'
-                    }}
-                  >
-                    <ArrowUpRight
-                      size={13}
-                      color={txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? '#ef4444' : '#818cf8'}
-                    />
-                  </div>
-                  <div className="txn-details">
-                    <div className="txn-recipient" title={txn.recipient}>
-                      {txn.recipient}
+            {recentTransactions.map((txn) => {
+              const isCredit = txn.type === 'credit';
+              return (
+                <div
+                  key={txn.id}
+                  className="glance-txn-item"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedTxn(txn)}
+                  title="Click to view full transaction details"
+                >
+                  <div className="txn-left">
+                    <div
+                      className="txn-icon-circle"
+                      style={{
+                        background: isCredit
+                          ? 'rgba(16, 185, 129, 0.18)'
+                          : txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
+                            ? 'rgba(239, 68, 68, 0.22)'
+                            : 'rgba(99, 102, 241, 0.15)'
+                      }}
+                    >
+                      {isCredit ? (
+                        <ArrowDownLeft size={13} color="#34d399" />
+                      ) : (
+                        <ArrowUpRight
+                          size={13}
+                          color={txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? '#ef4444' : '#818cf8'}
+                        />
+                      )}
                     </div>
-                    <div className="txn-meta">
-                      <span className="txn-source" title={txn.sourceName}>
-                        {txn.sourceName}
-                      </span>
-                      <span className="txn-dot">•</span>
-                      <span className="txn-time">{formatRelativeTime(txn.timestamp)}</span>
+                    <div className="txn-details">
+                      <div className="txn-recipient" title={txn.recipient}>
+                        {txn.recipient}
+                      </div>
+                      <div className="txn-meta">
+                        <span className="txn-source" title={txn.sourceName}>
+                          {txn.sourceName}
+                        </span>
+                        <span className="txn-dot">•</span>
+                        <span className="txn-time">{formatRelativeTime(txn.timestamp)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="txn-right">
-                  <div
-                    className="txn-amount-wrap debit"
-                    style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'baseline' }}
-                  >
-                    -₹{txn.amount?.toLocaleString('en-IN')}
-                  </div>
-                  <div
-                    className={`txn-note ${txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? 'flagged' : ''}`}
-                    title={txn.note || 'Payment'}
-                  >
-                    {txn.note || 'Payment'}
+                  <div className="txn-right">
+                    <div
+                      className={`txn-amount-wrap ${isCredit ? 'credit' : 'debit'}`}
+                      style={{
+                        whiteSpace: 'nowrap',
+                        display: 'inline-flex',
+                        alignItems: 'baseline',
+                        color: isCredit ? '#34d399' : undefined
+                      }}
+                    >
+                      {isCredit ? '+' : '-'}₹{txn.amount?.toLocaleString('en-IN')}
+                    </div>
+                    <div
+                      className={`txn-note ${isCredit
+                          ? 'credit-note'
+                          : txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
+                            ? 'flagged'
+                            : ''
+                        }`}
+                      style={{ color: isCredit ? '#34d399' : undefined }}
+                      title={txn.note || 'Payment'}
+                    >
+                      {txn.note || (isCredit ? 'Refund' : 'Payment')}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

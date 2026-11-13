@@ -107,6 +107,8 @@ export const DEFAULT_BANKS = [
     name: 'Lumen Bank',
     shortName: 'Lumen',
     accountNumber: '•••• 7719',
+    fullAccountNumber: '5010 0482 7719',
+    ifsc: 'LUMN0001048',
     type: 'Savings A/C',
     balance: 50000,
     currency: 'INR',
@@ -118,6 +120,8 @@ export const DEFAULT_BANKS = [
     name: 'State Bank of India',
     shortName: 'SBI',
     accountNumber: '•••• 3042',
+    fullAccountNumber: '3042 8192 1042',
+    ifsc: 'SBIN0003042',
     type: 'Primary A/C',
     balance: 10000,
     currency: 'INR',
@@ -186,7 +190,14 @@ export const financeStorage = {
   loadBanks: () => {
     try {
       const data = localStorage.getItem(STORAGE_KEY_BANKS);
-      return data ? JSON.parse(data) : DEFAULT_BANKS;
+      if (!data) return DEFAULT_BANKS;
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed)
+        ? parsed.map((b, i) => ({
+            ...(DEFAULT_BANKS.find((def) => def.id === b.id) || DEFAULT_BANKS[i] || {}),
+            ...b
+          }))
+        : DEFAULT_BANKS;
     } catch {
       return DEFAULT_BANKS;
     }

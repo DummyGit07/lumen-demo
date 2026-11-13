@@ -190,7 +190,7 @@ export default function NotificationBanner({ notification, onOpenApp, onDismiss,
                         act.onClick(addressInput.trim() || notification?.deliveryAddress);
                       }
                       // Only redirect/open app if the action is explicitly "View" or asks to open app
-                      if ((act.label === 'View' || act.tab || act.openApp) && onOpenApp) {
+                      if ((act.label === 'View' || act.label?.startsWith('View') || act.tab || act.openApp) && onOpenApp) {
                         onOpenApp(act.appId || notification.appId || 'lumen_ai');
                       }
                       if (onDismiss) onDismiss();

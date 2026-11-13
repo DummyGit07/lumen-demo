@@ -17,10 +17,13 @@ export default function LumenAiApp({
   activeTabProp,
   onTabChange,
   autoOpenDigitalCard = false,
-  onClearAutoOpenCard
+  onClearAutoOpenCard,
+  autoOpenTransactions = false,
+  onClearAutoOpenTransactions
 }) {
   const [activeTab, setActiveTab] = useState(activeTabProp || initialTab); // 'glance' | 'ask' | 'act' | 'trust'
   const [autoOpenCard, setAutoOpenCard] = useState(Boolean(autoOpenDigitalCard));
+  const [autoOpenTxns, setAutoOpenTxns] = useState(Boolean(autoOpenTransactions));
   const chatBodyRef = useRef(null);
 
   // Sync if parent passes activeTabProp
@@ -36,6 +39,13 @@ export default function LumenAiApp({
       setAutoOpenCard(true);
     }
   }, [autoOpenDigitalCard]);
+
+  // Sync if parent passes autoOpenTransactions
+  useEffect(() => {
+    if (autoOpenTransactions) {
+      setAutoOpenTxns(true);
+    }
+  }, [autoOpenTransactions]);
 
   // Financial Dashboard State
   const finance = useLumenFinance();
@@ -88,6 +98,12 @@ export default function LumenAiApp({
           window.dispatchEvent(new CustomEvent('lumen_open_digital_card'));
         }, 100);
       }
+      if (e.detail?.openTransactions) {
+        setAutoOpenTxns(true);
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('lumen_open_transactions'));
+        }, 100);
+      }
     };
     window.addEventListener('lumen_switch_tab', handleSwitch);
     return () => window.removeEventListener('lumen_switch_tab', handleSwitch);
@@ -114,6 +130,11 @@ export default function LumenAiApp({
                 onResetAutoOpen={() => {
                   setAutoOpenCard(false);
                   if (onClearAutoOpenCard) onClearAutoOpenCard();
+                }}
+                autoOpenTransactions={autoOpenTxns}
+                onResetAutoOpenTransactions={() => {
+                  setAutoOpenTxns(false);
+                  if (onClearAutoOpenTransactions) onClearAutoOpenTransactions();
                 }}
               />
             </motion.div>

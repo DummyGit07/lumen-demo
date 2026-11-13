@@ -3572,6 +3572,15 @@ body,
   color: #f87171;
 }
 
+.txn-amount-wrap.credit {
+  color: #34d399;
+}
+
+.txn-note.credit-note {
+  color: #34d399;
+  font-weight: 600;
+}
+
 .txn-note {
   font-size: calc(0.62rem * var(--mobile-font-scale, 1));
   color: #64748b;
@@ -4538,7 +4547,7 @@ body,
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
-  padding: 1rem 0.9rem 6rem;
+  padding: 0.85rem 0.85rem 3.5rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

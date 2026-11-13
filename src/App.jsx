@@ -271,6 +271,9 @@ export default function App() {
         if (extra.openDigitalCard) {
           setInternalAppScreens((prev) => ({ ...prev, lumen_ai_open_card: true }));
         }
+        if (extra.openTransactions) {
+          setInternalAppScreens((prev) => ({ ...prev, lumen_ai_open_transactions: true }));
+        }
       }
       handleLaunchApp(appId);
       if (tab) {
@@ -560,6 +563,8 @@ export default function App() {
                           onTabChange={(t) => setAppScreen('lumen_ai', t)}
                           autoOpenDigitalCard={Boolean(internalAppScreens.lumen_ai_open_card)}
                           onClearAutoOpenCard={() => setAppScreen('lumen_ai_open_card', false)}
+                          autoOpenTransactions={Boolean(internalAppScreens.lumen_ai_open_transactions)}
+                          onClearAutoOpenTransactions={() => setAppScreen('lumen_ai_open_transactions', false)}
                         />
                       )}
 

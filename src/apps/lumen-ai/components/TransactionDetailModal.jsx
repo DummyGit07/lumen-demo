@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
   ArrowUpRight,
+  ArrowDownLeft,
   CheckCircle2,
   AlertCircle,
   Copy,
@@ -37,6 +38,7 @@ export default function TransactionDetailModal({
     }
   };
 
+  const isCredit = transaction.type === 'credit';
   const isFlagged = transaction.isFlagged || (transaction.note && transaction.note.includes('FLAGGED'));
   const dateObj = transaction.timestamp ? new Date(transaction.timestamp) : new Date();
   const formattedFullDate = dateObj.toLocaleDateString('en-IN', {
@@ -105,15 +107,28 @@ export default function TransactionDetailModal({
               width: '46px',
               height: '46px',
               borderRadius: '50%',
-              background: isFlagged ? 'rgba(239, 68, 68, 0.2)' : 'rgba(99, 102, 241, 0.18)',
-              border: `1.5px solid ${isFlagged ? 'rgba(239, 68, 68, 0.45)' : 'rgba(99, 102, 241, 0.35)'}`,
+              background: isCredit
+                ? 'rgba(16, 185, 129, 0.2)'
+                : isFlagged
+                  ? 'rgba(239, 68, 68, 0.2)'
+                  : 'rgba(99, 102, 241, 0.18)',
+              border: `1.5px solid ${isCredit
+                  ? 'rgba(16, 185, 129, 0.45)'
+                  : isFlagged
+                    ? 'rgba(239, 68, 68, 0.45)'
+                    : 'rgba(99, 102, 241, 0.35)'
+                }`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '8px'
             }}
           >
-            <ArrowUpRight size={22} color={isFlagged ? '#ef4444' : '#818cf8'} />
+            {isCredit ? (
+              <ArrowDownLeft size={22} color="#34d399" />
+            ) : (
+              <ArrowUpRight size={22} color={isFlagged ? '#ef4444' : '#818cf8'} />
+            )}
           </div>
 
           <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', marginBottom: '2px' }}>
@@ -124,12 +139,12 @@ export default function TransactionDetailModal({
             style={{
               fontSize: '1.65rem',
               fontWeight: 900,
-              color: '#fff',
+              color: isCredit ? '#34d399' : '#fff',
               letterSpacing: '-0.02em',
               margin: '2px 0 6px'
             }}
           >
-            -₹{transaction.amount?.toLocaleString('en-IN')}
+            {isCredit ? '+' : '-'}₹{transaction.amount?.toLocaleString('en-IN')}
           </div>
 
           {/* Status Badge */}
@@ -142,13 +157,36 @@ export default function TransactionDetailModal({
               borderRadius: '99px',
               fontSize: '0.68rem',
               fontWeight: 700,
-              background: isFlagged ? 'rgba(239, 68, 68, 0.16)' : 'rgba(16, 185, 129, 0.16)',
-              color: isFlagged ? '#ef4444' : '#34d399',
-              border: `1px solid ${isFlagged ? 'rgba(239, 68, 68, 0.35)' : 'rgba(16, 185, 129, 0.35)'}`
+              background: isCredit
+                ? 'rgba(16, 185, 129, 0.16)'
+                : isFlagged
+                  ? 'rgba(239, 68, 68, 0.16)'
+                  : 'rgba(16, 185, 129, 0.16)',
+              color: isCredit ? '#34d399' : isFlagged ? '#ef4444' : '#34d399',
+              border: `1px solid ${isCredit
+                  ? 'rgba(16, 185, 129, 0.35)'
+                  : isFlagged
+                    ? 'rgba(239, 68, 68, 0.35)'
+                    : 'rgba(16, 185, 129, 0.35)'
+                }`
             }}
           >
-            {isFlagged ? <AlertCircle size={11} /> : <CheckCircle2 size={11} />}
-            <span>{isFlagged ? 'Flagged for Dispute Review' : 'Payment Successful'}</span>
+            {isCredit ? (
+              <>
+                <CheckCircle2 size={12} color="#34d399" />
+                <span>Dispute Refund Credited</span>
+              </>
+            ) : isFlagged ? (
+              <>
+                <AlertCircle size={12} />
+                <span>Flagged for Dispute Review</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 size={12} />
+                <span>Payment Successful</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -210,7 +248,9 @@ export default function TransactionDetailModal({
 
           {/* Payment Method / Account */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Debited From</span>
+            <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+              {isCredit ? 'Credited To' : 'Debited From'}
+            </span>
             <span style={{ fontSize: '0.76rem', fontWeight: 600, color: '#fff' }}>
               {transaction.sourceName || 'Lumen Account'}
             </span>
@@ -219,8 +259,12 @@ export default function TransactionDetailModal({
           {/* Payment Type */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Payment Type</span>
-            <span style={{ fontSize: '0.76rem', color: '#cbd5e1' }}>
-              {transaction.sourceType === 'card' ? 'Credit Card Charge' : 'Direct UPI Transfer'}
+            <span style={{ fontSize: '0.76rem', color: isCredit ? '#34d399' : '#cbd5e1' }}>
+              {isCredit
+                ? 'Bank transfer'
+                : transaction.sourceType === 'card'
+                  ? 'Credit Card Charge'
+                  : 'Direct UPI Transfer'}
             </span>
           </div>
 
@@ -228,7 +272,7 @@ export default function TransactionDetailModal({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Note</span>
             <span style={{ fontSize: '0.76rem', color: '#cbd5e1' }}>
-              {transaction.note || 'Payment Transfer'}
+              {transaction.note || (isCredit ? 'Dispute Refund' : 'Payment Transfer')}
             </span>
           </div>
 

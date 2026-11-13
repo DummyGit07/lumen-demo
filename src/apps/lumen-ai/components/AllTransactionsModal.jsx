@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowUpRight, ReceiptText } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownLeft, ReceiptText } from 'lucide-react';
 import { formatRelativeTime } from '../services/financeStorage';
 import TransactionDetailModal from './TransactionDetailModal';
 
@@ -64,51 +64,70 @@ export default function AllTransactionsModal({
               <span>No transactions recorded</span>
             </div>
           ) : (
-            transactions.map((txn) => (
-              <div
-                key={txn.id}
-                className="glance-txn-item"
-                style={{ padding: '0.75rem 0', cursor: 'pointer' }}
-                onClick={() => setSelectedTxn(txn)}
-                title="Click to view full transaction details"
-              >
-                <div className="txn-left">
-                  <div
-                    className="txn-icon-circle"
-                    style={{
-                      background: txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
-                        ? 'rgba(239, 68, 68, 0.22)'
-                        : 'rgba(99, 102, 241, 0.15)'
-                    }}
-                  >
-                    <ArrowUpRight
-                      size={14}
-                      color={txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? '#ef4444' : '#818cf8'}
-                    />
+            transactions.map((txn) => {
+              const isCredit = txn.type === 'credit';
+              return (
+                <div
+                  key={txn.id}
+                  className="glance-txn-item"
+                  style={{ padding: '0.75rem 0', cursor: 'pointer' }}
+                  onClick={() => setSelectedTxn(txn)}
+                  title="Click to view full transaction details"
+                >
+                  <div className="txn-left">
+                    <div
+                      className="txn-icon-circle"
+                      style={{
+                        background: isCredit
+                          ? 'rgba(16, 185, 129, 0.18)'
+                          : txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
+                          ? 'rgba(239, 68, 68, 0.22)'
+                          : 'rgba(99, 102, 241, 0.15)'
+                      }}
+                    >
+                      {isCredit ? (
+                        <ArrowDownLeft size={14} color="#34d399" />
+                      ) : (
+                        <ArrowUpRight
+                          size={14}
+                          color={txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? '#ef4444' : '#818cf8'}
+                        />
+                      )}
+                    </div>
+                    <div className="txn-details">
+                      <div className="txn-recipient" title={txn.recipient}>{txn.recipient}</div>
+                      <div className="txn-meta">
+                        <span className="txn-source" title={txn.sourceName}>{txn.sourceName}</span>
+                        <span className="txn-dot">•</span>
+                        <span className="txn-time">{formatRelativeTime(txn.timestamp)}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="txn-details">
-                    <div className="txn-recipient" title={txn.recipient}>{txn.recipient}</div>
-                    <div className="txn-meta">
-                      <span className="txn-source" title={txn.sourceName}>{txn.sourceName}</span>
-                      <span className="txn-dot">•</span>
-                      <span className="txn-time">{formatRelativeTime(txn.timestamp)}</span>
+
+                  <div className="txn-right">
+                    <div
+                      className={`txn-amount-wrap ${isCredit ? 'credit' : 'debit'}`}
+                      style={{ color: isCredit ? '#34d399' : undefined }}
+                    >
+                      {isCredit ? '+' : '-'}₹{txn.amount?.toLocaleString('en-IN')}
+                    </div>
+                    <div
+                      className={`txn-note ${
+                        isCredit
+                          ? 'credit-note'
+                          : txn.isFlagged || (txn.note && txn.note.includes('FLAGGED'))
+                          ? 'flagged'
+                          : ''
+                      }`}
+                      style={{ color: isCredit ? '#34d399' : undefined }}
+                      title={txn.note || 'Payment'}
+                    >
+                      {txn.note || (isCredit ? 'Refund' : 'Payment')}
                     </div>
                   </div>
                 </div>
-
-                <div className="txn-right">
-                  <div className="txn-amount-wrap debit">
-                    -₹{txn.amount?.toLocaleString('en-IN')}
-                  </div>
-                  <div
-                    className={`txn-note ${txn.isFlagged || (txn.note && txn.note.includes('FLAGGED')) ? 'flagged' : ''}`}
-                    title={txn.note || 'Payment'}
-                  >
-                    {txn.note || 'Payment'}
-                  </div>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </motion.div>

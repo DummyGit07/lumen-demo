@@ -15,7 +15,11 @@ import {
   Clock,
   Type,
   LayoutGrid,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  CheckCircle2,
+  Package,
+  MessageSquare
 } from 'lucide-react';
 import { fraudWorkflow } from '../apps/lumen-ai/services/fraudWorkflow';
 import { disputeWorkflow } from '../apps/lumen-ai/services/disputeWorkflow';
@@ -50,6 +54,7 @@ export default function SimulatorPanel({
   const [openSections, setOpenSections] = useState({});
   const [autonomyLevel, setAutonomyLevel] = useState(() => trustStorage.getAutonomyLevel());
   const [disputeAutonomyLevel, setDisputeAutonomyLevel] = useState(() => trustStorage.getDisputeAutonomyLevel());
+  const [disputeIncident, setDisputeIncident] = useState(() => trustStorage.getDisputeIncident());
   const [simFeedback, setSimFeedback] = useState('');
 
   // Keep autonomy level synced with Trust screen settings
@@ -59,6 +64,8 @@ export default function SimulatorPanel({
         setAutonomyLevel(data);
       } else if (event === 'dispute_autonomy_changed') {
         setDisputeAutonomyLevel(data);
+      } else if (event === 'dispute_incident_updated') {
+        setDisputeIncident(data);
       }
     });
     return unsub;
@@ -320,29 +327,220 @@ export default function SimulatorPanel({
                       }}
                     >
                       <AlertCircle size={14} color="#fff" />
-                      <span>Simulate Duplicate Transaction</span>
+                      <span>Simulate Duplicate (Blinkit ₹450)</span>
                     </button>
 
-                    {/* Reset Dispute Button */}
-                    {/* <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
-                      <button
-                        className="panel-button"
-                        onClick={handleResetDispute}
+                    {/* L2 Active Dispute Blinkit Support Agent Options */}
+                    {disputeIncident && disputeAutonomyLevel === 'l2' && (
+                      <div
                         style={{
-                          width: '100%',
-                          fontSize: '0.68rem',
-                          padding: '0.35rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '5px',
-                          color: '#94a3b8'
+                          marginTop: '10px',
+                          padding: '9px',
+                          background: 'rgba(30, 41, 59, 0.7)',
+                          borderRadius: '10px',
+                          border: '1px solid rgba(245, 158, 11, 0.25)'
                         }}
                       >
-                        <RotateCcw size={11} />
-                        <span>Clear Dispute Incident</span>
-                      </button>
-                    </div> */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '8px'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <MessageSquare size={13} color="#f59e0b" />
+                            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fff' }}>
+                              Blinkit Support Agent
+                            </span>
+                          </div>
+                          <span
+                            style={{
+                              fontSize: '0.58rem',
+                              color:
+                                disputeIncident.l2Stage === 'chat_active'
+                                  ? '#34d399'
+                                  : disputeIncident.l2Stage === 'resolved'
+                                  ? '#10b981'
+                                  : '#fbbf24',
+                              background:
+                                disputeIncident.l2Stage === 'chat_active'
+                                  ? 'rgba(16, 185, 129, 0.15)'
+                                  : disputeIncident.l2Stage === 'resolved'
+                                  ? 'rgba(16, 185, 129, 0.2)'
+                                  : 'rgba(245, 158, 11, 0.15)',
+                              padding: '1px 6px',
+                              borderRadius: '4px'
+                            }}
+                          >
+                            {disputeIncident.l2Stage === 'chat_active'
+                              ? 'Chat Active'
+                              : disputeIncident.l2Stage === 'resolved'
+                              ? 'Resolved'
+                              : 'Awaiting Email'}
+                          </span>
+                        </div>
+
+                        {/* Notice if user hasn't sent the email yet */}
+                        {(!disputeIncident.l2Stage || disputeIncident.l2Stage === 'email_draft') && (
+                          <div
+                            style={{
+                              fontSize: '0.66rem',
+                              color: '#94a3b8',
+                              background: 'rgba(15, 23, 42, 0.6)',
+                              padding: '7px 9px',
+                              borderRadius: '6px',
+                              lineHeight: 1.35
+                            }}
+                          >
+                            ⏳ <em>Email draft ready in Act tab. Tap "Send Email" on the phone screen to start the support chat.</em>
+                          </div>
+                        )}
+
+                        {/* 3 Floating Action Options when chat is active */}
+                        {disputeIncident.l2Stage === 'chat_active' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <div style={{ fontSize: '0.63rem', color: '#94a3b8', marginBottom: '2px' }}>
+                              Simulate Blinkit Response:
+                            </div>
+
+                            {/* Option 1: Ask Account Number & Amount */}
+                            <button
+                              onClick={() => {
+                                if (playHapticSound) playHapticSound('click');
+                                disputeWorkflow.simulateMerchantQuestion('account_and_amount');
+                              }}
+                              disabled={disputeIncident.isThinking}
+                              style={{
+                                background: 'rgba(56, 189, 248, 0.12)',
+                                border: '1px solid rgba(56, 189, 248, 0.35)',
+                                borderRadius: '8px',
+                                padding: '6px 8px',
+                                color: '#e0f2fe',
+                                fontSize: '0.68rem',
+                                fontWeight: 600,
+                                cursor: disputeIncident.isThinking ? 'default' : 'pointer',
+                                textAlign: 'left',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                opacity: disputeIncident.isThinking ? 0.5 : 1
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <CreditCard size={13} color="#38bdf8" />
+                                <span>1. Ask Account No. & Amount</span>
+                              </div>
+                              <span style={{ fontSize: '0.58rem', color: '#38bdf8' }}>3s Auto-fill</span>
+                            </button>
+
+                            {/* Option 2: Ask for Order ID */}
+                            <button
+                              onClick={() => {
+                                if (playHapticSound) playHapticSound('click');
+                                disputeWorkflow.simulateMerchantQuestion('order_id');
+                              }}
+                              disabled={disputeIncident.isThinking}
+                              style={{
+                                background: 'rgba(245, 158, 11, 0.12)',
+                                border: '1px solid rgba(245, 158, 11, 0.35)',
+                                borderRadius: '8px',
+                                padding: '6px 8px',
+                                color: '#fef3c7',
+                                fontSize: '0.68rem',
+                                fontWeight: 600,
+                                cursor: disputeIncident.isThinking ? 'default' : 'pointer',
+                                textAlign: 'left',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                opacity: disputeIncident.isThinking ? 0.5 : 1
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Package size={13} color="#fbbf24" />
+                                <span>2. Ask for Order ID</span>
+                              </div>
+                              <span style={{ fontSize: '0.58rem', color: '#fbbf24' }}>[Placeholder]</span>
+                            </button>
+
+                            {/* Option 3: Send Dispute Money */}
+                            <button
+                              onClick={() => {
+                                if (playHapticSound) playHapticSound('chime');
+                                disputeWorkflow.simulateMerchantQuestion('send_money');
+                              }}
+                              disabled={disputeIncident.isThinking}
+                              style={{
+                                background: 'rgba(16, 185, 129, 0.16)',
+                                border: '1px solid rgba(16, 185, 129, 0.45)',
+                                borderRadius: '8px',
+                                padding: '6px 8px',
+                                color: '#d1fae5',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                                cursor: disputeIncident.isThinking ? 'default' : 'pointer',
+                                textAlign: 'left',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                opacity: disputeIncident.isThinking ? 0.5 : 1
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <CheckCircle2 size={13} color="#34d399" />
+                                <span>3. Send Dispute Money (Resolve)</span>
+                              </div>
+                              <span style={{ fontSize: '0.58rem', color: '#34d399' }}>Refund ₹450</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Resolved Status */}
+                        {disputeIncident.l2Stage === 'resolved' && (
+                          <div
+                            style={{
+                              fontSize: '0.66rem',
+                              color: '#34d399',
+                              background: 'rgba(16, 185, 129, 0.12)',
+                              border: '1px solid rgba(16, 185, 129, 0.25)',
+                              padding: '6px 8px',
+                              borderRadius: '6px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <CheckCircle2 size={13} color="#10b981" />
+                            <span>Refund of ₹{disputeIncident.amount} credited & logged to ledger.</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Clear / Reset Dispute Session Button */}
+                    {disputeIncident && (
+                      <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+                        <button
+                          className="panel-button"
+                          onClick={handleResetDispute}
+                          style={{
+                            width: '100%',
+                            fontSize: '0.68rem',
+                            padding: '0.35rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '5px',
+                            color: '#94a3b8'
+                          }}
+                        >
+                          <RotateCcw size={11} />
+                          <span>Clear / Reset Dispute Session</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
