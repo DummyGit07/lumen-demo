@@ -177,7 +177,9 @@ export default function NotificationShade({
                               </span>
                             )}
                           </div>
-                          <span className="shade-item-time">{item.time || 'Now'}</span>
+                          {!item.hideTimestamp && (
+                            <span className="shade-item-time">{item.time || 'Now'}</span>
+                          )}
                         </div>
                         <div className="shade-item-title">{item.title}</div>
                         <div className="shade-item-body">{item.body}</div>

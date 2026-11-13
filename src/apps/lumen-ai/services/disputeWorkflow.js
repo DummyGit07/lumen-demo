@@ -188,29 +188,41 @@ Neeraj`;
     const notifPayload = {
       id: notifId,
       appId: 'lumen_ai',
-      appName: 'Lumen',
-      autonomyBadge: autonomyBadgeMap[activeLevel] || 'L1 Autonomy',
+      appName: 'Lumen AI',
+      hideTimestamp: true,
+      autonomyBadge: autonomyBadgeMap[activeLevel] || 'L2 Autonomy',
       icon: 'AlertCircle',
       title: 'Duplicate Charge Detected',
-      body: `Lumen AI detected a duplicate payment of ₹${formattedAmount} to ${merchant}. Tap to review.`,
+      body: `Detected duplicate payment of ₹${formattedAmount} to ${merchant}.\nLumen prepared a formal dispute email for support@${merchant.toLowerCase()}.com`,
       color: '#f59e0b',
-      duration: 10000,
+      duration: 15000,
       onClickCard: () => {
         this.openActScreen();
       },
       actions: [
         {
-          label: 'View',
-          variant: 'primary',
+          iconOnly: 'dismiss',
+          variant: 'default',
+          onClick: () => {
+            this.resolveDispute();
+          }
+        },
+        {
+          label: 'Edit Draft',
+          variant: 'default',
+          openApp: true,
+          tab: 'act',
           onClick: () => {
             this.openActScreen();
           }
         },
         {
-          label: 'Dismiss',
-          variant: 'ghost',
+          label: 'Send Email',
+          variant: 'primary',
+          inPlace: true,
+          confirmationText: `✓ Email sent to ${merchant} Support`,
           onClick: () => {
-            this.resolveDispute();
+            this.sendInitialEmail();
           }
         }
       ]
@@ -310,30 +322,84 @@ Neeraj`;
       };
       trustStorage.setDisputeIncident(updatedWithMsg);
 
+      // Grounded directly from user's actual bank account in financeStorage
+      const banks = financeStorage.loadBanks();
+      const matchedBank =
+        banks.find(
+          (b) =>
+            b.id === incident.sourceId ||
+            b.name === incident.sourceName ||
+            b.id === 'bank-lumen' ||
+            b.shortName === 'Lumen'
+        ) || banks[0];
+      const accNumber = matchedBank?.fullAccountNumber || matchedBank?.accountNumber || '5010 0482 7719';
+      const bankName = matchedBank?.name || 'Lumen Bank';
+
+      const draftText = `Bank Account: ${accNumber} (${bankName}), Disputed Amount: ${amountStr}. Please initiate the refund to this account.`;
+
       // 3-second thinking animation, then insert draft directly into input
       this.thinkingTimer = setTimeout(() => {
         const cur = trustStorage.getDisputeIncident();
         if (!cur) return;
-        // Grounded directly from user's actual bank account in financeStorage
-        const banks = financeStorage.loadBanks();
-        const matchedBank =
-          banks.find(
-            (b) =>
-              b.id === cur.sourceId ||
-              b.name === cur.sourceName ||
-              b.id === 'bank-lumen' ||
-              b.shortName === 'Lumen'
-          ) || banks[0];
-        const accNumber = matchedBank?.fullAccountNumber || matchedBank?.accountNumber || '•••• 7719';
-        const bankName = matchedBank?.name || 'Lumen Bank';
-
-        const draftText = `Bank Account: ${accNumber} (${bankName}), Disputed Amount: ${amountStr}. Please initiate the refund to this account.`;
         trustStorage.setDisputeIncident({
           ...cur,
           isThinking: false,
           inputDraft: draftText
         });
       }, 3000);
+
+      // Dismiss existing notification if any
+      this.dismissActiveNotification();
+
+      // Trigger Stage 2 notification
+      const notifId = `notif-dispute-acc-${Date.now()}`;
+      this.activeNotifId = notifId;
+
+      const notifPayload = {
+        id: notifId,
+        appId: 'lumen_ai',
+        appName: `Lumen AI × ${merchant} Dispute`,
+        hideTimestamp: true,
+        autonomyBadge: 'L2 Autonomy',
+        icon: 'AlertCircle',
+        color: '#f59e0b',
+        duration: 20000,
+        isThinking: true,
+        thinkingDuration: 3000,
+        promptText: `${merchant}: "Please confirm your bank account number and disputed amount."`,
+        thinkingText: 'Lumen is drafting reply...',
+        draftText: `Lumen ready to send: A/C ${accNumber} (${bankName}) • ${amountStr}`,
+        onClickCard: () => {
+          this.openActScreen();
+        },
+        actions: [
+          {
+            iconOnly: 'dismiss',
+            variant: 'default',
+            onClick: () => {
+              this.dismissActiveNotification();
+            }
+          },
+          {
+            label: 'Send Reply',
+            variant: 'primary',
+            inPlace: true,
+            confirmationText: `✓ Sent to ${merchant} Support`,
+            onClick: () => {
+              this.sendUserChatMessage(draftText);
+            }
+          }
+        ]
+      };
+
+      if (this.notificationTrigger) {
+        this.notificationTrigger(notifPayload);
+      }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('lumen_trigger_notification', { detail: notifPayload })
+        );
+      }
     } else if (type === 'order_id') {
       // 2. Blinkit asks for Order ID
       const merchantMsg = {
@@ -363,6 +429,55 @@ Neeraj`;
           inputDraft: draftText
         });
       }, 3000);
+
+      // Dismiss existing notification if any
+      this.dismissActiveNotification();
+
+      const notifId = `notif-dispute-order-${Date.now()}`;
+      this.activeNotifId = notifId;
+
+      const notifPayload = {
+        id: notifId,
+        appId: 'lumen_ai',
+        appName: `Lumen AI × ${merchant} Dispute`,
+        hideTimestamp: true,
+        autonomyBadge: 'L2 Autonomy',
+        icon: 'AlertCircle',
+        color: '#f59e0b',
+        duration: 25000,
+        isThinking: true,
+        thinkingDuration: 3000,
+        promptText: `${merchant}: "Please share your ${merchant} Order ID to verify charge."`,
+        thinkingText: 'Lumen is preparing reply template...',
+        hasInlineInput: true,
+        inputPlaceholder: `Enter Order ID (e.g. BLK-89214)...`,
+        confirmationText: '✓ Order ID sent',
+        onSubmitInput: (orderId) => {
+          const fullText = `My ${merchant} Order ID is ${orderId.trim()}. Please verify this against the duplicate charge.`;
+          this.sendUserChatMessage(fullText);
+        },
+        onClickCard: () => {
+          this.openActScreen();
+        },
+        actions: [
+          {
+            iconOnly: 'dismiss',
+            variant: 'default',
+            onClick: () => {
+              this.dismissActiveNotification();
+            }
+          }
+        ]
+      };
+
+      if (this.notificationTrigger) {
+        this.notificationTrigger(notifPayload);
+      }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('lumen_trigger_notification', { detail: notifPayload })
+        );
+      }
     } else if (type === 'send_money') {
       // 3. Blinkit resolves the dispute and credits money
       const refundId = `TXN-REF-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -404,6 +519,9 @@ Neeraj`;
       financeStorage.saveTransactions([refundTxn, ...txns], false);
       financeStorage.notifyUpdate();
 
+      // Dismiss existing notification
+      this.dismissActiveNotification();
+
       // Trigger resolution push notification
       const notifId = `notif-refund-${Date.now()}`;
       this.activeNotifId = notifId;
@@ -411,20 +529,28 @@ Neeraj`;
       const notifPayload = {
         id: notifId,
         appId: 'lumen_ai',
-        appName: 'Lumen',
+        appName: 'Lumen AI',
+        hideTimestamp: true,
         autonomyBadge: 'L2 Autonomy',
         icon: 'CheckCircle2',
-        title: 'Dispute Amount Recovered',
-        body: `Dispute resolved: ${amountStr} credited to Lumen Bank (ID: ${refundId}). Tap to view.`,
+        title: 'Dispute Resolved',
+        body: `Dispute resolved: ${amountStr} credited to your Lumen Bank account balance.\nRefund Transaction ID: ${refundId}`,
         color: '#10b981',
-        duration: 10000,
+        duration: 15000,
         onClickCard: () => {
           this.openTransactionHistory();
           this.resolveDispute();
         },
         actions: [
           {
-            label: 'View History',
+            iconOnly: 'dismiss',
+            variant: 'default',
+            onClick: () => {
+              this.resolveDispute();
+            }
+          },
+          {
+            label: 'View Ledger',
             variant: 'primary',
             openApp: true,
             tab: 'glance',

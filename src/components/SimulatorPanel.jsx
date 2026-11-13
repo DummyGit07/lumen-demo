@@ -362,14 +362,14 @@ export default function SimulatorPanel({
                                 disputeIncident.l2Stage === 'chat_active'
                                   ? '#34d399'
                                   : disputeIncident.l2Stage === 'resolved'
-                                  ? '#10b981'
-                                  : '#fbbf24',
+                                    ? '#10b981'
+                                    : '#fbbf24',
                               background:
                                 disputeIncident.l2Stage === 'chat_active'
                                   ? 'rgba(16, 185, 129, 0.15)'
                                   : disputeIncident.l2Stage === 'resolved'
-                                  ? 'rgba(16, 185, 129, 0.2)'
-                                  : 'rgba(245, 158, 11, 0.15)',
+                                    ? 'rgba(16, 185, 129, 0.2)'
+                                    : 'rgba(245, 158, 11, 0.15)',
                               padding: '1px 6px',
                               borderRadius: '4px'
                             }}
@@ -377,13 +377,13 @@ export default function SimulatorPanel({
                             {disputeIncident.l2Stage === 'chat_active'
                               ? 'Chat Active'
                               : disputeIncident.l2Stage === 'resolved'
-                              ? 'Resolved'
-                              : 'Awaiting Email'}
+                                ? 'Resolved'
+                                : 'Awaiting Response'}
                           </span>
                         </div>
 
                         {/* Notice if user hasn't sent the email yet */}
-                        {(!disputeIncident.l2Stage || disputeIncident.l2Stage === 'email_draft') && (
+                        {/* {(!disputeIncident.l2Stage || disputeIncident.l2Stage === 'email_draft') && (
                           <div
                             style={{
                               fontSize: '0.66rem',
@@ -396,7 +396,7 @@ export default function SimulatorPanel({
                           >
                             ⏳ <em>Email draft ready in Act tab. Tap "Send Email" on the phone screen to start the support chat.</em>
                           </div>
-                        )}
+                        )} */}
 
                         {/* 3 Floating Action Options when chat is active */}
                         {disputeIncident.l2Stage === 'chat_active' && (
@@ -430,9 +430,8 @@ export default function SimulatorPanel({
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <CreditCard size={13} color="#38bdf8" />
-                                <span>1. Ask Account No. & Amount</span>
+                                <span>Ask Account No. & Amount</span>
                               </div>
-                              <span style={{ fontSize: '0.58rem', color: '#38bdf8' }}>3s Auto-fill</span>
                             </button>
 
                             {/* Option 2: Ask for Order ID */}
@@ -460,9 +459,8 @@ export default function SimulatorPanel({
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <Package size={13} color="#fbbf24" />
-                                <span>2. Ask for Order ID</span>
+                                <span>Ask for Order ID</span>
                               </div>
-                              <span style={{ fontSize: '0.58rem', color: '#fbbf24' }}>[Placeholder]</span>
                             </button>
 
                             {/* Option 3: Send Dispute Money */}
@@ -490,9 +488,8 @@ export default function SimulatorPanel({
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <CheckCircle2 size={13} color="#34d399" />
-                                <span>3. Send Dispute Money (Resolve)</span>
+                                <span>Send Dispute Money</span>
                               </div>
-                              <span style={{ fontSize: '0.58rem', color: '#34d399' }}>Refund ₹450</span>
                             </button>
                           </div>
                         )}
@@ -513,7 +510,7 @@ export default function SimulatorPanel({
                             }}
                           >
                             <CheckCircle2 size={13} color="#10b981" />
-                            <span>Refund of ₹{disputeIncident.amount} credited & logged to ledger.</span>
+                            <span>Refunded ₹{disputeIncident.amount} .</span>
                           </div>
                         )}
                       </div>
