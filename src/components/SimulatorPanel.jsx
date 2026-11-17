@@ -194,7 +194,7 @@ export default function SimulatorPanel({
             >
               <div className="sub-sim-title-group">
                 <ShieldAlert size={14} color="#ef4444" />
-                <span style={{ color: '#fff', fontWeight: 700 }}>Fraud Simulation</span>
+                <span style={{ color: '#fff', fontWeight: 700 }}>Credit Card Fraud</span>
               </div>
               <ChevronDown
                 size={14}
@@ -305,7 +305,7 @@ export default function SimulatorPanel({
             >
               <div className="sub-sim-title-group">
                 <AlertCircle size={14} color="#f59e0b" />
-                <span style={{ color: '#fff', fontWeight: 700 }}>Dispute Simulation</span>
+                <span style={{ color: '#fff', fontWeight: 700 }}>Double Transaction Dispute</span>
               </div>
               <ChevronDown
                 size={14}
@@ -642,7 +642,7 @@ export default function SimulatorPanel({
             >
               <div className="sub-sim-title-group">
                 <Bot size={14} color="#818cf8" />
-                <span style={{ color: '#fff', fontWeight: 700 }}>Agent Payment Request</span>
+                <span style={{ color: '#fff', fontWeight: 700 }}>External Agent Payment Request</span>
               </div>
               <ChevronDown
                 size={14}
