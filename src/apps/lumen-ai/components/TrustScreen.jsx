@@ -8,11 +8,13 @@ import {
   Globe2,
   Lock,
   ArrowRight,
-  X
+  X,
+  Bot
 } from 'lucide-react';
 import { trustStorage } from '../services/trustStorage';
 
 export default function TrustScreen({ onNavigateTab }) {
+  const [activeTab, setActiveTab] = useState('agents'); // 'agents' | 'autonomy'
   const [autonomyLevel, setAutonomyLevel] = useState(() => trustStorage.getAutonomyLevel());
   const [disputeAutonomyLevel, setDisputeAutonomyLevel] = useState(() => trustStorage.getDisputeAutonomyLevel());
 
@@ -170,252 +172,306 @@ export default function TrustScreen({ onNavigateTab }) {
         )}
       </AnimatePresence>
 
-      {/* ========================================================
-          1. SLEEK HORIZONTAL AUTONOMY SPECTRUM SLIDER
-          ======================================================== */}
-      <div
-        className="spectrum-card"
-        style={{
-          borderColor: isL1
-            ? 'rgba(56, 189, 248, 0.35)'
-            : isL2
-              ? 'rgba(245, 158, 11, 0.35)'
-              : 'rgba(16, 185, 129, 0.4)'
-        }}
-      >
-        <div className="spectrum-header">
-          <div className="spectrum-header-title">
-            <span>Card Mgmt</span>
-            <span
-              className="spectrum-badge"
-              style={{
-                color: themeColor,
-                background: badgeBg,
-                borderColor: badgeBorder
-              }}
-            >
-              {badgeLabel}
-            </span>
-          </div>
-
-          <button
-            className={`trust-info-trigger-btn ${activeInfoCard === 'spectrum' ? 'active' : ''}`}
-            onClick={() => toggleInfo('spectrum')}
-            onMouseEnter={() => setActiveInfoCard('spectrum')}
-            title="What is Autonomy Spectrum?"
-          >
-            <Info size={14} />
-          </button>
-        </div>
-
-        {/* Info Popover */}
-        <AnimatePresence>
-          {activeInfoCard === 'spectrum' && (
-            <motion.div
-              className="trust-info-popover"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="trust-info-popover-title">Autonomy Spectrum Explained</div>
-                <button
-                  onClick={() => setActiveInfoCard(null)}
-                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
-                >
-                  <X size={12} />
-                </button>
-              </div>
-              <div className="trust-info-popover-text">
-                Controls the authority you delegate to Lumen AI during fraud & unauthorized transactions.<br />
-                • <strong>L1 Guided:</strong> AI flags anomalies and provides step-by-step guidance in Ask. You freeze and order cards yourself.<br />
-                • <strong>L2 Semi-Auto:</strong> AI provides step-by-step confirmation. You approve card freeze first, then approve replacement.<br />
-                • <strong>L3 Autonomous:</strong> AI acts with 1-click &ldquo;Freeze &amp; Replace&rdquo;, automatically locking the card and issuing a ready-to-use digital card.
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Segmented Horizontal Slider Track */}
-        <div className="spectrum-track-container">
-          <div className="spectrum-track">
-            {/* Active sliding indicator background */}
-            <motion.div
-              className="spectrum-slider-thumb"
-              layout
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-              style={{
-                left: isL1 ? '2px' : isL2 ? 'calc(33.33% + 1px)' : 'calc(66.66% - 2px)',
-                width: 'calc(33.33% - 2px)',
-                background: isL1
-                  ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.35))'
-                  : isL2
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35))'
-                    : 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.35))',
-                borderColor: themeColor,
-                boxShadow: `0 0 16px ${isL1 ? 'rgba(56, 189, 248, 0.3)' : isL2 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
-              }}
-            />
-
-            {/* Segment 1: L1 Guided */}
-            <button
-              className={`spectrum-seg-btn ${isL1 ? 'active' : ''}`}
-              onClick={() => handleSelectAutonomy('l1')}
-            >
-              <span className="spectrum-seg-num" style={{ color: isL1 ? '#38bdf8' : '#94a3b8' }}>
-                L1
-              </span>
-              <span className="spectrum-seg-label">Guided</span>
-            </button>
-
-            {/* Segment 2: L2 Semi-Auto */}
-            <button
-              className={`spectrum-seg-btn ${isL2 ? 'active' : ''}`}
-              onClick={() => handleSelectAutonomy('l2')}
-            >
-              <span className="spectrum-seg-num" style={{ color: isL2 ? '#f59e0b' : '#94a3b8' }}>
-                L2
-              </span>
-              <span className="spectrum-seg-label">Semi-Auto</span>
-            </button>
-
-            {/* Segment 3: L3 Autonomous */}
-            <button
-              className={`spectrum-seg-btn ${isL3 ? 'active' : ''}`}
-              onClick={() => handleSelectAutonomy('l3')}
-            >
-              <span className="spectrum-seg-num" style={{ color: isL3 ? '#10b981' : '#94a3b8' }}>
-                L3
-              </span>
-              <span className="spectrum-seg-label">Autonomous</span>
-            </button>
-          </div>
-        </div>
+      {/* 2. Section Selector Tabs: Agent Limits vs Autonomy Levels */}
+      <div className="trust-tabs-container">
+        <button
+          className={`trust-tab-btn ${activeTab === 'agents' ? 'active' : ''}`}
+          onClick={() => setActiveTab('agents')}
+        >
+          <Bot size={14} />
+          <span>Agent Limits</span>
+        </button>
+        <button
+          className={`trust-tab-btn ${activeTab === 'autonomy' ? 'active' : ''}`}
+          onClick={() => setActiveTab('autonomy')}
+        >
+          <Sliders size={14} />
+          <span>Autonomy Levels</span>
+        </button>
       </div>
 
       {/* ========================================================
-          2. DISPUTE DETECTION AUTONOMY CARD
+          SECTION 1: AGENT LIMITS / CONFIGURATION
           ======================================================== */}
-      <div
-        className="spectrum-card"
-        style={{
-          marginTop: '14px',
-          borderColor: isDispL1
-            ? 'rgba(56, 189, 248, 0.35)'
-            : isDispL2
-              ? 'rgba(245, 158, 11, 0.35)'
-              : 'rgba(16, 185, 129, 0.4)'
-        }}
-      >
-        <div className="spectrum-header">
-          <div className="spectrum-header-title">
-            <span>Dispute Detection</span>
-            <span
-              className="spectrum-badge"
-              style={{
-                color: dispThemeColor,
-                background: dispBadgeBg,
-                borderColor: dispBadgeBorder
-              }}
-            >
-              {dispBadgeLabel}
-            </span>
+      {activeTab === 'agents' && (
+        <motion.div
+          key="agent-limits-section"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}
+        >
+          <div className="agent-config-placeholder-card">
+            <div className="agent-config-placeholder-icon">
+              <Bot size={26} />
+            </div>
+            <div>
+              <div className="agent-config-placeholder-title">Agent Configuration & Limits</div>
+              <div className="agent-config-placeholder-desc">
+                Configure authorized AI agents (e.g. Alexa, ChatGPT, Copilot) and define spending guardrails.
+              </div>
+            </div>
           </div>
+        </motion.div>
+      )}
 
-          <button
-            className={`trust-info-trigger-btn ${activeInfoCard === 'dispute' ? 'active' : ''}`}
-            onClick={() => toggleInfo('dispute')}
-            onMouseEnter={() => setActiveInfoCard('dispute')}
-            title="What is Dispute Detection Autonomy?"
+      {/* ========================================================
+          SECTION 2: AUTONOMY LEVELS (Card Mgmt & Dispute Detection)
+          ======================================================== */}
+      {activeTab === 'autonomy' && (
+        <motion.div
+          key="autonomy-levels-section"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}
+        >
+          {/* Card Mgmt Autonomy Card */}
+          <div
+            className="spectrum-card"
+            style={{
+              borderColor: isL1
+                ? 'rgba(56, 189, 248, 0.35)'
+                : isL2
+                  ? 'rgba(245, 158, 11, 0.35)'
+                  : 'rgba(16, 185, 129, 0.4)'
+            }}
           >
-            <Info size={14} />
-          </button>
-        </div>
-
-        {/* Info Popover */}
-        <AnimatePresence>
-          {activeInfoCard === 'dispute' && (
-            <motion.div
-              className="trust-info-popover"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="trust-info-popover-title">Dispute Detection Autonomy</div>
-                <button
-                  onClick={() => setActiveInfoCard(null)}
-                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+            <div className="spectrum-header">
+              <div className="spectrum-header-title">
+                <span>Card Mgmt</span>
+                <span
+                  className="spectrum-badge"
+                  style={{
+                    color: themeColor,
+                    background: badgeBg,
+                    borderColor: badgeBorder
+                  }}
                 >
-                  <X size={12} />
+                  {badgeLabel}
+                </span>
+              </div>
+
+              <button
+                className={`trust-info-trigger-btn ${activeInfoCard === 'spectrum' ? 'active' : ''}`}
+                onClick={() => toggleInfo('spectrum')}
+                onMouseEnter={() => setActiveInfoCard('spectrum')}
+                title="What is Autonomy Spectrum?"
+              >
+                <Info size={14} />
+              </button>
+            </div>
+
+            {/* Info Popover */}
+            <AnimatePresence>
+              {activeInfoCard === 'spectrum' && (
+                <motion.div
+                  className="trust-info-popover"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="trust-info-popover-title">Autonomy Spectrum Explained</div>
+                    <button
+                      onClick={() => setActiveInfoCard(null)}
+                      style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <div className="trust-info-popover-text">
+                    Controls the authority you delegate to Lumen AI during fraud & unauthorized transactions.<br />
+                    • <strong>L1 Guided:</strong> AI flags anomalies and provides step-by-step guidance in Ask. You freeze and order cards yourself.<br />
+                    • <strong>L2 Semi-Auto:</strong> AI provides step-by-step confirmation. You approve card freeze first, then approve replacement.<br />
+                    • <strong>L3 Autonomous:</strong> AI acts with 1-click &ldquo;Freeze &amp; Replace&rdquo;, automatically locking the card and issuing a ready-to-use digital card.
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Segmented Horizontal Slider Track */}
+            <div className="spectrum-track-container">
+              <div className="spectrum-track">
+                {/* Active sliding indicator background */}
+                <motion.div
+                  className="spectrum-slider-thumb"
+                  layout
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  style={{
+                    left: isL1 ? '2px' : isL2 ? 'calc(33.33% + 1px)' : 'calc(66.66% - 2px)',
+                    width: 'calc(33.33% - 2px)',
+                    background: isL1
+                      ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.35))'
+                      : isL2
+                        ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35))'
+                        : 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.35))',
+                    borderColor: themeColor,
+                    boxShadow: `0 0 16px ${isL1 ? 'rgba(56, 189, 248, 0.3)' : isL2 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
+                  }}
+                />
+
+                {/* Segment 1: L1 Guided */}
+                <button
+                  className={`spectrum-seg-btn ${isL1 ? 'active' : ''}`}
+                  onClick={() => handleSelectAutonomy('l1')}
+                >
+                  <span className="spectrum-seg-num" style={{ color: isL1 ? '#38bdf8' : '#94a3b8' }}>
+                    L1
+                  </span>
+                  <span className="spectrum-seg-label">Guided</span>
+                </button>
+
+                {/* Segment 2: L2 Semi-Auto */}
+                <button
+                  className={`spectrum-seg-btn ${isL2 ? 'active' : ''}`}
+                  onClick={() => handleSelectAutonomy('l2')}
+                >
+                  <span className="spectrum-seg-num" style={{ color: isL2 ? '#f59e0b' : '#94a3b8' }}>
+                    L2
+                  </span>
+                  <span className="spectrum-seg-label">Semi-Auto</span>
+                </button>
+
+                {/* Segment 3: L3 Autonomous */}
+                <button
+                  className={`spectrum-seg-btn ${isL3 ? 'active' : ''}`}
+                  onClick={() => handleSelectAutonomy('l3')}
+                >
+                  <span className="spectrum-seg-num" style={{ color: isL3 ? '#10b981' : '#94a3b8' }}>
+                    L3
+                  </span>
+                  <span className="spectrum-seg-label">Autonomous</span>
                 </button>
               </div>
-              <div className="trust-info-popover-text">
-                Monitors and resolves unintentional duplicate transactions sent to the same merchant or recipient.<br />
-                • <strong>L1 Guided:</strong> Flags duplicate payments with full transaction IDs and alerts you. You review and mark complete manually.<br />
-                • <strong>L2 Semi-Auto:</strong> Flags duplicate payments and prepares a 1-click merchant reversal request with step-by-step confirmation.<br />
-                • <strong>L3 Autonomous:</strong> AI automatically initiates real-time payment gateway chargeback or reversal without requiring manual confirmation.
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Segmented Horizontal Slider Track */}
-        <div className="spectrum-track-container">
-          <div className="spectrum-track">
-            {/* Active sliding indicator background */}
-            <motion.div
-              className="spectrum-slider-thumb"
-              layout
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-              style={{
-                left: isDispL1 ? '2px' : isDispL2 ? 'calc(33.33% + 1px)' : 'calc(66.66% - 2px)',
-                width: 'calc(33.33% - 2px)',
-                background: isDispL1
-                  ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.35))'
-                  : isDispL2
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35))'
-                    : 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.35))',
-                borderColor: dispThemeColor,
-                boxShadow: `0 0 16px ${isDispL1 ? 'rgba(56, 189, 248, 0.3)' : isDispL2 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
-              }}
-            />
-
-            {/* Segment 1: L1 Guided */}
-            <button
-              className={`spectrum-seg-btn ${isDispL1 ? 'active' : ''}`}
-              onClick={() => handleSelectDisputeAutonomy('l1')}
-            >
-              <span className="spectrum-seg-num" style={{ color: isDispL1 ? '#38bdf8' : '#94a3b8' }}>
-                L1
-              </span>
-              <span className="spectrum-seg-label">Guided</span>
-            </button>
-
-            {/* Segment 2: L2 Semi-Auto */}
-            <button
-              className={`spectrum-seg-btn ${isDispL2 ? 'active' : ''}`}
-              onClick={() => handleSelectDisputeAutonomy('l2')}
-            >
-              <span className="spectrum-seg-num" style={{ color: isDispL2 ? '#f59e0b' : '#94a3b8' }}>
-                L2
-              </span>
-              <span className="spectrum-seg-label">Semi-Auto</span>
-            </button>
-
-            {/* Segment 3: L3 Autonomous */}
-            <button
-              className={`spectrum-seg-btn ${isDispL3 ? 'active' : ''}`}
-              onClick={() => handleSelectDisputeAutonomy('l3')}
-            >
-              <span className="spectrum-seg-num" style={{ color: isDispL3 ? '#10b981' : '#94a3b8' }}>
-                L3
-              </span>
-              <span className="spectrum-seg-label">Autonomous</span>
-            </button>
+            </div>
           </div>
-        </div>
-      </div>
+
+          {/* Dispute Detection Autonomy Card */}
+          <div
+            className="spectrum-card"
+            style={{
+              marginTop: '2px',
+              borderColor: isDispL1
+                ? 'rgba(56, 189, 248, 0.35)'
+                : isDispL2
+                  ? 'rgba(245, 158, 11, 0.35)'
+                  : 'rgba(16, 185, 129, 0.4)'
+            }}
+          >
+            <div className="spectrum-header">
+              <div className="spectrum-header-title">
+                <span>Dispute Detection</span>
+                <span
+                  className="spectrum-badge"
+                  style={{
+                    color: dispThemeColor,
+                    background: dispBadgeBg,
+                    borderColor: dispBadgeBorder
+                  }}
+                >
+                  {dispBadgeLabel}
+                </span>
+              </div>
+
+              <button
+                className={`trust-info-trigger-btn ${activeInfoCard === 'dispute' ? 'active' : ''}`}
+                onClick={() => toggleInfo('dispute')}
+                onMouseEnter={() => setActiveInfoCard('dispute')}
+                title="What is Dispute Detection Autonomy?"
+              >
+                <Info size={14} />
+              </button>
+            </div>
+
+            {/* Info Popover */}
+            <AnimatePresence>
+              {activeInfoCard === 'dispute' && (
+                <motion.div
+                  className="trust-info-popover"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="trust-info-popover-title">Dispute Detection Autonomy</div>
+                    <button
+                      onClick={() => setActiveInfoCard(null)}
+                      style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <div className="trust-info-popover-text">
+                    Monitors and resolves unintentional duplicate transactions sent to the same merchant or recipient.<br />
+                    • <strong>L1 Guided:</strong> Flags duplicate payments with full transaction IDs and alerts you. You review and mark complete manually.<br />
+                    • <strong>L2 Semi-Auto:</strong> Flags duplicate payments and prepares a 1-click merchant reversal request with step-by-step confirmation.<br />
+                    • <strong>L3 Autonomous:</strong> AI automatically initiates real-time payment gateway chargeback or reversal without requiring manual confirmation.
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Segmented Horizontal Slider Track */}
+            <div className="spectrum-track-container">
+              <div className="spectrum-track">
+                {/* Active sliding indicator background */}
+                <motion.div
+                  className="spectrum-slider-thumb"
+                  layout
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  style={{
+                    left: isDispL1 ? '2px' : isDispL2 ? 'calc(33.33% + 1px)' : 'calc(66.66% - 2px)',
+                    width: 'calc(33.33% - 2px)',
+                    background: isDispL1
+                      ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.35))'
+                      : isDispL2
+                        ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35))'
+                        : 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.35))',
+                    borderColor: dispThemeColor,
+                    boxShadow: `0 0 16px ${isDispL1 ? 'rgba(56, 189, 248, 0.3)' : isDispL2 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
+                  }}
+                />
+
+                {/* Segment 1: L1 Guided */}
+                <button
+                  className={`spectrum-seg-btn ${isDispL1 ? 'active' : ''}`}
+                  onClick={() => handleSelectDisputeAutonomy('l1')}
+                >
+                  <span className="spectrum-seg-num" style={{ color: isDispL1 ? '#38bdf8' : '#94a3b8' }}>
+                    L1
+                  </span>
+                  <span className="spectrum-seg-label">Guided</span>
+                </button>
+
+                {/* Segment 2: L2 Semi-Auto */}
+                <button
+                  className={`spectrum-seg-btn ${isDispL2 ? 'active' : ''}`}
+                  onClick={() => handleSelectDisputeAutonomy('l2')}
+                >
+                  <span className="spectrum-seg-num" style={{ color: isDispL2 ? '#f59e0b' : '#94a3b8' }}>
+                    L2
+                  </span>
+                  <span className="spectrum-seg-label">Semi-Auto</span>
+                </button>
+
+                {/* Segment 3: L3 Autonomous */}
+                <button
+                  className={`spectrum-seg-btn ${isDispL3 ? 'active' : ''}`}
+                  onClick={() => handleSelectDisputeAutonomy('l3')}
+                >
+                  <span className="spectrum-seg-num" style={{ color: isDispL3 ? '#10b981' : '#94a3b8' }}>
+                    L3
+                  </span>
+                  <span className="spectrum-seg-label">Autonomous</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div >
   );
 }
