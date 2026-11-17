@@ -40,6 +40,7 @@ export default function GlanceScreen({
   } = finance;
 
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [payPrefillData, setPayPrefillData] = useState(null);
   const [isAllTxnsOpen, setIsAllTxnsOpen] = useState(() => {
     if (typeof window !== 'undefined' && window.__lumen_auto_open_txns) {
       window.__lumen_auto_open_txns = false;
@@ -83,6 +84,40 @@ export default function GlanceScreen({
     };
     window.addEventListener('lumen_open_transactions', handleOpenTransactions);
     return () => window.removeEventListener('lumen_open_transactions', handleOpenTransactions);
+  }, []);
+
+  // Auto open individual transaction detail modal when triggered externally (e.g. from notification "View")
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.__lumen_selected_txn) {
+      setSelectedTxn(window.__lumen_selected_txn);
+      window.__lumen_selected_txn = null;
+    }
+
+    const handleOpenTxnDetail = (e) => {
+      const txn = e.detail;
+      if (txn) {
+        setSelectedTxn(txn);
+      }
+    };
+    window.addEventListener('lumen_open_transaction_detail', handleOpenTxnDetail);
+    return () => window.removeEventListener('lumen_open_transaction_detail', handleOpenTxnDetail);
+  }, []);
+
+  // Auto open prefilled pay modal when triggered externally (e.g. from unregistered agent review)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.__lumen_prefilled_pay) {
+      setPayPrefillData(window.__lumen_prefilled_pay);
+      setIsPayModalOpen(true);
+      window.__lumen_prefilled_pay = null;
+    }
+
+    const handlePrefilledPay = (e) => {
+      const data = e.detail;
+      setPayPrefillData(data);
+      setIsPayModalOpen(true);
+    };
+    window.addEventListener('lumen_open_prefilled_pay', handlePrefilledPay);
+    return () => window.removeEventListener('lumen_open_prefilled_pay', handlePrefilledPay);
   }, []);
 
   // Auto open recurring modal when triggered externally (e.g., from notification)
@@ -407,10 +442,14 @@ export default function GlanceScreen({
       {/* Interactive Pay Sheet Modal */}
       <PayModal
         isOpen={isPayModalOpen}
-        onClose={() => setIsPayModalOpen(false)}
+        onClose={() => {
+          setIsPayModalOpen(false);
+          setPayPrefillData(null);
+        }}
         banks={banks}
         cards={cards}
         onExecutePayment={executePayment}
+        initialData={payPrefillData}
       />
 
       {/* Full Transaction History Modal */}

@@ -19,12 +19,17 @@ import {
   CreditCard,
   CheckCircle2,
   Package,
-  MessageSquare
+  MessageSquare,
+  Bot
 } from 'lucide-react';
 import { fraudWorkflow } from '../apps/lumen-ai/services/fraudWorkflow';
 import { disputeWorkflow } from '../apps/lumen-ai/services/disputeWorkflow';
+import { agentWorkflow } from '../apps/lumen-ai/services/agentWorkflow';
+import { agentStorage } from '../apps/lumen-ai/services/agentStorage';
 import { trustStorage } from '../apps/lumen-ai/services/trustStorage';
 import { financeStorage } from '../apps/lumen-ai/services/financeStorage';
+
+const STANDARD_SIM_AGENTS = ['Alexa', 'ChatGPT', 'Gemini', 'Copilot', 'Siri'];
 
 export default function SimulatorPanel({
   isNotificationShadeOpen,
@@ -57,6 +62,11 @@ export default function SimulatorPanel({
   const [disputeIncident, setDisputeIncident] = useState(() => trustStorage.getDisputeIncident());
   const [simFeedback, setSimFeedback] = useState('');
 
+  // Agent Payment Simulation state
+  const [configuredAgents, setConfiguredAgents] = useState(() => agentStorage.getAgents());
+  const [selectedAgentName, setSelectedAgentName] = useState('Alexa');
+  const [agentRequestAmount, setAgentRequestAmount] = useState('3500');
+
   // Keep autonomy level synced with Trust screen settings
   useEffect(() => {
     const unsub = trustStorage.subscribe((event, data) => {
@@ -70,6 +80,19 @@ export default function SimulatorPanel({
     });
     return unsub;
   }, []);
+
+  // Sync configured agents with agentStorage updates
+  useEffect(() => {
+    const unsub = agentStorage.subscribe((event, data) => {
+      if (event === 'agents_updated') {
+        setConfiguredAgents(data);
+        if (selectedAgentName !== '__unregistered__' && !data.some((a) => a.name === selectedAgentName)) {
+          setSelectedAgentName(data[0]?.name || '__unregistered__');
+        }
+      }
+    });
+    return unsub;
+  }, [selectedAgentName]);
 
   const toggleSection = (id) => {
     if (playHapticSound) playHapticSound('click');
@@ -109,14 +132,42 @@ export default function SimulatorPanel({
     setTimeout(() => setSimFeedback(''), 2500);
   };
 
+  const handleSimulateAgentPayment = () => {
+    if (playHapticSound) playHapticSound('click');
+    const amt = parseFloat(agentRequestAmount);
+    if (isNaN(amt) || amt <= 0) {
+      setSimFeedback('Please enter a valid request amount');
+      setTimeout(() => setSimFeedback(''), 2500);
+      return;
+    }
+
+    const result = agentWorkflow.simulatePaymentRequest({
+      agentName: selectedAgentName,
+      amount: amt
+    });
+
+    if (result.status === 'unregistered') {
+      setSimFeedback(`Unregistered agent (${selectedAgentName}) requested ₹${amt}!`);
+    } else if (result.status === 'limit_exceeded') {
+      setSimFeedback(`${selectedAgentName} exceeded limit (₹${amt})!`);
+    } else if (result.status === 'insufficient_balance') {
+      setSimFeedback(`Insufficient balance for ${selectedAgentName}!`);
+    } else {
+      setSimFeedback(`₹${amt} debited for ${selectedAgentName}!`);
+    }
+    setTimeout(() => setSimFeedback(''), 3500);
+  };
+
   const handleResetFinance = () => {
     if (playHapticSound) playHapticSound('click');
     financeStorage.resetAll();
+    agentStorage.resetAgentSpends();
     trustStorage.clearFraudIncident();
     trustStorage.clearDisputeIncident();
     disputeWorkflow.dismissActiveNotification();
     fraudWorkflow.dismissActiveNotification();
-    setSimFeedback('Card balances & incidents reset!');
+    agentWorkflow.dismissActiveNotification();
+    setSimFeedback('Card balances, incidents & agent spends reset!');
     setTimeout(() => setSimFeedback(''), 2500);
   };
 
@@ -581,6 +632,117 @@ export default function SimulatorPanel({
               {simFeedback}
             </div>
           )}
+
+          {/* 3. Sub-Simulator: Agent Payment Request */}
+          <div className={`sub-sim-item ${openSections.agent_simulation ? 'open' : ''}`} style={{ borderColor: 'rgba(99, 102, 241, 0.35)' }}>
+            <div
+              className="sub-sim-header"
+              onClick={() => toggleSection('agent_simulation')}
+              style={{ background: 'rgba(99, 102, 241, 0.08)' }}
+            >
+              <div className="sub-sim-title-group">
+                <Bot size={14} color="#818cf8" />
+                <span style={{ color: '#fff', fontWeight: 700 }}>Agent Payment Request</span>
+              </div>
+              <ChevronDown
+                size={14}
+                className={`sub-sim-chevron ${openSections.agent_simulation ? 'open' : ''}`}
+              />
+            </div>
+            <AnimatePresence>
+              {openSections.agent_simulation && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="sub-sim-body" style={{ background: 'rgba(15, 23, 42, 0.4)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {/* Agent Selection (Only Names as requested) */}
+                    <div>
+                      <label style={{ fontSize: '0.64rem', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                        Select Agent:
+                      </label>
+                      <select
+                        value={selectedAgentName}
+                        onChange={(e) => setSelectedAgentName(e.target.value)}
+                        style={{
+                          width: '100%',
+                          background: 'rgba(0, 0, 0, 0.4)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          borderRadius: '8px',
+                          padding: '6px 8px',
+                          color: '#fff',
+                          fontSize: '0.72rem',
+                          outline: 'none'
+                        }}
+                      >
+                        {Array.from(
+                          new Set([
+                            ...STANDARD_SIM_AGENTS,
+                            ...configuredAgents.map((ag) => ag.name)
+                          ])
+                        ).map((name) => (
+                          <option key={name} value={name}>
+                            {name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Amount Input */}
+                    <div>
+                      <label style={{ fontSize: '0.64rem', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                        Request Amount (₹):
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={agentRequestAmount}
+                        onChange={(e) => setAgentRequestAmount(e.target.value)}
+                        placeholder="e.g. 3500"
+                        style={{
+                          width: '100%',
+                          background: 'rgba(0, 0, 0, 0.4)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          borderRadius: '8px',
+                          padding: '6px 8px',
+                          color: '#fff',
+                          fontSize: '0.74rem',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    {/* Trigger Button */}
+                    <button
+                      className="panel-button active"
+                      onClick={handleSimulateAgentPayment}
+                      style={{
+                        width: '100%',
+                        background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                        border: 'none',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: '0.74rem',
+                        padding: '0.55rem 0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)',
+                        marginTop: '2px'
+                      }}
+                    >
+                      <Bot size={13} color="#fff" />
+                      <span>Simulate Payment Request</span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* 1. Sub-Simulator: Notifications */}
           <div className={`sub-sim-item ${openSections.notifications ? 'open' : ''}`}>

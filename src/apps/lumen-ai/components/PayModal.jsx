@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, ArrowRight, ShieldCheck, Zap, AlertCircle } from 'lucide-react';
 
@@ -7,16 +7,26 @@ export default function PayModal({
   onClose,
   banks = [],
   cards = [],
-  onExecutePayment
+  onExecutePayment,
+  initialData = null
 }) {
-  const [recipient, setRecipient] = useState('');
-  const [upiId, setUpiId] = useState('');
-  const [amount, setAmount] = useState('');
+  const [recipient, setRecipient] = useState(initialData?.recipient || '');
+  const [upiId, setUpiId] = useState(initialData?.upiId || '');
+  const [amount, setAmount] = useState(initialData?.amount ? String(initialData.amount) : '');
   const [selectedMethodId, setSelectedMethodId] = useState(banks[0]?.id || cards[0]?.id || '');
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(initialData?.note || '');
   const [status, setStatus] = useState(null); // null | 'success' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [lastTxn, setLastTxn] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && initialData) {
+      if (initialData.recipient) setRecipient(initialData.recipient);
+      if (initialData.upiId) setUpiId(initialData.upiId);
+      if (initialData.amount) setAmount(String(initialData.amount));
+      if (initialData.note) setNote(initialData.note);
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -127,7 +137,7 @@ export default function PayModal({
             </div>
 
             <button className="lumen-primary-action-btn" onClick={handleResetAndClose}>
-              Done & Return to Glance
+              Done
             </button>
           </div>
         ) : (

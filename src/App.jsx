@@ -19,6 +19,7 @@ import LumenAiApp from './apps/lumen-ai/LumenAiApp';
 import GmailApp from './apps/gmail/GmailApp';
 import { fraudWorkflow } from './apps/lumen-ai/services/fraudWorkflow';
 import { disputeWorkflow } from './apps/lumen-ai/services/disputeWorkflow';
+import { agentWorkflow } from './apps/lumen-ai/services/agentWorkflow';
 
 import { INITIAL_APPS, WALLPAPERS, SAMPLE_NOTIFICATIONS } from './constants/apps';
 
@@ -305,6 +306,11 @@ export default function App() {
       navigateApp: navHandler
     });
 
+    agentWorkflow.init({
+      triggerNotification,
+      dismissNotification
+    });
+
     const handleGlobalTrigger = (e) => {
       if (e.detail) {
         triggerNotification(e.detail);
@@ -328,14 +334,21 @@ export default function App() {
       }
     };
 
+    const handleGlobalPrefilledPay = () => {
+      setActiveAppId('lumen_ai');
+      setInternalAppScreens((prev) => ({ ...prev, lumen_ai: 'glance' }));
+    };
+
     window.addEventListener('lumen_trigger_notification', handleGlobalTrigger);
     window.addEventListener('lumen_dismiss_notification', handleGlobalDismiss);
     window.addEventListener('lumen_navigate_app', handleGlobalNavApp);
+    window.addEventListener('lumen_open_prefilled_pay', handleGlobalPrefilledPay);
 
     return () => {
       window.removeEventListener('lumen_trigger_notification', handleGlobalTrigger);
       window.removeEventListener('lumen_dismiss_notification', handleGlobalDismiss);
       window.removeEventListener('lumen_navigate_app', handleGlobalNavApp);
+      window.removeEventListener('lumen_open_prefilled_pay', handleGlobalPrefilledPay);
     };
   }, []);
 
